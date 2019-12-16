@@ -1,4 +1,12 @@
+var aaaa;
+if (aaaa) { console.log('yes'); } else { console.log('nicht hgesettz'); }
 var colorDisabled = "#bcd";
+function test() {
+	var foo;
+	bar;
+	return foo;
+}
+
 
 function Frame(content, title, className) {
     this.content=content;
@@ -5935,7 +5943,7 @@ function BewertungApp() {
 		}
 	}
 
-	this.start=function() {
+	this.start = function() {
 		/*
 		let i;
         let elements = document.getElementsByTagName("input");
@@ -5960,10 +5968,11 @@ function BewertungApp() {
 			}
 		}
 		
-		
-		document.getElementById('sachdatenanzeige_save_button').onclick="";
-		document.getElementById('sachdatenanzeige_save_button').addEventListener("click", this.beforeSubmit.bind(this));
-
+		var button = document.getElementById('sachdatenanzeige_save_button');
+		if (button) {
+			button.onclick = "";
+			button.addEventListener("click", this.beforeSubmit.bind(this));
+		}
 	}
 	
 	if (!Number.isNumber) {

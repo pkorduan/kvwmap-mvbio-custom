@@ -1,0 +1,40 @@
+/* custom styles */
+#neuer_datensatz_button {
+	display: block;
+	position: relative;
+	text-align: right;
+	margin-right: 8px;
+}
+
+.message-box-msg {
+	text-align: left;
+}
+
+.pointer:hover {
+	color: #993333;
+	cursor: pointer;
+}
+
+#geo_name_search_field {
+  width: 100%;
+}
+
+#search_div {
+  display: none;
+}
+
+#openLayerParamBarIcon{
+	width: 16px; 
+	height: 16px; 
+	padding: 5px; 
+	font-size: 1.1em;
+	margin: 0 5px 0 5px;
+}
+
+.gle_attribute_value {
+	min-width: 75px;
+}
+
+#datensatz :focus, #datensatz .buttonlink:focus, #datensatz a:focus{
+	outline: 3px solid orange;
+}

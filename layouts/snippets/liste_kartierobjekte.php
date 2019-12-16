@@ -14,10 +14,12 @@
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
 
 <div style="min-height: 500px; height: 100%"><?php
-	if ($this->formvars['user_id'] != '') {
+	# Filter auf nur eigene, wenn user_id belegt ist oder bearbeitungsstufe auf inn Erfassung
+	if ($this->formvars['user_id'] != '' OR $this->formvars['bearbeitungsstufe'] == 1) {
 		$user_id_filter = '&value_user_id=' . $this->user->id . '&operator_user_id==';
 		$subtitle = 'nur eigene';
 	}
+
 	$bearbeitungsstufe = new PgObject($this, 'mvbio', 'code_bearbeitungsstufen');
 	$bearbeitungsstufen = $bearbeitungsstufe->getSQLResults("
 		SELECT
@@ -32,7 +34,6 @@
 	if ($this->formvars['bearbeitungsstufe'] == '') {
 		array_unshift($bearbeitungsstufen, array('value' => '', 'output' => '--- Bearbeitungsstufe wählen ---'));
 	}
-
 	$bearbeitungsstufe_filter = '';
 	if ($this->formvars['bearbeitungsstufe'] != '') {
 		$bearbeitungsstufe_filter = '&value_bearbeitungsstufe=' . $this->formvars['bearbeitungsstufe'] . '&operator_bearbeitungsstufe==';
@@ -75,7 +76,18 @@
 			Die Kartierobjekte werden erst gelöscht wenn der Prüfer das dazugehörige Kartiergebiet löscht. Mit der Funktion werden die alten im Archiv historisch und die neu in das Archiv überführten aktuell. Die Kartierobjekte erscheinen dann in keiner Liste von Kartierobjekten mehr.
 			Kartierkampagnen sind vom Prüfer manuell zu löschen. Auch in der Layerdefinition bzw. bei den Klassen und Styles etc.
 		*/
-	} ?>
+	}
+
+	# Stellen den Filter so ein, dass Kartierer keine Kartierungen von anderen sehen, die noch in der Erfassung sind
+	if ($bearbeitungsstufe_filter == '' AND $user_id_filter == '') {
+		$filter = '&searchmask_count=1&value_user_id=' . $this->user->id . '&operator_user_id==&boolean_operator_1=OR&1_value_bearbeitungsstufe=1&1_operator_bearbeitungsstufe=%3E';
+	}
+	else {
+		$filter = $user_id_filter . $bearbeitungsstufe_filter;
+	}
+	#echo '<p>go=Layer-Suche_Suchen&selected_layer_id=146' . $filter . '&anzahl=10000&mime_type=formatter&format=json';
+	
+	 ?>
 	<h2 style="display: inline">Kartierobjekte</h2><?
 	echo FormObject::createSelectField(
 		'bearbeitungsstand_filter_selector',
@@ -85,7 +97,7 @@
 		'float: right; margin-right: 10px; margin-top: 9px; width: 248px;',
 		"window.location.href='index.php?go=show_snippet&snippet=liste_kartierobjekte&bearbeitungsstufe=' + $(this).val() + '&user_id=" . $this->formvars['user_id'] . "'"
 	);
-	if ($this->Stelle->Bezeichnung == 'Kartierung') {
+	if ($this->Stelle->Bezeichnung == 'Kartierung' AND $bearbeitungsstufe->get('stufe') > 1) {
 		echo FormObject::createSelectField(
 			'user_filter_selector',
 			array(
@@ -136,7 +148,7 @@
 			data-show-refresh="false"
 			data-show-toggle="true"
 			data-show-columns="true"
-			data-query-params="go=Layer-Suche_Suchen&selected_layer_id=146<?php echo $user_id_filter . $bearbeitungsstufe_filter; ?>&anzahl=10000&mime_type=formatter&format=json"
+			data-query-params="go=Layer-Suche_Suchen&selected_layer_id=146<?php echo $filter; ?>&anzahl=10000&mime_type=formatter&format=json"
 			data-pagination="true"
 			data-page-size="100"
 			data-toggle="table"
@@ -330,60 +342,62 @@
 				}*/
 			};
 
-			function updateBearbeitungsstand(stufe, stand) {
-				var selected_rows = $('#kartierungen_table').bootstrapTable('getSelections'),
-						kartierung_ids = $.map(
-							selected_rows,
-							function(row) {
-								if (row.stand != stand) {
-									return row.kartierung_id;
-								}
-							}
-						);
-
-				if (kartierung_ids.length > 0) {
-					console.log('Update selected kartierung_ids: ' + kartierung_ids)
-					$.ajax({
-						url: 'index.php',
-						data: {
-							go: "show_snippet",
-							snippet: "update_bearbeitungsstaende",
-							mime_type: "application/json",
-							format: "json",
-							stufe_alt: <? echo $this->formvars['bearbeitungsstufe']; ?>,
-							stufe_neu: stufe,
-							kartierung_ids: kartierung_ids
-						},
-						success: function(response) {
-							var result = JSON.parse(response)[0];
-							console.log(result);
-							if (result.kartierung_ids.length > 0) {
-								$.map(
-									selected_rows,
-									function (row) {
-										if ($.inArray(row.kartierung_id, result.kartierung_ids) > -1) {
-											row.stand = stand;
-											$('#kartierungen_table').bootstrapTable('updateByUniqueId', {
-												id: row.kartierung_id,
-												row: row
-											});
-										}
+			function updateBearbeitungsstand(stufe, stand) { <?
+				if ($this->formvars['bearbeitungsstufe'] != '') { ?>
+					var selected_rows = $('#kartierungen_table').bootstrapTable('getSelections'),
+							kartierung_ids = $.map(
+								selected_rows,
+								function(row) {
+									if (row.stand != stand) {
+										return row.kartierung_id;
 									}
-								);
-								message([{ type: 'notice', msg: 'Bearbeitungsstufe erfolgreich geändert für Objekte mit Id: ' + result.kartierung_ids.join(', ') }]);
+								}
+							);
+
+					if (kartierung_ids.length > 0) {
+						console.log('Update selected kartierung_ids: ' + kartierung_ids)
+						$.ajax({
+							url: 'index.php',
+							data: {
+								go: "show_snippet",
+								snippet: "update_bearbeitungsstaende",
+								mime_type: "application/json",
+								format: "json",
+								stufe_alt: <? echo $this->formvars['bearbeitungsstufe']; ?>,
+								stufe_neu: stufe,
+								kartierung_ids: kartierung_ids
+							},
+							success: function(response) {
+								var result = JSON.parse(response)[0];
+								console.log(result);
+								if (result.kartierung_ids.length > 0) {
+									$.map(
+										selected_rows,
+										function (row) {
+											if ($.inArray(row.kartierung_id, result.kartierung_ids) > -1) {
+												row.stand = stand;
+												$('#kartierungen_table').bootstrapTable('updateByUniqueId', {
+													id: row.kartierung_id,
+													row: row
+												});
+											}
+										}
+									);
+									message([{ type: 'notice', msg: 'Bearbeitungsstufe erfolgreich geändert für Objekte mit Id: ' + result.kartierung_ids.join(', ') }]);
+								}
+								if (result.success == false) {
+									message([{ type: 'error', msg: result.msg}]);
+								}
+							},
+							error: function(xhr) {
+								alert('Fehler beim Ändern des Bearbeitungsstandes von kartierung_ids: ' + kartierung_ids + ' Fehlerstatus: ' + xhr.status + ' Meldung: ' + xhr.statusText);
 							}
-							if (result.success == false) {
-								message([{ type: 'error', msg: result.msg}]);
-							}
-						},
-						error: function(xhr) {
-							alert('Fehler beim Ändern des Bearbeitungsstandes von kartierung_ids: ' + kartierung_ids + ' Fehlerstatus: ' + xhr.status + ' Meldung: ' + xhr.statusText);
-						}
-					});
-				}
-				else {
-					message('Keine änderbaren Kartierobjekte ausgewählt!');
-				}
+						});
+					}
+					else {
+						message('Keine änderbaren Kartierobjekte ausgewählt!');
+					} <?
+				} ?>
 			}
 
 			function checkboxFormatter(value, row, index) {
@@ -419,6 +433,7 @@
 
 			function kartierungEditFunctionsFormatter(value, row) {
 				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=105&value_kartierung_id=' + value + '&operator_kartierung_id==">ansehen</a>';
+				console.log(output);
 				return output;
 			}
 		</script>

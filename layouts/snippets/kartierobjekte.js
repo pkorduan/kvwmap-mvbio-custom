@@ -133,7 +133,7 @@ function DatensatzValidator(layerId, datensatzNr) {
 		this.hide("105_group_Biotoptypen");
 		this.hide("105_group_Lage");
 
-		this.hide("105_group_Lage");
+		this.hide("105_group_Lage"); // ToDo: Warum ist das doppelt?
 		this.hide("105_group_Beschreibung");
 		this.hide("105_group_Wertbestimmende_Kriterien");
 		this.hide("105_group_Gefährdung");
@@ -145,16 +145,15 @@ function DatensatzValidator(layerId, datensatzNr) {
 		this.hide("105_group_Pflanzen");
 		this.hide("105_group_Tiere");
 		this.hide("105_group_Bearbeitung");
-
 		this.hide("105_group_Fotos");
 		this.hide("105_group_Rest");
 		this.hide("105_group_Schutzmerkmale");
-		
 
+
+		$('#value_105_bogenart_id_' + datensatzNr).children().children('option[value="3"]').hide();
 		document.getElementById("tr_105_bearbeitungsstufe_"+datensatzNr).style.display = 'none';
 		document.getElementById("tr_105_pruefhinweis_koordinator_"+datensatzNr).style.display = 'none';
 		document.getElementById("tr_105_biotopname_"+datensatzNr).style.display = 'none';
-
 		document.getElementById("tr_105_standort_"+datensatzNr).style.display = 'none';
 		document.getElementById("tr_105_la_sper_"+datensatzNr).style.display = 'none';
 		document.getElementById("tr_105_la_sper_"+datensatzNr).style.display = 'none';

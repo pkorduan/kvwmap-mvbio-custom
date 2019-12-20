@@ -157,7 +157,7 @@
 		>
 			<thead>
 				<tr><?
-					if ($this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('aenderungsberechtigte_stelle') : '' == $this->Stelle->Bezeichnung) { ?>
+					if (($this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('aenderungsberechtigte_stelle') : '') == $this->Stelle->Bezeichnung) { ?>
 						<th
 							data-sortable="false"
 							data-visible="true"
@@ -311,7 +311,7 @@
 				$('.change-bearbeitungsstand').on(
 					'click',
 					function (e) {
-						console.log('Ändere Bearbeitungsstand');
+						//console.log('Ändere Bearbeitungsstand');
 						updateBearbeitungsstand(e.target.getAttribute('stufe'), e.target.value);
 					}
 				);
@@ -355,7 +355,7 @@
 							);
 
 					if (kartierung_ids.length > 0) {
-						console.log('Update selected kartierung_ids: ' + kartierung_ids)
+						//console.log('Update selected kartierung_ids: ' + kartierung_ids)
 						$.ajax({
 							url: 'index.php',
 							data: {
@@ -369,7 +369,7 @@
 							},
 							success: function(response) {
 								var result = JSON.parse(response)[0];
-								console.log(result);
+								//console.log(result);
 								if (result.kartierung_ids.length > 0) {
 									$.map(
 										selected_rows,
@@ -433,7 +433,7 @@
 
 			function kartierungEditFunctionsFormatter(value, row) {
 				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=105&value_kartierung_id=' + value + '&operator_kartierung_id==">ansehen</a>';
-				console.log(output);
+				//console.log(output);
 				return output;
 			}
 		</script>

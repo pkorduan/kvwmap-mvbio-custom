@@ -11,14 +11,16 @@
 			k.column_name,
 			ba.archivtabelle
 		FROM
-			information_schema.columns b JOIN
-			information_schema.columns k ON b.column_name = k.column_name JOIN
-			mvbio.bogenarten ba ON b.table_name = ba.archivtabelle JOIN
-			archiv.verlustboegen eb ON ba.id = eb.bogenart_id
+			information_schema.columns b
+			JOIN information_schema.columns k ON b.column_name = k.column_name
+			JOIN mvbio.bogenarten ba ON b.table_name = ba.archivtabelle
+			JOIN archiv.erfassungsboegen eb ON ba.id = eb.bogenart_id
 		WHERE
-			b.table_schema = 'archiv' AND	eb.id = " . $this->formvars['bogen_id'] . " AND
-			k.table_schema = 'mvbio' AND k.table_name = 'verlustobjekte' AND
-			k.column_name NOT IN (
+			b.table_schema = 'archiv'
+			AND	eb.id = " . $this->formvars['bogen_id'] . "
+			AND k.table_schema = 'mvbio'
+			AND k.table_name = 'verlustobjekte'
+			AND k.column_name NOT IN (
 				'id',
 				'kartierobjekt_id',
 				'kampagne',
@@ -27,7 +29,7 @@
 				'unb'
 			)
 	";
-	#echo '<br>SQL zum Abfragen der Spaltennamen, die übernommen werden sollen.' . $sql;
+	#echo '<br>SQL zum Abfragen der Spaltennamen, die übernommen werden sollen: ' . $sql;
 	$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 	if ($ret['success']) {
 		$insert_columns = $select_columns = array();
@@ -44,10 +46,12 @@
 		$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
 		$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
 		$select_columns['bogenart_id'] = 3;
+		$insert_columns['bogen_id'] = 'bogen_id';
+		$select_columns['bogen_id'] = $this->formvars['bogen_id'];
 
 		# Eintragen des neuen Verlustbogens mit den Daten des ausgewählten Bogens
 		$sql = "
-			INSERT INTO mvbio.verlustobjekte (kampagne_id, kartiergebiet_id, bogenart_id, stelle_id, user_id, bearbeitungsstufe, biotopname, label_alt)
+			INSERT INTO mvbio.verlustobjekte (" . implode(', ', $insert_columns) . ")
 			SELECT
 				" . implode(', ', $select_columns) . "
 			FROM
@@ -56,16 +60,16 @@
 				id = " . $this->formvars['bogen_id'] . "
 			RETURNING id
 		";
-		#echo '<br>SQL zum Eintragen des Kartierobjektes' . $sql;
+		#echo '<br>SQL zum Eintragen des Kartierobjektes: ' . $sql;
 		$ret = $this->pgdatabase->execSQL($sql, 4, 0);
-
 		if ($ret['success']) {
 			$rs = pg_fetch_assoc($ret[1]);
 			$new_verlustobjekt_id = $rs['id'];
+			$this->add_message('success', 'Neues Verlustobjekt mit id: ' . $new_verlustobjekt_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Verlustobjekt jetzt bearbeiten.');
 			$fehler = false;
 		}
 		else {
-			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neue Kartierung!<br>Wählen Sie vor der Übernahme unter Einstellungen eine Kampagne und ein Kartiergebiet.');
+			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neues Verlustobjekt!<br>Hinweis: Wählen Sie immer vor der Übernahme unter Einstellungen die Kampagne und Kartiergebiet in die übernommen werden soll.');
 			$fehler = true;
 		}
 	}
@@ -92,9 +96,11 @@
 		ob_end_clean();
 		ob_start();
 		header('Content-Type: text/html; charset=utf-8');
-		$this->formvars['selected_layer_id'] = xx;
+		include(CLASSPATH . 'Layer.php');
+		$layer = Layer::find_by_name($this, 'Verlustobjekte');
+		$this->formvars['selected_layer_id'] = $layer->get('Layer_ID');
 		$this->formvars['value_verlustobjekt_id'] = $new_verlustobjekt_id;
-		$this->formvars['operator_kartierung_id'] = '=';
+		$this->formvars['operator_verlustobjekt_id'] = '=';
 		$this->GenerischeSuche_Suchen();
 		exit();
 	}

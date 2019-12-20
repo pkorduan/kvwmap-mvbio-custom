@@ -74,8 +74,8 @@
 			";
 			$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 			if ($ret['success']) {
-				echo '<p>Erfolgreich eingetragen';
-				$this->add_message('success', 'Neues Kartierobjekt mit id: ' . $new_kartierung_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.');
+				#echo '<p>Erfolgreich eingetragen';
+				$this->add_message('success', 'Neues Kartierobjekt mit id: ' . $new_kartierung_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Kartierobjekt jetzt bearbeiten.');
 
 				if ($archivtabelle == 'bewertungsboegen') {
 				# Abfrage der LRT-Gruppe
@@ -163,7 +163,7 @@
 			}
 		}
 		else {
-			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neue Kartierung!<br>Wählen Sie vor der Übernahme unter Einstellungen eine Kampagne und ein Kartiergebiet.');
+			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neue Kartierung!<br>Hinweis: Wählen Sie immer vor der Übernahme unter Einstellungen eine Kampagne und ein Kartiergebiet.');
 			$fehler = true;
 		}
 	}

@@ -1,12 +1,11 @@
 BEGIN;
-
 	CREATE TABLE mvbio.verlustobjekte (
     id serial,
     kampagne_id integer,
     kartiergebiet_id integer,
     kartierebene_id integer,
     bogenart_id integer,
-    kartiergebiet_name character varying COLLATE pg_catalog."default",
+    bogen_id integer,
     stelle_id integer,
     user_id integer,
     giscode character varying(13) COLLATE pg_catalog."default",
@@ -30,16 +29,14 @@ BEGIN;
     koordinator_korrekturhinweis text COLLATE pg_catalog."default",
     pruefer_pruefhinweis text COLLATE pg_catalog."default",
     koordinator_rueckweisung boolean DEFAULT false,
-    geom geometry(MultiPolygon,5650),
-    ost_west_lage integer,
     kommentar_zum_korrekturhinweis text COLLATE pg_catalog."default",
     kommentar_zum_pruefhinweis text COLLATE pg_catalog."default",
     pruefer_rueckweisung boolean NOT NULL DEFAULT false,
-    nicht_begehbar boolean,
-    verl_ursa text,
+    verl_ursache text,
 		verl_nat character(1),
 		verl_ant character(1),
 		verl_wf character(1),
+    geom geometry(MultiPolygon,5650),
     CONSTRAINT verlustobjekte_pkey PRIMARY KEY (id),
     CONSTRAINT verlustobjekte_bogenart_id_fkey FOREIGN KEY (bogenart_id)
         REFERENCES mvbio.bogenarten (id) MATCH SIMPLE
@@ -62,7 +59,7 @@ BEGIN;
       OIDS = TRUE
   );
 
-  CREATE FUNCTION mvbio.validate_verlustobjekt()
+  CREATE OR REPLACE FUNCTION mvbio.validate_verlustobjekt()
       RETURNS trigger
       LANGUAGE 'plpgsql'
       COST 100
@@ -76,6 +73,7 @@ BEGIN;
       msg text[];
       liegt_ausserhalb_kartiergebiet boolean;
       geschnittenes_kartierobjekt record;
+	  geschnittenes_verlustobjekt record;
     BEGIN
 
   		raise notice 'new.lock: %', NEW.lock;
@@ -145,7 +143,7 @@ BEGIN;
               ', NEW.id
             );
           END IF;
-          -- Fehlermeldung wenn der Überlappungsbereich, der durch Verschneidung der zu speichernden Fläche mit allen seinen Nachbarn entsteht,
+          -- Fehlermeldung wenn der Überlappungsbereich, der durch Verschneidung der zu speichernden Verlustfläche mit allen seinen Nachbarkartierflächen entsteht,
           -- nicht vollständig innerhalb des 5m Puffers des Umrings der zu speichernden Fläche liegt
           sql = FORMAT('
             SELECT
@@ -163,9 +161,31 @@ BEGIN;
           END LOOP;
 
           IF array_length(msg, 1) > 0 THEN
-            RAISE EXCEPTION 'Die Geometrie des Kartierobjektes überschneidet Kartierobjekt: %', replace(array_to_string(msg, ', '), '"', '\"');
+            RAISE EXCEPTION 'Die Geometrie des Verlustobjektes überschneidet Kartierobjekt: %', replace(array_to_string(msg, ', '), '"', '\"');
           END IF;
-        END IF;
+
+          -- Fehlermeldung wenn der Überlappungsbereich, der durch Verschneidung der zu speichernden Verlustfläche mit allen seinen Nachbarverlustflächen entsteht,
+          -- nicht vollständig innerhalb des 5m Puffers des Umrings der zu speichernden Fläche liegt
+          sql = FORMAT('
+            SELECT
+              label
+            FROM
+              mvbio.verlustobjekte
+            WHERE
+              kartiergebiet_id = %2$s AND
+              ST_Intersects(geom, %1$L) AND
+              NOT GDI_WithinBufferOfExteriorRing(ST_Intersection(geom, %1$L), geom, 5)
+              %3$s
+          ', NEW.geom, NEW.kartiergebiet_id, sql_where);
+          FOR geschnittenes_verlustobjekt IN EXECUTE sql LOOP
+            msg = array_append(msg, geschnittenes_verlustobjekt.label::text);
+          END LOOP;
+
+          IF array_length(msg, 1) > 0 THEN
+            RAISE EXCEPTION 'Die Geometrie des Verlustobjektes überschneidet anderes Verlustobjekt: %', replace(array_to_string(msg, ', '), '"', '\"');
+          END IF;
+
+		END IF;
 
         -- Setzt die Kampagne ID
         NEW.kampagne_id = kartiergebiet.kampagne_id;
@@ -183,7 +203,6 @@ BEGIN;
       RETURN NEW;
     END;
   $BODY$;
-
   COMMENT ON FUNCTION mvbio.validate_verlustobjekt() IS 'Validiert die Inhalte des Verlustobjektes wenn lock = false.';
 
   CREATE TRIGGER tr_10_validate_verlustobjekt
@@ -201,5 +220,8 @@ BEGIN;
   ALTER TABLE mvbio.kartierobjekte
     DROP COLUMN verlustursachen,
     DROP COLUMN beschreibung_der_verlustursachen;
+
+  
+
 
 COMMIT;

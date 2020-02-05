@@ -73,7 +73,8 @@
 			Alle, die Stand "zur Archivierung freigegeben haben" werden durch einen Cron-Job in das Archiv überführt und bekommen den Stand "in Archiv überführt"
 			Die Prüfer dürfen Ändern von "4 nach 5, 5 nach 6, aber nicht von 6 nach 5 und auch nicht von 6 nach 7 (das geht automatisch) und auch nicht von 7 nach 6 zurück (ein mal im Archiv geht es nicht zurück)"
 			Wenn Stand 6 erreicht ist kann man höchstens als Admin den Job stoppen, der die Überführung ausführt und dann noch welche manuell von 6 auf 5 oder gar niedriger zurücksetzen für eine erneute Prüfung durch die Prüfer oder weiter runter.
-			Die Kartierobjekte werden erst gelöscht wenn der Prüfer das dazugehörige Kartiergebiet löscht. Mit der Funktion werden die alten im Archiv historisch und die neu in das Archiv überführten aktuell. Die Kartierobjekte erscheinen dann in keiner Liste von Kartierobjekten mehr.
+			Die Kartierobjekte werden erst gelöscht wenn der Prüfer das dazugehörige Kartiergebiet löscht.
+			Mit der Funktion werden die alten im Archiv historisch und die neu in das Archiv überführten aktuell. Die Kartierobjekte erscheinen dann in keiner Liste von Kartierobjekten mehr.
 			Kartierkampagnen sind vom Prüfer manuell zu löschen. Auch in der Layerdefinition bzw. bei den Klassen und Styles etc.
 		*/
 	}

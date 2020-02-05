@@ -993,6 +993,19 @@ function BewertungStillgewaesser_1_1_3() {
 	}
 	*/
 
+	this.prepareHTML = function(b) {
+		let lrtCode = b.lrtCode;
+		var UC1 = b.getValue("UC1");
+		if (lrtCode===3150 && ["UST","USP"].indexOf(UC1)>=0) {			
+			document.getElementById("value_144_t113_1_6_"+b.datensatzNr).style.display = 'none';
+			document.getElementById("name_144_t113_1_6_"+b.datensatzNr).style.display = 'none';			
+		}
+		else {
+			document.getElementById("value_144_t113_1_6_"+b.datensatzNr).style.display = '';
+			document.getElementById("name_144_t113_1_6_"+b.datensatzNr).style.display = '';			
+		}
+	};	
+
 	this.bewerte=function(b) {
         var result = -1;
 		var lrtCode = b.lrtCode;
@@ -1008,10 +1021,11 @@ function BewertungStillgewaesser_1_1_3() {
 					result = {b:'A', txt:"Temporäre Kleingewässer, Torfstiche: >= 2 Elemente"};
 	 
 				} else if (T113_2 === 1) {
-					result = {b:'B-C', txt:"Temporäre Kleingewässer, Torfstiche: = 1 Element"};
+					result = {b:'B', txt:"Temporäre Kleingewässer, Torfstiche: = 1 Element"};
 				}
 				else {
-					result = {b:'-2', txt:"Temporäre Kleingewässer, Torfstiche: = 1 Element"};
+					// result = {b:'-2', txt:"Temporäre Kleingewässer, Torfstiche: = 1 Element"};
+					result = {b:'0'};
 				}
 			}
 			else if (["USG","USC","USA","USS","USL","USB","USK","USW"].indexOf(UC1)>=0){
@@ -5168,7 +5182,11 @@ function Gruppenbewertung(dsBewertung, grpNr) {
 		}
 	}
 }
-
+/**
+ * 
+ * @param {*} layerId 
+ * @param {*} datensatzNr 
+ */
 function DatensatzBewertung(layerId, datensatzNr) {
     this.datensatzNr = datensatzNr;
     this.layerId = layerId;
@@ -5185,8 +5203,11 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	this.gefcodes = null;
 
 	this.start=function() {
-		this.lrtCode = this._getLRTCode();
 
+		if (this.layerId===109) {
+		}
+		
+		this.lrtCode = this._getLRTCode();
 		if (this.layerId===144) {
 			this.bewertung = new LrtBewertung(this, bewertungenStillgewaesser);
 		} else if (this.layerId===145) {
@@ -5197,8 +5218,12 @@ function DatensatzBewertung(layerId, datensatzNr) {
 			this.bewertung = new LrtBewertung(this, bewertungenMoore);
 		} else if (this.layerId===160) {
 			this.bewertung = new LrtBewertung(this, bewertungenOffenland);
+		} else {
+			// unknown not the right Layer
+			console.info("skip "+this.layerId);
+			return;
 		}
-
+		
 
 		this.hide(this.layerId+"_group_Stammdaten");
 		this.hide(this.layerId+"_group_Schutzmerkmale");
@@ -5317,7 +5342,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 			k = data[i];
 			s+=k+" "+ this.isVisible(this.map[k][0]);
 		}
-		console.info(s);
+		// console.info(s);
 	}
 
 	this.hasHabitat = function(habitat) {
@@ -5397,36 +5422,45 @@ function DatensatzBewertung(layerId, datensatzNr) {
 			if (s.lastIndexOf('.')>0) {
 				s = s.substring(0, s.indexOf(' '));
 				var bewertung = this.getBewertung(s);
-				if (bewertung) {
+				if (bewertung && bewertung.isRequired(this)) {
 					var table01 = getParent(matches[i], "TABLE");
 					var table02 = getNextSiblingWithTag(table01, "TABLE");
 					// table02.style.tableLayout="fixed";
-					var row = table02.rows[0];
-					if (row.style.display==='none') {
-						row.style.display='table-row';
+					if (table02 && table02.rows && table02.rows.length>0) {
+					
+						var row = table02.rows[0];
+						if (!row) {
+							console.error("Fehler bei \""+ s + "\" " + table02.rows.length);
+						}
+						if (row.style.display==='none') {
+							row.style.display='table-row';
+						}
+						var cell = row.insertCell(row.cells.length);					
+						cell.rowSpan=table02.rows.length;
+						cell.width="30px";
+						cell.style.minWidth="30px";
+						
+						// cell.style.width="30px";
+						// cell.style.minWidth="30px";
+						// cell.style.maxWidth="30px";
+						
+						cell.style.backgroundColor="gray";
+						cell.style.textAlign="center";					
+						cell.innerText=bewertung.nr;
+						
+						// bewertung.cell=cell;
+						/*
+						innerDiv.style.backgroundColor="gray";
+						innerDiv.style.textAlign="center";
+						innerDiv.rowSpan=table02.rows.length;
+						innerDiv.innerText=bewertung.nr;
+						bewertung.cell=innerDiv;
+						*/
+						bewertung.cell=cell;
 					}
-					var cell = row.insertCell(row.cells.length);					
-					cell.rowSpan=table02.rows.length;
-					cell.width="30px";
-					cell.style.minWidth="30px";
-					
-					// cell.style.width="30px";
-					// cell.style.minWidth="30px";
-					// cell.style.maxWidth="30px";
-					
-					cell.style.backgroundColor="gray";
-					cell.style.textAlign="center";					
-					cell.innerText=bewertung.nr;
-					
-					// bewertung.cell=cell;
-					/*
-					innerDiv.style.backgroundColor="gray";
-					innerDiv.style.textAlign="center";
-					innerDiv.rowSpan=table02.rows.length;
-					innerDiv.innerText=bewertung.nr;
-					bewertung.cell=innerDiv;
-					*/
-					bewertung.cell=cell;
+					else {
+						console.error("Fehler bei \""+ s + "\"");
+					}
 				}
 				else {
 					if (s.length>2) {
@@ -5888,10 +5922,16 @@ function BewertungApp() {
 		for (var i = 0; i < inputElements.length; i++) {
 
 			var id = inputElements[i].id;
+
+			
 			
 			var idA = id.split("_");
 			var datensatzNr = Number.parseInt(idA[idA.length-1], 10);
 			var layerId = Number.parseInt(idA[0], 10);
+			if (layerId===109) {
+				console.info(inputElements[i]);
+				console.info("109");
+			}
 			 
 			if (!isNaN(datensatzNr) && !isNaN(layerId)) {
 				if (!this.map[layerId+datensatzNr]) {

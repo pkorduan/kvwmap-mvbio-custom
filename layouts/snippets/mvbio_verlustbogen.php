@@ -60,12 +60,14 @@
 				id = " . $this->formvars['bogen_id'] . "
 			RETURNING id
 		";
-		#echo '<br>SQL zum Eintragen des Kartierobjektes: ' . $sql;
+		#echo '<br>SQL zum Eintragen des Verlustobjektes: ' . $sql;
 		$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 		if ($ret['success']) {
 			$rs = pg_fetch_assoc($ret[1]);
 			$new_verlustobjekt_id = $rs['id'];
 			$this->add_message('success', 'Neues Verlustobjekt mit id: ' . $new_verlustobjekt_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Verlustobjekt jetzt bearbeiten.');
+			# ToDo Prüfen ob hier auch die Nebencodes extra mit übernommen werden müssen und was ist mit den anderen 1:n bezogenen Sachen?
+			# Brauchen wir überhaupt die Tabelle biotoptypen_nebencodes_verlustboegen?
 			$fehler = false;
 		}
 		else {

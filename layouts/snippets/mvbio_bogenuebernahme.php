@@ -46,12 +46,6 @@
 			$select_columns['bogenart_id'] = 2; # Bogenart von Kartierungsobjekten mit Bewertungsbögen ist 2
 		}
 
-		if ($this->formvars['bogenart'] == 'verlustbogen') {
-			# Bogenart für neuen Datensatz auf Verlustbogen setzen (3)
-			# Attribute „Verlustursachen“ und „Beschreibung der Verlustursachen“ hinzufügen bzw. sichtbar machen, je nachdem wie implementiert
-			$select_columns['bogenart_id'] = 3;
-		}
-
 		# Eintragen des neuen Kartierobjektes mit den Daten des ausgewählten Bogens
 		$sql = '
 			INSERT INTO mvbio.kartierobjekte ("' . implode('", "', $insert_columns) . '")
@@ -80,8 +74,8 @@
 			";
 			$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 			if ($ret['success']) {
-				echo '<p>Erfolgreich eingetragen';
-				$this->add_message('success', 'Neues Kartierobjekt mit id: ' . $new_kartierung_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.');
+				#echo '<p>Erfolgreich eingetragen';
+				$this->add_message('success', 'Neues Kartierobjekt mit id: ' . $new_kartierung_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Kartierobjekt jetzt bearbeiten.');
 
 				if ($archivtabelle == 'bewertungsboegen') {
 				# Abfrage der LRT-Gruppe
@@ -169,7 +163,7 @@
 			}
 		}
 		else {
-			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neue Kartierung!<br>Wählen Sie vor der Übernahme unter Einstellungen eine Kampagne und ein Kartiergebiet.');
+			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neue Kartierung!<br>Hinweis: Wählen Sie immer vor der Übernahme unter Einstellungen eine Kampagne und ein Kartiergebiet.');
 			$fehler = true;
 		}
 	}

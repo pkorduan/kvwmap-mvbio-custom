@@ -125,7 +125,7 @@ function loaded() {
 	var callback = function() {
 		(new BewertungApp()).start();
 	}
-	loadScript("/layouts/snippets/lrt_bewertung.js", callback);	
+	loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/lrt_bewertung.js", callback);	
 }
 
 

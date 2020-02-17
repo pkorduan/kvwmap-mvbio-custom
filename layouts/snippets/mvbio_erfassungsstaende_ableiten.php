@@ -3,10 +3,10 @@
 	# Lege alle Kampagnen im Archiv an, die noch nicht vorhanden sind und für die es aber abzuleitende Kartierobjekte gibt
 	$sql = "
 		INSERT INTO archiv.kampagnen (
-			id, kartierungsart, abk, bezeichnung, erfassungszeitraum, umfang, datenschichten, erstellt_am, erstellt_von, abgeschlossen, geom
+			id, abk, bezeichnung, erfassungszeitraum, umfang, datenschichten, erstellt_am, erstellt_von, abgeschlossen, geom
 		)
-		SELECT
-			kk.*
+		SELECT DISTINCT
+			kk.id, kk.abk, kk.bezeichnung, kk.erfassungszeitraum, kk.umfang, kk.datenschichten, kk.erstellt_am, kk.erstellt_von, false, kk.geom
 		FROM
 			mvbio.kartierobjekte ko JOIN
 			mvbio.kampagnen kk ON ko.kampagne_id = kk.id LEFT JOIN
@@ -20,10 +20,10 @@
 	# Lege alle Kartiergebiete im Archiv an, die noch nicht vorhanden sind und für die es aber abzuleitende Kartierobjekte gibt
 	$sql = "
 		INSERT INTO archiv.kartiergebiete (
-			id, kampagne_id, losnummer, bezeichnung, bemerkungen, stelle_id, geom
+			id, kampagne_id, losnummer, bezeichnung, bemerkungen, geom
 		)
-		SELECT
-			kg.*
+		SELECT DISTINCT
+			kg.id, kg.kampagne_id, kg.losnummer, kg.bezeichnung, kg.bemerkungen, kg.geom
 		FROM
 			mvbio.kartierobjekte ko JOIN
 			mvbio.kartiergebiete kg ON ko.kartiergebiet_id = kg.id LEFT JOIN
@@ -34,18 +34,35 @@
 	";
 	$log->write($sql);
 
+	/*
+	# ToDo: Das folgende Ersetzen durch eine andere Herangehensweise
+	# Nicht die Kartierobjekte abfragen und jeweils entscheiden was erzeugt werden soll, sondern
+	# Pro Archivbogenart abfragen welche Kartierobjekte in Bearbeitungsstufe 6 sind und entsprechend
+	# der Beschreibung https://mvbio.de/wiki/doku.php?id=aktualisierung#ersetzung_von_alten_durch_neue_boegen
+	# als Bogen im Archiv abgelegt werden sollen. 
+*/
 
-	# Frage die abzuleitenden Kartierobjekte ab
+	# Frage die abzuleitenden Kurzbögen ab
 	$sql = "
+		INSERT INTO archiv.kurzboegen(
+			kartierobjekt_id,
+			kampagne_id, kartiergebiet_id, kartierebene_id, bogenart_id, stelle_id, user_id,
+			giscode, label,
+			lfd_nr_kr,
+			biotopname, standort, unb, flaeche, la_sper, la_sp_txt, schutz_bio, altbestand, alt_giscod, alt_lfd_nr, alt_bearb, alt_datp20, fb_id, hc, hcp, uc1, uc2, vegeinheit, wert_krit_1, wert_krit_2, wert_krit_3, wert_krit_4, wert_krit_5, wert_krit_6, wert_krit_7, wert_krit_8, wert_krit_9, wert_krit_10, wert_krit_11, wert_krit_12, wert_krit_13, wert_krit_14, wert_krit_15, wert_krit_16, gefaehrdg, gefcode, ohnegefahr, empfehlung, fauna, bearbeiter, e_datum, l_datum, foto, loeschen, druck, aend_datum, korrektur, geprueft, pruefer, pruefdatum, lock, status, legende, version, import_table, bearbeitungsstufe, geom
+		)
 		SELECT
-			*
+			id AS kartierobjekt_id,
+			kampagne_id, kartiergebiet_id, kartierebene_id, bogenart_id, stelle_id, user_id,
+			giscode, label,
+			lfd_nr_kr, biotopname, standort, unb, flaeche, la_sper, la_sp_txt, schutz_bio, altbestand, alt_giscod, alt_lfd_nr, alt_bearb, alt_datp20, fb_id, hc, hcp, uc1, uc2, vegeinheit, wert_krit_1, wert_krit_2, wert_krit_3, wert_krit_4, wert_krit_5, wert_krit_6, wert_krit_7, wert_krit_8, wert_krit_9, wert_krit_10, wert_krit_11, wert_krit_12, wert_krit_13, wert_krit_14, wert_krit_15, wert_krit_16, gefaehrdg, gefcode, ohnegefahr, empfehlung, fauna, bearbeiter, e_datum, l_datum, foto, loeschen, druck, aend_datum, korrektur, geprueft, pruefer, pruefdatum, lock, status, legende, version, import_table, bearbeitungsstufe, geom
 		FROM
 			mvbio.kartierobjekte
 		WHERE
 			bearbeitungsstufe = 6
 	";
 	$log->write($sql);
-
+/*
 	$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 	while ($rs = pg_fetch_assoc($ret[1])) {
 		switch ($rs['bogenart_id']) {
@@ -834,6 +851,6 @@
 	function ableitung_zustandsbewertung($ko) {
 		
 	}
-
+*/
 	$log->close();
 ?>

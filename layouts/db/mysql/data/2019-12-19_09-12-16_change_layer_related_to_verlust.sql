@@ -1,0 +1,1 @@
+UPDATE layer SET pfad = replace(pfad, ', verlustursachen, beschreibung_der_verlustursachen', '') WHERE layer_id = 105;

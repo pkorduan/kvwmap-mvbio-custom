@@ -189,9 +189,7 @@ function DatensatzValidator(layerId, datensatzNr) {
 		let config = { attributes: true, childList: true, subtree: true };
 		let observer = new MutationObserver(fctObserve);
 		elem = document.getElementById(this.layerId+"_"+variableName+"_"+this.datensatzNr);
-		
 
-		
 		if (elem && elem.parentNode) {
 			observer.observe(elem, config);
 		}
@@ -209,7 +207,7 @@ function DatensatzValidator(layerId, datensatzNr) {
 		if (evt && evt.keyCode && evt.keyCode<46) {
 			return;
 		}
-		
+
 		let elem = document.getElementById(this.layerId+"_nc_"+datensatzNr);
 
 		let elems = elem.getElementsByClassName("subFormListItem");
@@ -223,28 +221,25 @@ function DatensatzValidator(layerId, datensatzNr) {
 					
 					let value = Number(sNr);
 					if (value<0) {
-						alert("Wert kleiner 0 ("+linkElements[0].innerText+")");
+						message([{ "type" : 'error', "msg" : "Wert kleiner 0 ("+linkElements[0].innerText+")"}]);
 					}
-					summeFlaechenAnteile+=value;
+					summeFlaechenAnteile += value;
 				}
 				
 			}
 		}
-		
-		
 
 		if (isNaN(summeFlaechenAnteile)) {
 			this.txtFlaechenAnteile.innerText="Summe Flächenanteile konnte nicht berechnet werden";
 		}
 		else {
 			if (summeFlaechenAnteile>100) {
-				alert("Die Summe der Flächenanteile ist größer 100");
+				message([{ "type" : 'warning', "msg" : 'Die Summe der Flächenanteile ist größer 100'}]);
 			}
 			this.txtFlaechenAnteile.innerText="Summe Flächenanteile: "+summeFlaechenAnteile+" %";
 		}
 		
 	}
-	
 
 	this.onClick=function(event) {
 		console.info("onClick "+this.layerId+":"+this.datensatzNr);

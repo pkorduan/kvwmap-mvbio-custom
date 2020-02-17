@@ -1,0 +1,1 @@
+UPDATE `layer` SET `pfad` = replace(`pfad`, ', lfd_nr,', ', ') WHERE `pfad` LIKE '%, lfd_nr, %';

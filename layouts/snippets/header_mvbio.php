@@ -126,6 +126,7 @@ if ($this->go == 'Stelle_waehlen') {
 						filterBogenarten(parameter.value);
 					break;
 				}
+				console.log('end of onLayerParameterChanged');
 			};
 			filterKartiergebiete($('#layer_parameter_kampagne_id').val());
 			filterKartierebenen($('#layer_parameter_kampagne_id').val());
@@ -146,24 +147,32 @@ if ($this->go == 'Stelle_waehlen') {
 	<div style="padding: 6px; float: left; width: 54%; text-align: left;"><?
 		$params = $this->user->rolle->get_layer_params($this->Stelle->selectable_layer_params, $this->pgdatabase);
 		$title = array();
-		foreach ($params['kampagne_id']['options'] AS $param) {
-			if ($param['value'] == rolle::$layer_params['kampagne_id']) {
-				if ($param['output'] != 'alle') $title[] = $param['output'];
+		if ($params['kampagne_id']) {
+			foreach ($params['kampagne_id']['options'] AS $param) {
+				if ($param['value'] == rolle::$layer_params['kampagne_id']) {
+					if ($param['output'] != 'alle') $title[] = $param['output'];
+				}
 			}
 		}
-		foreach ($params['kartiergebietfilter']['options'] AS $param) {
-			if ($param['value'] == rolle::$layer_params['kartiergebietfilter']) {
-				if ($param['output'] != 'alle') $title[] = $param['output'];
+		if ($params['kartiergebietfilter']) {
+			foreach ($params['kartiergebietfilter']['options'] AS $param) {
+				if ($param['value'] == rolle::$layer_params['kartiergebietfilter']) {
+					if ($param['output'] != 'alle') $title[] = $param['output'];
+				}
 			}
 		}
-		foreach ($params['kartierebenenfilter']['options'] AS $param) {
-			if ($param['value'] == rolle::$layer_params['kartierebenenfilter']) {
-				if ($param['output'] != 'alle') $title[] = $param['output'];
+		if ($params['kartierebenenfilter']) {
+			foreach ($params['kartierebenenfilter']['options'] AS $param) {
+				if ($param['value'] == rolle::$layer_params['kartierebenenfilter']) {
+					if ($param['output'] != 'alle') $title[] = $param['output'];
+				}
 			}
 		}
-		foreach ($params['bogenartfilter']['options'] AS $param) {
-			if ($param['value'] == rolle::$layer_params['bogenartfilter']) {
-				if ($param['output'] != 'alle') $title[] = $param['output'];
+		if ($params['bogenartfilter']) {
+			foreach ($params['bogenartfilter']['options'] AS $param) {
+				if ($param['value'] == rolle::$layer_params['bogenartfilter']) {
+					if ($param['output'] != 'alle') $title[] = $param['output'];
+				}
 			}
 		} ?>
 		<span class="fett px20"><?php

@@ -1004,7 +1004,7 @@ function BewertungStillgewaesser_1_1_3() {
 			document.getElementById("value_144_t113_1_6_"+b.datensatzNr).style.display = '';
 			document.getElementById("name_144_t113_1_6_"+b.datensatzNr).style.display = '';			
 		}
-	};	
+	};
 
 	this.bewerte=function(b) {
         var result = -1;
@@ -6013,6 +6013,10 @@ function BewertungApp() {
 			button.onclick = "";
 			button.addEventListener("click", this.beforeSubmit.bind(this));
 		}
+		/*
+		document.getElementById('sachdatenanzeige_save_button').onclick="";
+		document.getElementById('sachdatenanzeige_save_button').addEventListener("click", this.beforeSubmit.bind(this));
+		*/
 	}
 	
 	if (!Number.isNumber) {

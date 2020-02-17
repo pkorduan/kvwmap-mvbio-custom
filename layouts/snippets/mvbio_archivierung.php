@@ -1,6 +1,6 @@
 <?php
 	$log = new LogFile('/var/www/logs/mvbio/archivierung.log', 'text', date("Y:m:d H:i:s", time()));
-	foreach($kampagne['kartiergebiete'] AS $kartiergebiet) {
+	foreach ($kampagne['kartiergebiete'] AS $kartiergebiet) {
 		# übernehme Kartiergebiet in das archiv
 		$sql = "
 			INSERT INTO archiv.kartiergebiete

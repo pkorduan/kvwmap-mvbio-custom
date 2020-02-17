@@ -985,6 +985,19 @@ function BewertungStillgewaesser_1_1_3() {
 	}
 	*/
 
+	this.prepareHTML = function(b) {
+		let lrtCode = b.lrtCode;
+		var UC1 = b.getValue("UC1");
+		if (lrtCode===3150 && ["UST","USP"].indexOf(UC1)>=0) {			
+			document.getElementById("value_144_t113_1_6_"+b.datensatzNr).style.display = 'none';
+			document.getElementById("name_144_t113_1_6_"+b.datensatzNr).style.display = 'none';			
+		}
+		else {
+			document.getElementById("value_144_t113_1_6_"+b.datensatzNr).style.display = '';
+			document.getElementById("name_144_t113_1_6_"+b.datensatzNr).style.display = '';			
+		}
+	};
+	
 	this.bewerte=function(b) {
         var result = -1;
 		var lrtCode = b.lrtCode;
@@ -1000,10 +1013,10 @@ function BewertungStillgewaesser_1_1_3() {
 					result = {b:'A', txt:"Temporäre Kleingewässer, Torfstiche: >= 2 Elemente"};
 	 
 				} else if (T113_2 === 1) {
-					result = {b:'B-C', txt:"Temporäre Kleingewässer, Torfstiche: = 1 Element"};
+					result = {b:'B', txt:"Temporäre Kleingewässer, Torfstiche: = 1 Element"};
 				}
 				else {
-					result = {b:'-2', txt:"Temporäre Kleingewässer, Torfstiche: = 1 Element"};
+					result = {b:'0'};					  
 				}
 			}
 			else if (["USG","USC","USA","USS","USL","USB","USK","USW"].indexOf(UC1)>=0){
@@ -5960,10 +5973,15 @@ function BewertungApp() {
 			}
 		}
 		
-		
+		var button = document.getElementById('sachdatenanzeige_save_button');
+		if (button) {
+			button.onclick = "";
+			button.addEventListener("click", this.beforeSubmit.bind(this));
+		}
+		/*
 		document.getElementById('sachdatenanzeige_save_button').onclick="";
 		document.getElementById('sachdatenanzeige_save_button').addEventListener("click", this.beforeSubmit.bind(this));
-
+		*/
 	}
 	
 	if (!Number.isNumber) {

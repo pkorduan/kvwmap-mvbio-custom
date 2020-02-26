@@ -69,7 +69,7 @@
 				return true;
 			}
 			else {
-				echo '<p>Fehler beim ausführen der Migration ' . $file;
+				echo '<p>Fehler beim Ausführen der Migration ' . $file;
 				return false;
 			}
 		}

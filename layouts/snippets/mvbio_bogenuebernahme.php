@@ -45,10 +45,9 @@
 		if ($archivtabelle == 'bewertungsboegen') {
 			$select_columns['bogenart_id'] = 2; # Bogenart von Kartierungsobjekten mit Bewertungsbögen ist 2
 		}
-
 		# Eintragen des neuen Kartierobjektes mit den Daten des ausgewählten Bogens
 		$sql = '
-			INSERT INTO mvbio.kartierobjekte ("' . implode('", "', $insert_columns) . '")
+			INSERT INTO mvbio.kartierobjekte ("' . implode('", "', $insert_columns) . '", stelle_id, user_id)
 			SELECT
 				' . implode(', ', $select_columns) . '
 			FROM
@@ -63,9 +62,9 @@
 			$rs = pg_fetch_assoc($ret[1]);
 			$new_kartierung_id = $rs['id'];
 			$sql = "
-					INSERT INTO mvbio.pflanzenvorkommen (kartierung_id, pflanzenart_id, nummer, dzv, fsk, rl, cf, tax, bav)
+					INSERT INTO mvbio.pflanzenvorkommen (kartierung_id, pflanzenart_id, dzv, fsk, rl, cf, tax, bav)
 					SELECT
-						" . $new_kartierung_id . ", pv.pflanzenart_id, pv.nummer, pv.dzv, pv.fsk, pv.rl, pv.cf, pv.tax, pv.bav
+						" . $new_kartierung_id . ", pv.pflanzenart_id, pv.dzv, pv.fsk, pv.rl, pv.cf, pv.tax, pv.bav
 					FROM
 						archiv.erfassungsboegen eb JOIN
 						archiv.pflanzenvorkommen pv ON eb.kartierobjekt_id = pv.kartierung_id
@@ -174,7 +173,7 @@
 
 	if ($fehler) { ?>
 		<h2 style="margin-top: 20px; margin-bottom: 20px;">Datenübernahme von archivierten Bögen in neue Kartierung</h2>
-		<a href="https://mvbio.de/kvwmap/index.php?go=get_last_query">Zurück</a> zur letzten Sachdatenanzeige.<?php
+		<a href="<? echo URL . APPLVERSION; ?>index.php?go=get_last_query">Zurück</a> zur letzten Sachdatenanzeige.<?php
 		/*
 		Das geht nicht weil das includiert dargestellt werden würde
 		$this->last_query = $this->user->rolle->get_last_query();

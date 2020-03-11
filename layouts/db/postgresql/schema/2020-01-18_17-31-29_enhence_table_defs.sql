@@ -42,7 +42,7 @@ BEGIN;
     IS 'Prüft bei Datensätzen ohne e_datum oder mit e_datum > 1.1.2019 ob der Wert von hcp im Bereich von 0-100 liegt.';
 
   ALTER TABLE archiv.erfassungsboegen ADD COLUMN created_at time without time zone NOT NULL DEFAULT now();
-  UPDATE archiv.erfassungsboegen set created_at = '2019-09-01 20:19:01'
+  UPDATE archiv.erfassungsboegen set created_at = '2019-09-01 20:19:01';
 
   ALTER TABLE mvbio.kartierobjekte
     ADD COLUMN created_at time without time zone NOT NULL DEFAULT now(),

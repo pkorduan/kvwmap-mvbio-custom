@@ -1,3 +1,13 @@
+// Schaltet die Auswahl der Verlustbögen bei der Neuerfassung auch aus wenn eine andere Kartierebene gewählt wird.
+$('#105_kartierebene_id_-1').on(
+  'change',
+  function() {
+    setTimeout(function() {
+      $('#value_105_bogenart_id_-1').children().children('option[value="3"]').hide();
+    }, 1000);
+  }
+);
+
 function getTextfieldId(layerId, datensatzNr, variableName) {
 	return layerId+"_"+variableName+"_"+datensatzNr;
 }

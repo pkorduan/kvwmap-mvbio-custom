@@ -17,7 +17,7 @@
 			#echo '<p>Schon ausgeführte Migrationsdateien:';
 			#show_migration_files($executed_migration_files);
 			$diff = array_diff($migration_files, $executed_migration_files);
-			# ToDo Sort $diff by timestamp
+			# ToDo Sort $diff by timestamp instead of name
 			usort($diff, function($a, $b) {
 				return basename($a) > basename($b);
 			});
@@ -45,6 +45,9 @@
 			foreach ($files AS $migration_file) {
 				if (migrate($migration_file)) {
 					$migrated_files[] = $migration_file;
+				}
+				else {
+					break;
 				}
 			}
 			return $migrated_files;

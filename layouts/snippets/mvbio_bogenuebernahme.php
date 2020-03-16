@@ -62,9 +62,9 @@
 			$rs = pg_fetch_assoc($ret[1]);
 			$new_kartierung_id = $rs['id'];
 			$sql = "
-					INSERT INTO mvbio.pflanzenvorkommen (kartierung_id, pflanzenart_id, dzv, fsk, rl, cf, tax, bav)
+					INSERT INTO mvbio.pflanzenvorkommen (kartierung_id, pflanzenart_id, valid_nr, dzv, fsk, rl, cf, tax, bav)
 					SELECT
-						" . $new_kartierung_id . ", pv.pflanzenart_id, pv.dzv, pv.fsk, pv.rl, pv.cf, pv.tax, pv.bav
+						" . $new_kartierung_id . ", pv.pflanzenart_id, pv.valid_nr, pv.dzv, pv.fsk, pv.rl, pv.cf, pv.tax, pv.bav
 					FROM
 						archiv.erfassungsboegen eb JOIN
 						archiv.pflanzenvorkommen pv ON eb.kartierobjekt_id = pv.kartierung_id

@@ -234,6 +234,12 @@
 						data-switchable="true"
 					>Bogenart</th>
 					<th
+						data-field="hc"
+						data-sortable="true"
+						data-visible="true"
+						data-switchable="true"
+					>Hauptcode</th>
+					<th
 						data-field="lrt_code"
 						data-sortable="true"
 						data-visible="true"

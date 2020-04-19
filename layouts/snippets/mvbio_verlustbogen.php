@@ -40,11 +40,15 @@
 		}
 
 		# Übernahme von Auto-Werten für die neue Kartierung
-		$select_columns['stelle_id'] = $this->Stelle->id;
+		$insert_columns['user_id'] = 'user_id';
+		$insert_columns['stelle_id'] = 'stelle_id';
 		$select_columns['user_id'] = $this->user->id;
+		$select_columns['stelle_id'] = $this->Stelle->id;
 		$select_columns['bearbeitungsstufe'] = 1;
 		$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
 		$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
+    $select_columns['e_datum'] = 'NULL';
+    $select_columns['l_datum'] = 'NULL';
 		$select_columns['bogenart_id'] = 3;
 		$insert_columns['bogen_id'] = 'bogen_id';
 		$select_columns['bogen_id'] = $this->formvars['bogen_id'];

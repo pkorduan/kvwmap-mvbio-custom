@@ -1,4 +1,12 @@
 /* custom styles */
+
+#value_105_pflanzen_0 > * :focus {
+/*  outline-color: red;*/
+  -webkit-box-shadow: 0px 0px 1px 3px blue;
+  -moz-box-shadow: 0px 0px 1px 3px blue;
+  box-shadow: 0px 0px 1px 3px blue;
+}
+
 #neuer_datensatz_button {
 	display: block;
 	position: relative;

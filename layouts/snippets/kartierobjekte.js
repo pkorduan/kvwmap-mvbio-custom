@@ -8,6 +8,29 @@ $('#105_kartierebene_id_-1').on(
   }
 );
 
+wert_krit_selectors = [];
+for (i = 1; i <= 16; i++) {
+	wert_krit_selectors.push('#105_wert_krit_' + i + '_0');
+}
+
+$(wert_krit_selectors.join(', ')).on(
+	'mouseup',
+	function(evt) {
+		if (!$(evt.target).is(':checked')) {
+			$('#105_keine_wert_krit_0').removeAttr("checked");
+		}
+	}
+);
+
+$('#105_keine_wert_krit_0').on(
+	'change',
+	function(evt) {
+		if ($(evt.target).is(':checked')) {
+			$(wert_krit_selectors.join(', ')).removeAttr("checked");
+		}
+	}
+);
+
 function getTextfieldId(layerId, datensatzNr, variableName) {
 	return layerId+"_"+variableName+"_"+datensatzNr;
 }

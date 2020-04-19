@@ -42,9 +42,16 @@
 		$select_columns['bearbeitungsstufe'] = 1;
 		$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
 		$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
-		if ($archivtabelle == 'bewertungsboegen') {
-			$select_columns['bogenart_id'] = 2; # Bogenart von Kartierungsobjekten mit Bewertungsbögen ist 2
-		}
+    $select_columns['e_datum'] = 'NULL';
+    $select_columns['l_datum'] = 'NULL';
+    if ($this->formvars['bogenart_id'] == '') {
+  		if ($archivtabelle == 'bewertungsboegen') {
+      	$select_columns['bogenart_id'] = 2;
+  		}
+    }
+    else {
+			$select_columns['bogenart_id'] = $this->formvars['bogenart_id'];
+    }
 		# Eintragen des neuen Kartierobjektes mit den Daten des ausgewählten Bogens
 		$sql = '
 			INSERT INTO mvbio.kartierobjekte ("' . implode('", "', $insert_columns) . '", stelle_id, user_id)
@@ -62,9 +69,9 @@
 			$rs = pg_fetch_assoc($ret[1]);
 			$new_kartierung_id = $rs['id'];
 			$sql = "
-					INSERT INTO mvbio.pflanzenvorkommen (kartierung_id, pflanzenart_id, valid_nr, dzv, fsk, rl, cf, tax, bav)
+					INSERT INTO mvbio.pflanzenvorkommen (kartierung_id, species_nr, valid_nr, dzv, fsk, rl, cf, tax, bav)
 					SELECT
-						" . $new_kartierung_id . ", pv.pflanzenart_id, pv.valid_nr, pv.dzv, pv.fsk, pv.rl, pv.cf, pv.tax, pv.bav
+						" . $new_kartierung_id . ", pv.species_nr, pv.valid_nr, pv.dzv, pv.fsk, pv.rl, pv.cf, pv.tax, pv.bav
 					FROM
 						archiv.erfassungsboegen eb JOIN
 						archiv.pflanzenvorkommen pv ON eb.kartierobjekt_id = pv.kartierung_id

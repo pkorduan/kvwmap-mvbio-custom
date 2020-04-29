@@ -178,7 +178,13 @@
 						data-sortable="true"
 						data-visible="true"
 						data-switchable="true"
-					>Objekt-Code</th>			
+					>Objekt-Code</th>
+					<th
+						data-field="arbeits_id"
+						data-sortable="true"
+						data-visible="true"
+						data-switchable="true"
+					>Arbeits-ID</th>
 					<th
 						data-field="kampagne_id"
 						data-sortable="true"

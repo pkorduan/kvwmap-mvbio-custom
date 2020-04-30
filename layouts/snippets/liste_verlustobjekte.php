@@ -427,7 +427,7 @@
 			}
 
 			function kartierungEditFunctionsFormatter(value, row) {
-				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=240&value_kartierung_id=' + value + '&operator_kartierung_id==">ansehen</a>';
+				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=240&value_verlustobjekt_id=' + value + '&operator_verlustobjekt_id==">ansehen</a>';
 				//console.log(output);
 				return output;
 			}

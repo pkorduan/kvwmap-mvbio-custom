@@ -256,7 +256,7 @@
 						data-sortable="true"
 						data-visible="true"
 						data-switchable="true"
-						data-width="400px"
+						data-width="40px"
 					>Biotopname</th>
 					<th
 						data-field="kartierer_name"
@@ -288,7 +288,10 @@
 		<script language="javascript" type="text/javascript">
 			$('#gui-table').css('width', '100%');
 			$('#container_paint').css('height', 'auto');
-			
+			resizeBootstrapTable = function() {
+				$('.bootstrap-table').css('width', (document.GUI.browserwidth.value - 240) + 'px');
+			};
+			window.addEventListener('resize', resizeBootstrapTable);
 
 			$(function () {
 				result = $('#eventsResult');
@@ -308,6 +311,7 @@
 				// event handler
 				$('#kartierungen_table')
 				.one('load-success.bs.table', function (e, data) {
+					resizeBootstrapTable();
 					result.success('Tabelle erfolgreich geladen');
 				})
 				.on('post-body.bs.table', function (e, data) {

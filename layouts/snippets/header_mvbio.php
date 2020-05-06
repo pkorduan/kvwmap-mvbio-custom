@@ -118,7 +118,8 @@ if ($this->go == 'Stelle_waehlen') {
 
 			filterTest = function(param_value) {
 				if (param_value == 'Test') {
-					$('#layer_parameter_kartiergebietfilter').val(3454);
+					// Set value of Testgebiet
+					$('#layer_parameter_kartiergebietfilter').val($('#layer_parameter_kartiergebietfilter option:contains(Testgebiet)').val());
 				}
 				else {
 					$('#layer_parameter_kartiergebietfilter').val("0");

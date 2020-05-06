@@ -116,6 +116,15 @@ if ($this->go == 'Stelle_waehlen') {
 				}
 			};
 
+			filterTest = function(param_value) {
+				if (param_value == 'Test') {
+					$('#layer_parameter_kartiergebietfilter').val(3454);
+				}
+				else {
+					$('#layer_parameter_kartiergebietfilter').val("0");
+				}
+			};
+
 			onLayerParameterChanged = function(parameter) {
 				switch (parameter.id) {
 					case 'layer_parameter_kampagne_id':
@@ -125,8 +134,10 @@ if ($this->go == 'Stelle_waehlen') {
 					case 'layer_parameter_kartierebenenfilter':
 						filterBogenarten(parameter.value);
 					break;
+					case 'layer_parameter_umgebung' :
+					  filterTest(parameter.value);
+					break;
 				}
-				console.log('end of onLayerParameterChanged');
 			};
 			filterKartiergebiete($('#layer_parameter_kampagne_id').val());
 			filterKartierebenen($('#layer_parameter_kampagne_id').val());
@@ -176,7 +187,7 @@ if ($this->go == 'Stelle_waehlen') {
 			}
 		} ?>
 		<span class="fett px20"><?php
-			echo $this->Stelle->Bezeichnung . ' ' . implode(', ', $title); ?>
+			echo $this->Stelle->Bezeichnung . (rolle::$layer_params['umgebung'] == 'Test' ? ' <span style="color: red">Testumgebung</span>' : '') . ' ' . implode(', ', $title); ?>
 		</span>
 	</div>
 

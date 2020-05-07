@@ -1,5 +1,13 @@
 /* custom styles */
 
+.switch-gle-view-columns {
+	display: none;
+}
+
+.use_for_dataset {
+	display: none;
+}
+
 #value_105_pflanzen_0 > * :focus {
 /*  outline-color: red;*/
   -webkit-box-shadow: 0px 0px 1px 3px blue;

@@ -69,10 +69,27 @@
 		if ($ret['success']) {
 			$rs = pg_fetch_assoc($ret[1]);
 			$new_verlustobjekt_id = $rs['id'];
-			$this->add_message('success', 'Neues Verlustobjekt mit id: ' . $new_verlustobjekt_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Verlustobjekt jetzt bearbeiten.');
-			# ToDo Prüfen ob hier auch die Nebencodes extra mit übernommen werden müssen und was ist mit den anderen 1:n bezogenen Sachen?
-			# Brauchen wir überhaupt die Tabelle biotoptypen_nebencodes_verlustboegen?
-			$fehler = false;
+
+			# Eintragen der Nebencodes für das neue Kartierobjekt
+			$sql = "
+				INSERT INTO mvbio.biotoptypen_nebencodes_verlustobjekte (verlustobjekt_id, code, flaechendeckung_prozent, vegeinheit)
+				SELECT
+					" . $new_verlustobjekt_id . ", nc.code, nc.flaechendeckung_prozent, nc.vegeinheit
+				FROM
+					archiv.biotoptypen_nebencodes nc
+				WHERE
+					nc.kartierung_id = " . $this->formvars['bogen_id'] . "
+			";
+			#echo '<br>SQL zum Eintragen der Nebencodes für Verlustobjekt: ' . $sql;
+			$ret = $this->pgdatabase->execSQL($sql, 4, 0);
+			if ($ret['success']) {
+				$this->add_message('success', 'Neues Verlustobjekt mit id: ' . $new_verlustobjekt_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Verlustobjekt jetzt bearbeiten.');
+				$fehler = false;
+			}
+			else {
+				$this->add_message('error', 'Fehler beim Eintragen der Nebencodes.');
+				$fehler = true;
+			}
 		}
 		else {
 			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neues Verlustobjekt!<br>Hinweis: Wählen Sie immer vor der Übernahme unter Einstellungen die Kampagne und Kartiergebiet in die übernommen werden soll.');

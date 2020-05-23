@@ -69,6 +69,7 @@
 			$rs = pg_fetch_assoc($ret[1]);
 			$new_kartierobjekt_id = $rs['id'];
 
+/* Pflanzenvorkommen sollen nicht übernommen werden
 			# Eintragen der Pflanzenvorkommen
 			$sql = "
 				INSERT INTO mvbio.pflanzenvorkommen (kartierung_id, species_nr, valid_nr, dzv, fsk, rl, cf, tax, bav)
@@ -81,7 +82,8 @@
 					eb.id = " . $this->formvars['bogen_id'] . "
 			";
 			#echo '<br>SQL zum Eintragen der Pflanzenvorkommen: ' . $sql;
-			$ret = $this->pgdatabase->execSQL($sql, 4, 0);
+			#$ret = $this->pgdatabase->execSQL($sql, 4, 0);
+*/
 			if ($ret['success']) {
 
 				# Eintragen der Nebencodes für das neue Kartierobjekt

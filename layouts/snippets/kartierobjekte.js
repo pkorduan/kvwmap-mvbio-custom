@@ -8,6 +8,15 @@ $('#105_kartierebene_id_-1').on(
   }
 );
 
+$('#tr_105_fotos_0').on(
+  'change',
+  function() {
+    var num_fotos = $('#105_fotos_0 div.raster_record').length;
+    $('#105_foto_0').val(num_fotos);
+    $('#105_foto_0').next().html(num_fotos);
+  }
+);
+
 wert_krit_selectors = [];
 for (i = 1; i <= 16; i++) {
 	wert_krit_selectors.push('#105_wert_krit_' + i + '_0');
@@ -104,8 +113,8 @@ function DatensatzValidator(layerId, datensatzNr) {
 			this.disable("ohnegefahr", false);
 		}
 		
-		console.info("validateGefcodes "+gefcodeCount+" ohneGefahr="+ohneGefahr);
-		console.info("validateGefcodes textGefahr: \""+textGefahr+"\"");
+		//console.info("validateGefcodes "+gefcodeCount+" ohneGefahr="+ohneGefahr);
+		//console.info("validateGefcodes textGefahr: \""+textGefahr+"\"");
 	}
 	
 	this.observerSubFormGefcode = function(mutationRecords) {

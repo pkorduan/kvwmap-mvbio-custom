@@ -8,6 +8,41 @@
 	display: none;
 }
 
+.dringlichkeit-3 {
+	background-color: orange;
+}
+
+.dringlichkeit-4 {
+	background-color: red;
+}
+
+.status-ready {
+	color: #7c7c7c;
+	background-color: #dae4ec;
+	font-weight: 600;
+	font-size: 23px;
+	border: #dae4ec
+
+}
+
+.status-ready input {
+  color: #7c7c7c;
+  background-color: #dae4ec;
+  border: #dae4ec
+}
+
+.status-ready select {
+  color: #7c7c7c;
+  background-color: #dae4ec;
+  border: #dae4ec
+}
+
+.status-ready textarea {
+  color: #7c7c7c;
+  background-color: #dae4ec;
+  border: #dae4ec
+}
+
 #value_105_pflanzen_0 > * :focus {
 /*  outline-color: red;*/
   -webkit-box-shadow: 0px 0px 1px 3px blue;
@@ -53,4 +88,8 @@
 
 #datensatz :focus, #datensatz .buttonlink:focus, #datensatz a:focus{
 	outline: 3px solid orange;
+}
+
+.datensatz {
+	width: 100%;
 }

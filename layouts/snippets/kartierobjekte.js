@@ -17,6 +17,11 @@ $('#tr_105_fotos_0').on(
   }
 );
 
+if ($('#105_bogenart_id_0').val() == 1) {
+  $('.105_group_FFH-LRT, .105_group_Beschreibung, .105_group_Standortmerkmale, .105_group_Nutzungsmerkmale, .105_group_Pflanzen').hide();
+}
+
+
 wert_krit_selectors = [];
 for (i = 1; i <= 16; i++) {
 	wert_krit_selectors.push('#105_wert_krit_' + i + '_0');

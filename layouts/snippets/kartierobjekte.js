@@ -21,32 +21,6 @@ if ($('#105_bogenart_id_0').val() == 1) {
   $('.105_group_FFH-LRT, .105_group_Beschreibung, .105_group_Standortmerkmale, .105_group_Nutzungsmerkmale, .105_group_Pflanzen').hide();
 }
 
-function createMultiPhotoUploadDiv(kartierobjekt_id) {
-  $('#new_105_fotos_0').after('<div id="multiple_foto_upload_sperr_div" class="sperr-div" style="display: block">');
-  $('#multiple_foto_upload_sperr_div').append('<div id="multiple_foto_upload_div" class="mutliple_upload_div">');
-  $('#multiple_foto_upload_div').append('\
-    <div class="contr"><div style="float:left"><h2>Upload mehrerer Fotos zur Kartierung ID: ' + kartierobjekt_id + '</h2></div><div style="float: right"><img src="graphics/exit.png" onclick="closeMultiPhotoUploadDiv(' + kartierobjekt_id + ')"></div></div>\
-    <div style="clear: both"></div>\
-    <div class="upload_form_cont">\
-        <div id="dropArea">Fotos hier reinziehen<span style="font-size: 16px"><p>bis zu 50 Dateien pro Upload<br>Dateigröße pro Bild unter 5Mb</p></span></div>\
-        <div class="info">\
-            <div>Verbleibende Dateien zum Hochladen: <span id="count">0</span></div>\
-            <input type="hidden" id="url" value="index.php?go=show_snippet&snippet=upload_foto&only_main=1&only_create=1&kartierobjekt_id=' + kartierobjekt_id + '"/>\
-            <h2>Ergebnis:</h2>\
-            <div id="result"></div>\
-            <canvas width="500" height="20"></canvas>\
-        </div>\
-    </div>\
-  <script src="custom/layouts/snippets/upload_multiple_files.js"></script>\
-  <link href="custom/layouts/upload_multiple_files.css" rel="stylesheet" type="text/css">\
-  ');
-};
-
-function closeMultiPhotoUploadDiv(kartierobjekt_id) {
-  $('#multiple_foto_upload_sperr_div').remove();
-  reload_subform_list('105_fotos_0', 0, 0);
-};
-
 wert_krit_selectors = [];
 for (i = 1; i <= 16; i++) {
 	wert_krit_selectors.push('#105_wert_krit_' + i + '_0');

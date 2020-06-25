@@ -5,7 +5,7 @@ var dropArea = document.getElementById('dropArea');
 var canvas = document.querySelector('canvas');
 var context = canvas.getContext('2d');
 var count = document.getElementById('count');
-var destinationUrl = document.getElementById('url');
+var destinationUrl = document.getElementById('upload_foto_url');
 var result = document.getElementById('result');
 var list = [];
 var totalSize = 0;
@@ -85,7 +85,7 @@ var totalProgress = 0;
         }
         // prepare FormData
         var formData = new FormData();
-        formData.append('109;datei;fotos;;Dokument;1;varchar;1', file);
+        formData.append(fotoLayerId_ + ';datei;' + fotoTableName_ + ';;Dokument;1;varchar;1', file);
         xhr.send(formData);
     }
     // upload next file

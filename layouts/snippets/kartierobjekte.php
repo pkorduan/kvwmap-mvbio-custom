@@ -78,6 +78,7 @@
 			}
 		}
 		loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/kartierobjekte.js", callback);	
+		loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/multiPhotoUploadDiv.js", callback);	
 	}
 
 	function unloaded() {

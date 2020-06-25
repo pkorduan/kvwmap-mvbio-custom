@@ -11,23 +11,18 @@ function bytesToSize1024($bytes, $precision = 2) {
 	return @round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision).' '.$unit[$i];
 }
 
-if (isset($_FILES['109;datei;fotos;;Dokument;1;varchar;1'])) {
-	$sFileName = $_FILES['109;datei;fotos;;Dokument;1;varchar;1']['name'];
-	$sFileTmpName = $_FILES['109;datei;fotos;;Dokument;1;varchar;1']['tmp_name'];
-	$sFileType = $_FILES['109;datei;fotos;;Dokument;1;varchar;1']['type'];
-	$sFileSize = bytesToSize1024($_FILES['109;datei;fotos;;Dokument;1;varchar;1']['size'], 1);
+if (isset($_FILES[$this->formvars['foto_layer_id'] . ';datei;' . $this->formvars['foto_table_name'] . ';;Dokument;1;varchar;1'])) {
+	$sFileName = $_FILES[$this->formvars['foto_layer_id'] . ';datei;' . $this->formvars['foto_table_name'] . ';;Dokument;1;varchar;1']['name'];
+	$sFileTmpName = $_FILES[$this->formvars['foto_layer_id'] . ';datei;' . $this->formvars['foto_table_name'] . ';;Dokument;1;varchar;1']['tmp_name'];
+	$sFileType = $_FILES[$this->formvars['foto_layer_id'] . ';datei;' . $this->formvars['foto_table_name'] . ';;Dokument;1;varchar;1']['type'];
+	$sFileSize = bytesToSize1024($_FILES[$this->formvars['foto_layer_id'] . ';datei;' . $this->formvars['foto_table_name'] . ';;Dokument;1;varchar;1']['size'], 1);
 
 	$this->formvars['go'] = 'neuer_Layer_Datensatz_speichern';
-	$this->formvars['selected_layer_id'] = 109;
-	$this->formvars['form_field_names'] = '109;id;fotos;;Text;1;int4;1|109;kartierung_id;fotos;;Text;0;int4;1|109;datei;fotos;;Dokument;1;varchar;1|109;exif_latlng;fotos;;ExifLatLng;1;varchar;1|109;exif_richtung;fotos;;ExifRichtung;1;float8;1|109;exif_erstellungszeit;fotos;;ExifErstellungszeit;1;timestamp;1';
-	$this->formvars['109;id;fotos;;Text;1;int4;1'] = '';
-	$this->formvars['109;kartierung_id;fotos;;Text;0;int4;1'] = $this->formvars['kartierobjekt_id'];
-	$this->formvars['109;datei;fotos;;Dokument;1;varchar;1'] = 1;
-	/*
-	109;exif_latlng;fotos;;ExifLatLng;1;varchar;1|
-	109;exif_richtung;fotos;;ExifRichtung;1;float8;1|
-	109;exif_erstellungszeit;fotos;;ExifErstellungszeit;1;timestamp;1|
-*/
+	$this->formvars['selected_layer_id'] = $this->formvars['foto_layer_id'];
+	$this->formvars['form_field_names'] = $this->formvars['foto_layer_id'] . ';id;' . $this->formvars['foto_table_name'] . ';;Text;1;int4;1|' . $this->formvars['foto_layer_id'] . ';' . $this->formvars['join_attribute_name'] . ';' . $this->formvars['foto_table_name'] . ';;Text;0;int4;1|' . $this->formvars['foto_layer_id'] . ';datei;' . $this->formvars['foto_table_name'] . ';;Dokument;1;varchar;1|' . $this->formvars['foto_layer_id'] . ';exif_latlng;' . $this->formvars['foto_table_name'] . ';;ExifLatLng;1;varchar;1|' . $this->formvars['foto_layer_id'] . ';exif_richtung;' . $this->formvars['foto_table_name'] . ';;ExifRichtung;1;float8;1|' . $this->formvars['foto_layer_id'] . ';exif_erstellungszeit;' . $this->formvars['foto_table_name'] . ';;ExifErstellungszeit;1;timestamp;1';
+	$this->formvars[$this->formvars['foto_layer_id'] . ';id;' . $this->formvars['foto_table_name'] . ';;Text;1;int4;1'] = '';
+	$this->formvars[$this->formvars['foto_layer_id'] . ';' . $this->formvars['join_attribute_name'] . ';' . $this->formvars['foto_table_name'] . ';;Text;0;int4;1'] = $this->formvars['join_attribute_id'];
+	$this->formvars[$this->formvars['foto_layer_id'] . ';datei;' . $this->formvars['foto_table_name'] . ';;Dokument;1;varchar;1'] = 1;
 	$this->formvars['only_create'] = true;
 	$this->neuer_Layer_Datensatz_speichern();
 	echo <<<EOF

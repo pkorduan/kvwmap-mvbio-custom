@@ -17,6 +17,10 @@ $('#tr_105_fotos_0').on(
   }
 );
 
+if ($('#105_bogenart_id_0').val() == 1) {
+  $('.105_group_FFH-LRT, .105_group_Beschreibung, .105_group_Standortmerkmale, .105_group_Nutzungsmerkmale, .105_group_Pflanzen').hide();
+}
+
 function createMultiPhotoUploadDiv(kartierobjekt_id) {
   $('#new_105_fotos_0').after('<div id="multiple_foto_upload_sperr_div" class="sperr-div" style="display: block">');
   $('#multiple_foto_upload_sperr_div').append('<div id="multiple_foto_upload_div" class="mutliple_upload_div">');

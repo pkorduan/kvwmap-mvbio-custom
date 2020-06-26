@@ -52,6 +52,7 @@
 		$select_columns['bogenart_id'] = 3;
 		$insert_columns['bogen_id'] = 'bogen_id';
 		$select_columns['bogen_id'] = $this->formvars['bogen_id'];
+		$select_columns['foto'] = 0;
 
 		# Eintragen des neuen Verlustbogens mit den Daten des ausgewählten Bogens
 		$sql = "

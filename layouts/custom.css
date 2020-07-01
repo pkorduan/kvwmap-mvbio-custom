@@ -8,40 +8,57 @@
 	display: none;
 }
 
+.dringlichkeit-1 {
+	background-color: #ddddff;
+}
+
+.dringlichkeit-1 a {
+	color: blue;
+}
+
+.dringlichkeit-2 {
+	background-color: #ddddff;
+}
+
+.dringlichkeit-2 a {
+	color: blue;
+}
+
 .dringlichkeit-3 {
-	background-color: orange;
+	background-color: #FFEBCE;
+}
+
+.dringlichkeit-3 a {
+	color: #e89a00;
 }
 
 .dringlichkeit-4 {
-	background-color: red;
+	background-color: #ffdddd;
+}
+
+.dringlichkeit-4 a {
+	color: #ff0000;
+}
+
+.dringlichkeit-5 {
+	background-color: #deffdc;
+}
+
+.dringlichkeit-5 a {
+	color: #018b1e;
 }
 
 .status-ready {
-	color: #7c7c7c;
-	background-color: #dae4ec;
+	background-color: #eeeeee;
+}
+
+.status-ready a {
 	font-weight: 600;
 	font-size: 23px;
-	border: #dae4ec
-
+	border: #dae4ec;
+	color: gray;
 }
 
-.status-ready input {
-  color: #7c7c7c;
-  background-color: #dae4ec;
-  border: #dae4ec
-}
-
-.status-ready select {
-  color: #7c7c7c;
-  background-color: #dae4ec;
-  border: #dae4ec
-}
-
-.status-ready textarea {
-  color: #7c7c7c;
-  background-color: #dae4ec;
-  border: #dae4ec
-}
 
 #value_105_pflanzen_0 > * :focus {
 /*  outline-color: red;*/
@@ -92,4 +109,20 @@
 
 .datensatz {
 	width: 100%;
+}
+
+.pflanzen_f{
+	background: green;
+}
+
+.pflanzen_m{
+	background: tomato;
+}
+
+.pflanzen_s{
+	background: lightgreen;
+}
+
+.pflanzen_s input{
+	font-family: 'SourceSansPro2';
 }

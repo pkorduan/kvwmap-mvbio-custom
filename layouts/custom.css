@@ -67,6 +67,18 @@
   box-shadow: 0px 0px 1px 3px blue;
 }
 
+#autofeld_zweispaltig_auswahl_und_suggest_div input{
+	width: 500px;
+}
+
+#name_106_nativename_-1, #value_106_nativename_-1 {
+	display: none;
+}
+
+#value_106_dzv_-1 .subform_106 {
+	width: 33px !important;
+}
+
 #neuer_datensatz_button {
 	display: block;
 	position: relative;

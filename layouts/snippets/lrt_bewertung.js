@@ -2386,12 +2386,44 @@ function BewertungOffenland_3_2_1() {
     this.nr="3.2.1";
     this.txt="Stoffeinträge möglich durch fehlende Pufferstrukturen (außerhalb des LRT)";
     this.lrtCodes=[1340, 2310, 2330, 4010, 4030, 5130, 6120, 6210, 6230, 6240, 6410, 6440, 6510];
+	
+	this.prepareHTML = function(b) {
+		b.setCalculated("T321_2", true);
+	}
+	
 	this.getKorrekturWert=function() {
 		return this.korrekturWert;
 	}	
 	this.berechneKorrekturWert=function(b) {
 		let T321_1 = Number.parseInt(b.getValue("T321_1"));
 		let T321_2 = b.getValue("T321_2");
+	
+		
+		if (Number.isInteger(T321_1) && this.oldValueT321_1 !== T321_1) {
+			var rbNr;
+			if (T321_1<=10) {
+				rbNr = 7; 
+			} else if (T321_1<=25) {
+				rbNr = 6; 
+			} else if (T321_1<=50) {
+				rbNr = 5; 
+			} else if (T321_1<=75) {
+				rbNr = 4; 
+			} else if (T321_1<=90) {
+				rbNr = 3; 
+			} else if (T321_1<100) {
+				rbNr = 2; 
+			} else if (T321_1===100) {
+				rbNr = 1; 
+			}
+			
+			this.oldValueT321_1 = T321_1;
+			this.oldValueT321_2 = rbNr;
+			b.setRadioButton("T321_2", rbNr);
+			T321_2 = b.getValue("T321_2");
+		}
+
+		this.oldValueT321_2 = T321_2;
 
 		if (Number.isInteger(T321_2) && T321_2 > 0) {
 			let nrEingabe = Number.isInteger(T321_1);
@@ -2412,6 +2444,12 @@ function BewertungOffenland_3_2_1() {
 			}
 			if (isValid) {
 				this.korrekturWert = [4,5,6,7].indexOf(T321_2)>=0 ? -1 : 0;
+			}
+		} else {
+			if (Number.isInteger(T321_1) && T321_1<=100 && T321_1>=0) {
+			}
+			else {
+				this.korrekturWert = { err:"Eingebener Wert ist zu gross oder zu klein."};
 			}
 		}
 	}

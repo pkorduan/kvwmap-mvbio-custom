@@ -42,7 +42,7 @@
 		$select_columns['bearbeitungsstufe'] = 1;
 		$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
 		$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
-    $select_columns['e_datum'] = 'NULL';
+#    $select_columns['e_datum'] = 'NULL';
     $select_columns['l_datum'] = 'NULL';
     if ($this->formvars['bogenart_id'] == '') {
   		if ($archivtabelle == 'bewertungsboegen') {

@@ -3,7 +3,7 @@
 	include(CLASSPATH . 'FormObject.php');
 	include_once(CLASSPATH . 'LayerAttributeRolleSetting.php');
 	$layer_id = 146;
-	$larsObj = new LayerAttributeRolleSetting($this, $this->Stelle->id, $this->user->id, 146);
+	$larsObj = new LayerAttributeRolleSetting($this, $this->Stelle->id, $this->user->id, $layer_id);
 	$rolle_attribute_settings = $larsObj->read_layer_attributes2rolle($layer_id, $this->Stelle->id, $this->user->id);
 	if (count($rolle_attribute_settings) > 0) {
 		$sort_attribute = array_values(
@@ -21,9 +21,9 @@
 			'sort_direction' => 'asc'
 		);
 	}
-	#echo '<p>' . print_r($sort_attribute, true);
-	#echo '<p>Sortierattribute: ' . $sort_attribute['attributename'];
-	#echo '<br>Sortierrichtung:' . $sort_attribute['sort_direction'];
+#	echo '<p>' . print_r($sort_attribute, true);
+#	echo '<p>Sortierattribute: ' . $sort_attribute['attributename'];
+#	echo '<br>Sortierrichtung:' . $sort_attribute['sort_direction'];
 ?>
 <link rel="stylesheet" href="<?php echo BOOTSTRAP_PATH; ?>css/bootstrap.min.css" type="text/css">
 <link rel="stylesheet" href="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.css" type="text/css">
@@ -195,18 +195,18 @@
 						data-field="kartierung_id"
 						data-sortable="true"
 						data-visible="<? echo ($rolle_attribute_settings['kartierung_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
-						data-switchable="true"
+						data-switchable="false"
 					>ID</th>
 					<th
 						data-field="label"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['label']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('label', $rolle_attribute_settings) OR $rolle_attribute_settings['label']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Objekt-Code</th>
 					<th
 						data-field="arbeits_id"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['arbeits_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('arbeits_id', $rolle_attribute_settings) OR $rolle_attribute_settings['arbeits_id']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Arbeits-ID</th>
 					<th
@@ -218,86 +218,86 @@
 					<th
 						data-field="kampagne_abk"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kampagne_abk']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('kampagne_abk', $rolle_attribute_settings) OR $rolle_attribute_settings['kampagne_abk']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Kampagne</th>
 					<th
 						data-field="kampagne"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kampagne']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ($rolle_attribute_settings['kampagne']['switched_on'] == 1 ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Kampagne Bezeichnung</th>
 					<th
 						data-field="kartiergebiet_id"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kartiergebiet_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ($rolle_attribute_settings['kartiergebiet_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Kartiergebiet ID</th>
 					<th
 						data-field="kartiergebiet"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kartiergebiet']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('kartiergebiet', $rolle_attribute_settings) OR $rolle_attribute_settings['kartiergebiet']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Kartiergebiet</th>
 					<th
 						data-field="kartierebene_id"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kartierebene_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ($rolle_attribute_settings['kartierebene_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Kartierebene Id</th>
 					<th
 						data-field="kartierebene"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kartierebene']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('kartierebene', $rolle_attribute_settings) OR $rolle_attribute_settings['kartierebene']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Kartierebene</th>
 					<th
 						data-field="bogenart_id"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['bogenart_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ($rolle_attribute_settings['bogenart_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Bogenart Id</th>
 					<th
 						data-field="bogenart"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['bogenart']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('bogenart', $rolle_attribute_settings) OR $rolle_attribute_settings['bogenart']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Bogenart</th>
 					<th
 						data-field="hc"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['hc']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('hc', $rolle_attribute_settings) OR $rolle_attribute_settings['hc']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Hauptcode</th>
 					<th
 						data-field="lrt_code"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['lrt_code']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('lrt_code', $rolle_attribute_settings) OR $rolle_attribute_settings['lrt_code']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>LRT-Code</th>
 					<th
 						data-field="biotopname"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['biotopname']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('biotopname', $rolle_attribute_settings) OR $rolle_attribute_settings['biotopname']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 						data-width="40px"
 					>Biotopname</th>
 					<th
 						data-field="kartierer_name"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kartierer_name']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('kartierer_name', $rolle_attribute_settings) OR $rolle_attribute_settings['kartierer_name']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Kartierer</th>
 					<th
 						data-field="user_id"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['user_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ($rolle_attribute_settings['user_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>User-ID</th>
 					<th
 						data-field="stand"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['stand']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('stand', $rolle_attribute_settings) OR $rolle_attribute_settings['stand']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Bearbeitungsstand</th>
 					<th

@@ -86,10 +86,6 @@
 	margin-right: 8px;
 }
 
-.message-box-msg {
-	text-align: left;
-}
-
 .pointer:hover {
 	color: #993333;
 	cursor: pointer;

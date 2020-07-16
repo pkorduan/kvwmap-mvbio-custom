@@ -194,7 +194,7 @@
 					<th
 						data-field="kartierung_id"
 						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kartierung_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+						data-visible="true"
 						data-switchable="false"
 					>ID</th>
 					<th

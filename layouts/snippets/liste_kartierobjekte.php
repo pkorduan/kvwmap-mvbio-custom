@@ -1,6 +1,29 @@
 <?
 	include(CLASSPATH . 'PgObject.php');
 	include(CLASSPATH . 'FormObject.php');
+	include_once(CLASSPATH . 'LayerAttributeRolleSetting.php');
+	$layer_id = 146;
+	$larsObj = new LayerAttributeRolleSetting($this, $this->Stelle->id, $this->user->id, 146);
+	$rolle_attribute_settings = $larsObj->read_layer_attributes2rolle($layer_id, $this->Stelle->id, $this->user->id);
+	if (count($rolle_attribute_settings) > 0) {
+		$sort_attribute = array_values(
+			array_filter(
+				$rolle_attribute_settings,
+				function ($attribute) {
+					return $attribute['sort_order'];
+				}
+			)
+		)[0];
+	}
+	else {
+		$sort_attribute = array(
+			'attributename' => 'label',
+			'sort_direction' => 'asc'
+		);
+	}
+	#echo '<p>' . print_r($sort_attribute, true);
+	#echo '<p>Sortierattribute: ' . $sort_attribute['attributename'];
+	#echo '<br>Sortierrichtung:' . $sort_attribute['sort_direction'];
 ?>
 <link rel="stylesheet" href="<?php echo BOOTSTRAP_PATH; ?>css/bootstrap.min.css" type="text/css">
 <link rel="stylesheet" href="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.css" type="text/css">
@@ -12,6 +35,7 @@
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extension/bootstrap-table-export.min.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
+<script src="funktionen/bootstrap-table-settings.js"></script>
 
 <div style="min-height: 500px; height: 100%"><?php
 	# Filter auf nur eigene, wenn user_id belegt ist oder bearbeitungsstufe auf inn Erfassung
@@ -141,15 +165,15 @@
 			data-height="100%"
 			data-click-to-select="true"
 			data-filter-control="true" 
-			data-sort-name="kartierung_id"
-			data-sort-order="asc"
+			data-sort-name="<?php echo $sort_attribute['attributename']; ?>"
+			data-sort-order="<?php echo $sort_attribute['sort_direction']; ?>"
 			data-search="true"
 			data-show-export="false"
 			data-export_types=['json', 'xml', 'csv', 'txt', 'sql', 'excel']
 			data-show-refresh="false"
 			data-show-toggle="true"
 			data-show-columns="true"
-			data-query-params="go=Layer-Suche_Suchen&selected_layer_id=146<?php echo $filter; ?>&anzahl=10000&mime_type=formatter&format=json"
+			data-query-params="go=Layer-Suche_Suchen&selected_layer_id=<?php echo $layer_id; ?><?php echo $filter; ?>&anzahl=10000&mime_type=formatter&format=json"
 			data-pagination="true"
 			data-page-size="100"
 			data-toggle="table"
@@ -170,110 +194,110 @@
 					<th
 						data-field="kartierung_id"
 						data-sortable="true"
-						data-visible="true"
+						data-visible="<? echo ($rolle_attribute_settings['kartierung_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>ID</th>
 					<th
 						data-field="label"
 						data-sortable="true"
-						data-visible="true"
+						data-visible="<? echo ($rolle_attribute_settings['label']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Objekt-Code</th>
 					<th
 						data-field="arbeits_id"
 						data-sortable="true"
-						data-visible="true"
+						data-visible="<? echo ($rolle_attribute_settings['arbeits_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Arbeits-ID</th>
 					<th
 						data-field="kampagne_id"
 						data-sortable="true"
-						data-visible="false"
+						data-visible="<? echo ($rolle_attribute_settings['kampagne_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Kampagne ID</th>
 					<th
 						data-field="kampagne_abk"
 						data-sortable="true"
-						data-visible="false"
+						data-visible="<? echo ($rolle_attribute_settings['kampagne_abk']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Kampagne</th>
 					<th
 						data-field="kampagne"
 						data-sortable="true"
-						data-visible="false"
+						data-visible="<? echo ($rolle_attribute_settings['kampagne']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Kampagne Bezeichnung</th>
 					<th
 						data-field="kartiergebiet_id"
 						data-sortable="true"
-						data-visible="false"
+						data-visible="<? echo ($rolle_attribute_settings['kartiergebiet_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Kartiergebiet ID</th>
 					<th
 						data-field="kartiergebiet"
 						data-sortable="true"
-						data-visible="false"
+						data-visible="<? echo ($rolle_attribute_settings['kartiergebiet']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Kartiergebiet</th>
 					<th
 						data-field="kartierebene_id"
 						data-sortable="true"
-						data-visible="false"
+						data-visible="<? echo ($rolle_attribute_settings['kartierebene_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Kartierebene Id</th>
 					<th
 						data-field="kartierebene"
 						data-sortable="true"
-						data-visible="true"
+						data-visible="<? echo ($rolle_attribute_settings['kartierebene']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Kartierebene</th>
 					<th
 						data-field="bogenart_id"
 						data-sortable="true"
-						data-visible="false"
+						data-visible="<? echo ($rolle_attribute_settings['bogenart_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Bogenart Id</th>
 					<th
 						data-field="bogenart"
 						data-sortable="true"
-						data-visible="true"
+						data-visible="<? echo ($rolle_attribute_settings['bogenart']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Bogenart</th>
 					<th
 						data-field="hc"
 						data-sortable="true"
-						data-visible="true"
+						data-visible="<? echo ($rolle_attribute_settings['hc']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Hauptcode</th>
 					<th
 						data-field="lrt_code"
 						data-sortable="true"
-						data-visible="true"
+						data-visible="<? echo ($rolle_attribute_settings['lrt_code']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>LRT-Code</th>
 					<th
 						data-field="biotopname"
 						data-sortable="true"
-						data-visible="true"
+						data-visible="<? echo ($rolle_attribute_settings['biotopname']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 						data-width="40px"
 					>Biotopname</th>
 					<th
 						data-field="kartierer_name"
 						data-sortable="true"
-						data-visible="true"
+						data-visible="<? echo ($rolle_attribute_settings['kartierer_name']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Kartierer</th>
 					<th
 						data-field="user_id"
 						data-sortable="true"
-						data-visible="false"
+						data-visible="<? echo ($rolle_attribute_settings['user_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>User-ID</th>
 					<th
 						data-field="stand"
 						data-sortable="true"
-						data-visible="true"
+						data-visible="<? echo ($rolle_attribute_settings['stand']['switched_on'] == 1 ? 'true' : 'false'); ?>"
 						data-switchable="true"
 					>Bearbeitungsstand</th>
 					<th
@@ -313,6 +337,7 @@
 				.one('load-success.bs.table', function (e, data) {
 					resizeBootstrapTable();
 					result.success('Tabelle erfolgreich geladen');
+					registerEventHandler();
 				})
 				.on('post-body.bs.table', function (e, data) {
 					$('.xpk-func-del-konvertierung').click(

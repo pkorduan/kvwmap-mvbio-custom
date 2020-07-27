@@ -193,8 +193,8 @@
 					} ?>
 					<th
 						data-field="kartierung_id"
-						data-sortable="true"
 						data-visible="true"
+						data-formatter="kartierungEditFunctionsFormatter"
 						data-switchable="false"
 					>ID</th>
 					<th
@@ -270,9 +270,9 @@
 						data-switchable="true"
 					>Hauptcode</th>
 					<th
-						data-field="lrt_code"
+						data-field="lrt_info_code"
 						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('lrt_code', $rolle_attribute_settings) OR $rolle_attribute_settings['lrt_code']['switched_on'] == 1) ? 'true': 'false'); ?>"
+						data-visible="<? echo ((!array_key_exists('lrt_info_code', $rolle_attribute_settings) OR $rolle_attribute_settings['lrt_info_code']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>LRT-Code</th>
 					<th
@@ -300,12 +300,6 @@
 						data-visible="<? echo ((!array_key_exists('stand', $rolle_attribute_settings) OR $rolle_attribute_settings['stand']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 					>Bearbeitungsstand</th>
-					<th
-						data-field="kartierung_id"
-						data-visible="true"
-						data-formatter="kartierungEditFunctionsFormatter"
-						data-switchable="false"
-					>&nbsp;</th>
 				</tr>
 			</thead>
 		</table>
@@ -474,7 +468,7 @@
 			}
 
 			function kartierungEditFunctionsFormatter(value, row) {
-				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=105&value_kartierung_id=' + value + '&operator_kartierung_id==">ansehen</a>';
+				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=105&value_kartierung_id=' + value + '&operator_kartierung_id==">' + row.kartierung_id + '</a>';
 				//console.log(output);
 				return output;
 			}

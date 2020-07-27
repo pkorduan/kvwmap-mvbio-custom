@@ -210,6 +210,20 @@
 						data-switchable="true"
 					>Arbeits-ID</th>
 					<th
+						data-field="hat_geom"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('hat_geom', $rolle_attribute_settings) OR $rolle_attribute_settings['hat_geom']['switched_on'] == 1) ? 'true' : 'false'); ?>"
+						data-formatter="boolTypeFormatter"
+						data-switchable="true"
+					>hat Geom</th>
+					<th
+						data-field="hat_fotos"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('hat_fotos', $rolle_attribute_settings) OR $rolle_attribute_settings['hat_fotos']['switched_on'] == 1) ? 'true' : 'false'); ?>"
+						data-formatter="boolTypeFormatter"
+						data-switchable="true"
+					>hat Fotos</th>
+					<th
 						data-field="kampagne_id"
 						data-sortable="true"
 						data-visible="<? echo ($rolle_attribute_settings['kampagne_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
@@ -456,15 +470,9 @@
 			}
 
 			// formatter functions
-			function kartierungFormatter(value, row) {
-		/*		var kartierung = JSON.parse(value);
-				return $.map(
-					gemeinden,
-					function(gemeinde) {
-						return gemeinde.gemeindename;
-					}
-				).join(', ')
-		*/
+			function boolTypeFormatter(value, row) {
+				console.log(value);
+				return (value == 't' ? 'ja' : 'nein');
 			}
 
 			function kartierungEditFunctionsFormatter(value, row) {

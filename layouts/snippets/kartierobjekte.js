@@ -11,7 +11,7 @@ $('#105_kartierebene_id_-1').on(
 $('#tr_105_fotos_0').on(
   'change',
   function() {
-    var num_fotos = $('#105_fotos_0 div.raster_record').length;
+    var num_fotos = $('#105_fotos_0 div.raster_record,div.raster_record_open').length;
     $('#105_foto_0').val(num_fotos);
     $('#105_foto_0').next().html(num_fotos);
   }

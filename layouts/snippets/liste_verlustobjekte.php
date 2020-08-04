@@ -385,6 +385,7 @@
 							data: {
 								go: "show_snippet",
 								snippet: "update_bearbeitungsstaende",
+								objektart: "Verlustobjekte",
 								mime_type: "application/json",
 								format: "json",
 								stufe_alt: <? echo $this->formvars['bearbeitungsstufe']; ?>,

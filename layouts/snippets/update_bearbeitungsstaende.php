@@ -3,10 +3,10 @@
 	$success = false;
 	# Beschränkung auf Kartierer wenn Änderungsberechtigte Stelle Kartierung ist
 	$kartiererfilter = ($this->Stelle->Bezeichnung == 'Karterung' ? " AND k.user_id = " . $this->user->id : "");
-	# Update Kartierobjekte
+	# Update Objekte
 	$sql = "
 		UPDATE
-			mvbio.kartierobjekte k
+			mvbio." . ($this->formvars['objektart'] == 'Verlustobjekte' ? 'verlustobjekte' : 'kartierobjekte') . " k
 		SET
 			bearbeitungsstufe = " . $this->formvars['stufe_neu'] . "
 		FROM

@@ -280,4 +280,40 @@
 		$this->GenerischeSuche_Suchen();
 		exit();
 	}
+/*
+-- Angaben zur Erstkartierung von Kurzbögen und Kampagne 1 übernehmen an Hand einer Zuordnungstabelle
+UPDATE
+  mvbio.kartierobjekte ko
+SET
+  giscode = b.giscode,
+  alt_giscod = b.alt_giscod,
+  alt_lfd_nr = b.alt_lfd_nr,
+  alt_bearb = b.alt_bearb,
+  alt_datp20 = b.alt_datp20
+FROM
+  mvbio.zuordnungstabelle z JOIN
+  archiv.grundboegen b ON z.giscode = b.giscode
+WHERE
+  z.label = ko.label AND
+  b.kampagne_id = 1
+
+-- Und das ganze noch mal für Grundbögen
+
+UPDATE
+  mvbio.kartierobjekte ko
+SET
+  giscode = b.giscode,
+  alt_giscod = b.alt_giscod,
+  alt_lfd_nr = b.alt_lfd_nr,
+  see_nr = b.see_nr,
+  alt_bearb = b.alt_bearb,
+  alt_datp20 = b.alt_datp20,
+  alt_datffh = b.alt_datffh
+FROM
+  mvbio.msommer m JOIN
+  archiv.grundboegen b ON m.giscode = b.giscode
+WHERE
+  m.label = ko.label AND
+  b.kampagne_id = 1
+*/
 ?>

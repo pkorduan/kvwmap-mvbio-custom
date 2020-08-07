@@ -20,7 +20,8 @@
 	function loaded() {
 		var callback = function() {
 		}
-		loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/multiPhotoUploadDiv.js", callback);	
+		loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/verlustobjekte.js", callback);
+		loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/multiPhotoUploadDiv.js", callback);
 	}
 
 	function unloaded() {

@@ -94,7 +94,7 @@ var totalProgress = 0;
             count.textContent = list.length - 1;
             dropArea.className = 'uploading';
             var nextFile = list.shift();
-            if (nextFile.size >= 5242880) { // 256kb
+            if (nextFile.size >= 5242880) { // 5MB
                 result.innerHTML += '<div class="f">Zu große Datei (max Dateigröße von 5 Mb überschritten)</div>';
                 handleComplete(nextFile.size);
             } else {

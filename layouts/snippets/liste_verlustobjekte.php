@@ -193,10 +193,11 @@
 					} ?>
 					<th
 						data-field="kartierung_id"
-						data-sortable="true"
 						data-visible="true"
+						data-formatter="kartierungEditFunctionsFormatter"
 						data-switchable="false"
 					>ID</th>
+
 					<th
 						data-field="label"
 						data-sortable="true"
@@ -264,6 +265,20 @@
 						data-switchable="true"
 						data-width="400px"
 					>Biotopname</th>
+					<th
+						data-field="koordinator_rueckweisung"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('koordinator_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['koordinator_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
+						data-switchable="true"
+						data-formatter="boolTypeFormatter"
+					>Rückweisung durch Koordinator</th>
+					<th
+						data-field="pruefer_rueckweisung"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('pruefer_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['pruefer_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
+						data-switchable="true"
+						data-formatter="boolTypeFormatter"
+					>Rückweisung durch Prüfer</th>
 					<th
 						data-field="kartierer_name"
 						data-sortable="true"
@@ -456,8 +471,13 @@
 		*/
 			}
 
+			function boolTypeFormatter(value, row) {
+				//console.log(value);
+				return (value == 't' ? 'ja' : 'nein');
+			}
+
 			function kartierungEditFunctionsFormatter(value, row) {
-				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=240&value_verlustobjekt_id=' + value + '&operator_verlustobjekt_id==">ansehen</a>';
+				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=240&value_verlustobjekt_id=' + value + '&operator_verlustobjekt_id==">' + row.kartierung_id + '</a>';
 				//console.log(output);
 				return output;
 			}

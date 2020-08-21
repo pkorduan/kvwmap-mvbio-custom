@@ -298,6 +298,20 @@
 						data-width="40px"
 					>Biotopname</th>
 					<th
+						data-field="koordinator_rueckweisung"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('koordinator_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['koordinator_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
+						data-switchable="true"
+						data-formatter="boolTypeFormatter"
+					>Rückweisung durch Koordinator</th>
+					<th
+						data-field="pruefer_rueckweisung"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('pruefer_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['pruefer_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
+						data-switchable="true"
+						data-formatter="boolTypeFormatter"
+					>Rückweisung durch Prüfer</th>
+					<th
 						data-field="kartierer_name"
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('kartierer_name', $rolle_attribute_settings) OR $rolle_attribute_settings['kartierer_name']['switched_on'] == 1) ? 'true': 'false'); ?>"

@@ -1,5 +1,5 @@
 <?php
-	# Frage Bogenart ab
+	# Frage Layer-id der Bogenart ab
 	$sql = "
 		SELECT
 		  l.layer_id
@@ -19,12 +19,13 @@
 		WHERE
 			eb.id = " . $this->formvars['bogen_id'] . "
 	";
+	#echo '<p>SQL zum Abfragen der Datensätze: ' . $sql;
 	$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 	$rs = pg_fetch_assoc($ret[1]);
 	$this->formvars['selected_layer_id'] = $rs['layer_id'];
 	$this->formvars['go'] = 'Layer-Suche_Suchen';
-	$this->formvars['operator_id'] = '=';
-	$this->formvars['value_id'] = $this->formvars['bogen_id'];
-	$this->formvars['only_main'] = 1;
+	$this->formvars['operator_bogen_id'] = '=';
+	$this->formvars['value_bogen_id'] = $this->formvars['bogen_id'];
 	$this->GenerischeSuche_Suchen();
+	$this->only_main = 1;
 ?>

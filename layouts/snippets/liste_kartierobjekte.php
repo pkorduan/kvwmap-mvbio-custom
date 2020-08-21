@@ -175,6 +175,7 @@
 			data-show-columns="true"
 			data-query-params="go=Layer-Suche_Suchen&selected_layer_id=<?php echo $layer_id; ?><?php echo $filter; ?>&anzahl=10000&mime_type=formatter&format=json"
 			data-pagination="true"
+			data-page-list=[10,25,50,100,250,500,1000,all]
 			data-page-size="100"
 			data-toggle="table"
 			data-toolbar="#toolbar"	
@@ -471,7 +472,7 @@
 
 			// formatter functions
 			function boolTypeFormatter(value, row) {
-				console.log(value);
+				//console.log(value);
 				return (value == 't' ? 'ja' : 'nein');
 			}
 

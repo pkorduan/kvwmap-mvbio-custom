@@ -1,4 +1,4 @@
-<?php include_once(SNIPPETS . 'generic_layer_editor_2.php'); ?>
+<?php include(SNIPPETS . 'generic_layer_editor_2.php'); ?>
 
 <style>
 	.bewertungsFrame {

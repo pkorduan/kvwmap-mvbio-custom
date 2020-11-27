@@ -38,7 +38,7 @@
 <script src="funktionen/bootstrap-table-settings.js"></script>
 
 <div style="min-height: 500px; height: 100%"><?php
-	# Filter auf nur eigene, wenn user_id belegt ist oder bearbeitungsstufe auf inn Erfassung
+	# Filter auf nur eigene, wenn user_id belegt ist oder bearbeitungsstufe auf in Erfassung
 	if ($this->formvars['user_id'] != '' OR $this->formvars['bearbeitungsstufe'] == 1) {
 		$user_id_filter = '&value_user_id=' . $this->user->id . '&operator_user_id==';
 		$subtitle = 'nur eigene';
@@ -85,7 +85,7 @@
 
 		/* ToDo
 			Die Listen werden wie folgt mit Funktion zum Standwechsel ausgestattet.
-			Nur die Seiten, die jeweils nur einen Stand anzeigen erhalten Funktion zum wechsel.
+			Nur die Seiten, die jeweils nur einen Stand anzeigen erhalten Funktion zum Wechsel.
 			Man kann die angezeigten nur eine Stufe hoch oder runter wechseln
 			und nur wenn der Bearbeiter mit seinen Rechten das darf.
 			Der Kartierer z.B. darf nur 1 nach 2, 2 nach 1 und 2 nach 3 aber nicht 3 nach 2 etc.
@@ -195,6 +195,7 @@
 					<th
 						data-field="kartierung_id"
 						data-visible="true"
+						data-sortable="true"
 						data-formatter="kartierungEditFunctionsFormatter"
 						data-switchable="false"
 					>ID</th>
@@ -217,6 +218,12 @@
 						data-formatter="boolTypeFormatter"
 						data-switchable="true"
 					>hat Geom</th>
+					<th
+						data-field="flaeche"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('flaeche', $rolle_attribute_settings) OR $rolle_attribute_settings['flaeche']['switched_on'] == 1) ? 'true' : 'false'); ?>"
+						data-switchable="true"
+					>Fläche</th>
 					<th
 						data-field="hat_fotos"
 						data-sortable="true"

@@ -1,5 +1,5 @@
-var aaaa;
-if (aaaa) { console.log('yes'); } else { console.log('nicht hgesettz'); }
+// var aaaa;
+// if (aaaa) { console.log('yes'); } else { console.log('nicht hgesettz'); }
 var colorDisabled = "#bcd";
 function test() {
 	var foo;
@@ -74,13 +74,7 @@ function Frame(content, title, className) {
     }
 
 		this.toggle = function() {
-			console.info(this.dragEnded);
-			/*
-			if (this.dragEnded===true) {
-				this.dragEnded=false;
-				return;
-			}
-			*/
+
 			if (this.content.style.display=='none') {
 				this.content.style.display="block";
 				this.closeBttn.innerHTML = '<img border="0" src="graphics//minus.gif">';
@@ -129,7 +123,7 @@ function Frame(content, title, className) {
 function showText(s) {
 
 	this.close=function() {
-		console.info("close");
+		
 		document.body.removeChild(this.div);
 	}
 	this.div=document.createElement('div');
@@ -367,8 +361,8 @@ function BewertungFliessgewaesser_2_1_1() {
 		let titleElement = b.getSectionTitleElement("T211_1_1");
 		if (lrtCode===3260) {
 			titleElement.innerText = "2.1.1 Anzahl besonders charakteristischer Pflanzenarten";
-			console.info("value_145_t211_1_1_"+b.layerId);
-			console.info(document.getElementById("value_145_t211_1_1_"+b.datensatzNr));
+			// console.info("value_145_t211_1_1_"+b.layerId);
+			// console.info(document.getElementById("value_145_t211_1_1_"+b.datensatzNr));
 			document.getElementById("value_145_t211_1_1_"+b.datensatzNr).style.display = 'none';
 			document.getElementById("name_145_t211_1_1_"+b.datensatzNr).style.display = 'none';
 		} else if (lrtCode===3270) {
@@ -571,7 +565,7 @@ function BewertungFliessgewaesser_3_1_1() {
 	this.berechneKorrekturWert=function(b) {
 		let T311_1 = Number.parseInt(b.getValue("T311_1_1"));
 		let T311_2 = b.getValue("T311_2");
-		console.info("BewertungFliessgewaesser_3_1_1.berechneKorrekturWert T311_2", T311_2);
+		// console.info("BewertungFliessgewaesser_3_1_1.berechneKorrekturWert T311_2", T311_2);
 
 		if (Number.isInteger(T311_2) && T311_2 > 0) {
 			// 1       2       3       4       5        6
@@ -602,7 +596,7 @@ function BewertungFliessgewaesser_3_1_1() {
 		else {
 			this.korrekturWert = null;
 		}
-		console.info("T311_2", T311_2, this.korrekturWert);
+		// console.info("T311_2", T311_2, this.korrekturWert);
 	};	
 
 }
@@ -883,7 +877,7 @@ function BewertungStillgewaesser_1_1_1() {
 	this.lrtCodes=[3110, 3131, 3140, 3160];
 	
 	this.bewerte=function(b) {
-		console.info("BewertungStillgewaesser_1_1_1");
+		// console.info("BewertungStillgewaesser_1_1_1");
         // Deckungsgrad des aktuell besiedelbaren Gewässergrundes mit lr-typischer Vegetation 3110, 3131, 3132, 3140, 3160
         let result = -1;
 		let lrtCode = b.lrtCode;
@@ -1013,10 +1007,10 @@ function BewertungStillgewaesser_1_1_3() {
         var T113_2 = T113_1.length;
 		var UC1 = b.getValue("UC1");
 
-		console.info("uc1="+UC1);
+		// console.info("uc1="+UC1);
         if (lrtCode===3150) { 
 			if (["UST","USP"].indexOf(UC1)>=0) {
-				console.info('UC1 in ["UST","USP"] ' +T113_2);
+
 				if (T113_2 >= 2) {
 					result = {b:'A', txt:"Temporäre Kleingewässer, Torfstiche: >= 2 Elemente"};
 	 
@@ -1206,7 +1200,7 @@ function BewertungStillgewaesser_2_1_1() {
             }
 		}
 		if ([3150].indexOf(lrtCode)>=0) {
-			console.info("UC1="+UC1);
+
 			if (["USG","USC","USA","USS","USL","USB","USK","USW","UST","USP"].indexOf(UC1)>=0) {
 				if ( 
 					(UC1==="USG" && T211_1_1 >= 10) ||
@@ -2514,12 +2508,7 @@ function BewertungOffenland_3_2_3() {
 		var nutzintens_2 = b.getValue("nutzintens_2");
 		var nutzintens_3 = b.getValue("nutzintens_3");
 		var nutzintens_4 = b.getValue("nutzintens_4");
-		/*
-		console.info("nutzintens_1\""+nutzintens_1+"\"");
-		console.info("nutzintens_2\""+nutzintens_2+"\"");
-		console.info("nutzintens_3\""+nutzintens_3+"\"");
-		console.info("nutzintens_4\""+nutzintens_4+"\"");
-		*/
+		
 		if (nutzintens_4==="t" || nutzintens_3==="t") {
 			b.setRadioButton("T323_1", 3);
 		} else if (nutzintens_4==="f" || nutzintens_3==="f") {
@@ -2764,7 +2753,7 @@ function BewertungOffenland_3_2_8() {
 		var lrtCode = b.lrtCode;
         var T328_1_1 = parseInt(b.getValue("T328_1_1"));
 		var T328_1_2 = b.getValue("T328_1_2");
-		console.info("T328_1_2",T328_1_2);
+		
 		
 		if (T328_1_2) {
 			result = {b: 'A'};
@@ -2825,7 +2814,7 @@ function BewertungMoore_1_1_1() {
 		let T111_2 = -1;
 		let sum = 0;
 		for (let i=0; i<nc.length; i++) {
-			console.info(nc[i]);
+			// console.info(nc[i]);
 		}
 
 		/*
@@ -2855,7 +2844,7 @@ function BewertungMoore_1_1_1() {
 				sum += nc[i].percentage;
 			}
 		}
-		console.info("Summe Flächenanteile: "+sum);
+		// console.info("Summe Flächenanteile: "+sum);
 		if (Number.isInteger(sum)) {
 			if (sum === 100) {
 				T111_2 = 1;
@@ -2960,17 +2949,17 @@ function BewertungMoore_1_1_3() {
 	
 	this.berechne=function(b) {
 		let lrtCode = b.lrtCode;
-		console.info("lrtCodfe="+lrtCode);
+		// console.info("lrtCodfe="+lrtCode);
 		if (lrtCode === 7220) {
 			let deckung = 0;
 			let hc = b.getHauptCode();
-			console.info(hc);
+			// console.info(hc);
 			if ("VQT" === hc.code) {
 				deckung += hc.percentage;
 			}
 			let nc = b.getNebenCodes();
 			for (let i=0; i<nc.length; i++) {
-				console.info(nc[i]);
+				// console.info(nc[i]);
 				if ("VQT" === nc[i].code) {
 					deckung += nc[i].percentage;
 				}
@@ -4039,7 +4028,7 @@ function BewertungKueste_1_5_2() {
 		// var anz = b.getAnzahlNebenCodes() ;
 		var anz = parseInt(b.getValue("anzahl_nc"));
 		var hc = b.getValue("hc");
-		console.info("anz="+anz+"  hc="+hc);
+		// console.info("anz="+anz+"  hc="+hc);
 		if (hc && hc.length>=3) {
 			anz+=1;
 			if (anz>=7) {
@@ -4100,7 +4089,7 @@ function BewertungKueste_1_5_4() {
     this.lrtCodes=[1330, 2190];
 	
 	
-	this.berechne=function(b) {
+	this.berechne=function(b) {		
 		var lrtCode = b.lrtCode;
 		if (lrtCode === 2190) {
 			if (b.hasHabitat("CDZ")) {
@@ -4124,8 +4113,8 @@ function BewertungKueste_1_5_4() {
 		
 		if (lrtCode === 1330) {
 			T154_1 = b.getValue("T154_1");
-			T211_1_3 = b.getValue("T211_1_3");
-
+			T211_1_3 = parseInt(b.getValue("T211_1_3"));
+						
 			if (Array.isArray(T154_1) && !isNaN(T211_1_3) && T211_1_3 > 0) {	
 				result = 0;			
 				if (T154_1.length  >= 4 && T211_1_3 === 1 || T154_1.length >= 3 && T211_1_3 === 2) {
@@ -4150,6 +4139,7 @@ function BewertungKueste_1_5_4() {
 				}
 			}
 		} 
+		console.info(result);
 		this.result=result;
 	}
 }
@@ -4286,7 +4276,7 @@ function BewertungKueste_2_1_1() {
 				if (!isNaN(T211_1_2)) {
 					result = 0;					
 					if (T211_1_3===1) {
-						console.info("West");
+						// console.info("West");
 						if (T211_1_2 >= 10) {
 							result = {b:'A'};
 						} else if (T211_1_2 >= 6) {
@@ -4295,7 +4285,7 @@ function BewertungKueste_2_1_1() {
 							result = {b:'C'};
 						}
 					} else if (T211_1_3===2) {
-						console.info("Ost");
+						// console.info("Ost");
 						if (T211_1_2 >= 7) {
 							result = {b:'A'};
 						} else if (T211_1_2 >= 3) {
@@ -5121,12 +5111,12 @@ function Gruppenbewertung(dsBewertung, grpNr) {
 		for (var i=0; i<this.korrekturen.length; i++) {
 			if (this.korrekturen[i].getKorrekturWert) {
 				let korrekturWert = this.korrekturen[i].getKorrekturWert();
-				console.info("rrr01 ", this.nr, korrekturWert, isNaN(korrekturWert));
+				// console.info("rrr01 ", this.nr, korrekturWert, isNaN(korrekturWert));
 				if (Number.isInteger(korrekturWert)) {
 					korrekturen+=this.korrekturen[i].getKorrekturWert(b);
 				}
 				else {
-					console.info("rrr isNaN",b, this.korrekturen[i].getKorrekturWert());
+					// console.info("rrr isNaN",b, this.korrekturen[i].getKorrekturWert());
 					result = null; 
 					this.korrekturen[i].result = -1;
 					break;
@@ -5292,7 +5282,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 		let callback = function() {
 			
 			return function() {
-				console.info("callback");
+				// console.info("callback");
 				f.readHabitate();
 				f.readGefaehrdungen();
 			}();
@@ -5312,7 +5302,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	}
 	
 	this.readHabitate=function() {
-		console.info("readHabitate");
+		// console.info("readHabitate");
 		let e = document.getElementById(this.layerId+"_habitate_"+this.datensatzNr).parentNode;
 		var elements = e.getElementsByClassName("subFormListItem");
 
@@ -5335,7 +5325,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	}
 
 	this.readGefaehrdungen=function() {
-		console.info("readGefaehrdungen");
+		// console.info("readGefaehrdungen");
 
 		let e = document.getElementById(this.layerId+"_gefcode_"+this.datensatzNr);
 		if (e && e.parentNode) {
@@ -5366,7 +5356,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	}
 
 	this.printHTML = function() {
-		console.info("printHTML");
+		// console.info("printHTML");
 		var data = [];
 		for (k in this.map) {
 			if (k.length>1) {
@@ -5607,7 +5597,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 						this.frame.setBewertung(bewertung);
 					}
 					if (bewertung.getKorrekturWert) {
-						console.info("DatensatzBewertung.bewerte ", bewertung.nr);
+						// console.info("DatensatzBewertung.bewerte ", bewertung.nr);
 						if (bewertung.cell) {
 							var value = bewertung.getKorrekturWert();
 							if (Number.isInteger(value)) {
@@ -5922,8 +5912,11 @@ function DatensatzBewertung(layerId, datensatzNr) {
 
     this._getLRTCode = function() {
         var s = this.layerId+"_lrt_code_"+this.datensatzNr;
-        var value = document.getElementById(s).value;
-        return parseInt(value);
+		var el = document.getElementById(s);
+		if (el) {
+			var value = document.getElementById(s).value;
+			return parseInt(value);
+		}
     }
 
 	this.getFlaecheInHa = function(layerId, datensatzNr) {		
@@ -5966,10 +5959,7 @@ function BewertungApp() {
 			var idA = id.split("_");
 			var datensatzNr = Number.parseInt(idA[idA.length-1], 10);
 			var layerId = Number.parseInt(idA[0], 10);
-			if (layerId===109) {
-				console.info(inputElements[i]);
-				console.info("109");
-			}
+			
 			 
 			if (!isNaN(datensatzNr) && !isNaN(layerId)) {
 				if (!this.map[layerId+datensatzNr]) {

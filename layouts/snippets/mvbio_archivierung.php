@@ -10,6 +10,7 @@
 		$log->write($sql);
 
 		# setze Status der unter dem Kartiergebiet liegenden Bögen zurück 
+		# ToDo nicht nur grundboegen
 		$sql = "
 			UPDATE archiv.grundboegen gb
 			SET status = 0
@@ -21,6 +22,7 @@
 		";
 
 		# Liest die im View aufbereiteten Kartierobjekte mit Status = 1 als Bögen in die Archivtabellen ein
+		# ToDo view mvbio.grundboegen anpassen
 		$sql = "
 			INSERT INTO archiv.grundboegen
 			SELECT * FROM mvbio.grundboegen

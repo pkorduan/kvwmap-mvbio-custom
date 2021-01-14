@@ -251,22 +251,22 @@ function BewertungFrame(datensatzNr, bewertung) {
 		var tbl = this.tbl; // document.getElementById("bewertungsFrame");
 		var row = this.map[bewertungsNr];
 				
-		if (value===-1) {
-			row.cells[1].innerText="";
-			row.style.backgroundColor="#aaa";
+		if (value === -1) {
+			row.cells[1].innerText = "";
+			row.style.backgroundColor = "#aaa";
 		}
 		else {
 			if (value.skiped) {
-				row.cells[1].innerText="";
-				row.cells[1].title="Bewertung entfällt";
-				row.style.backgroundColor="#444";
+				row.cells[1].innerText = "";
+				row.cells[1].title = "Bewertung entfällt";
+				row.style.backgroundColor = "#444";
 				
 			}
 			else {
 				if (bewertung.getKorrekturWert) {
-					row.cells[1].innerText=value;
+					row.cells[1].innerHTML = value;
 					// row.style.backgroundColor='lightblue';
-					row.style.backgroundColor=getColor(bewertung.resultKorrigiert);
+					row.style.backgroundColor = getColor(bewertung.resultKorrigiert);
 				}
 				else {
 					if (value===0) {		
@@ -433,7 +433,7 @@ function BewertungFliessgewaesser_2_2() {
     this.nr="2.2";
     this.txt="Tierarten";
     this.lrtCodes=[3260, 3270];
-	
+
 	this.getKorrekturWert=function() {
 		return this.korrekturWert;
 	}
@@ -1281,42 +1281,43 @@ function BewertungStillgewaesser_2_1_2() {
 	
 	Bewertung.call(this);
 	
-    this.nr="2.1.2";
-    this.txt="Anzahl besonders charakteristischer Pflanzenarten und Armleuchteralgen";
-    this.lrtCodes=[3140];
+	this.nr="2.1.2";
+	this.txt="Anzahl besonders charakteristischer Pflanzenarten und Armleuchteralgen";
+	this.lrtCodes = [3140];
 	
 	this.bewerte=function(b) {
-        let result = -1;
+		let result = -1;
 		let lrtCode = b.lrtCode;
-        let T212_2 = parseInt(b.getValue("T212_2"));
+		let T212_2 = parseInt(b.getValue("T212_2"));
 		let UC1 = b.getValue("UC1");
-		if (lrtCode===3140) {
+
+		if (lrtCode === 3140) {
 			if (
 				(UC1 === "USG" && T212_2 >= 10) ||
-				(["USW", "USS", "USL", "USB", "USK"].indexOf(UC1)>=0 && T212_2 >= 4) ||
+				(["USW", "USS", "USL", "USB", "USK"].indexOf(UC1) >= 0 && T212_2 >= 4) ||
 				(UC1 === "UST" && T212_2 >= 3) ||
 				(UC1 === "USP" && T212_2 >= 2)
 			) {
-				result = {b:'A', txt:""};
+				result = { b:'A', txt:"" };
 			}
 			else if (
-				(UC1 === "USG" && T212_2>=5) ||
-				(["USW", "USS", "USL", "USB", "USK"].indexOf(UC1)>=0 && T212_2 >=3) ||
+				(UC1 === "USG" && T212_2 >= 5) ||
+				(["USW", "USS", "USL", "USB", "USK"].indexOf(UC1) >= 0 && T212_2 >= 3) ||
 				(UC1 === "UST" && T212_2 === 2) ||
 				(UC1 === "USP" && T212_2 === 1) 
 			) {
-				result = {b:'B', txt:""};
+				result = { b:'B', txt:"" };
 			}
 			else if (
 				(UC1 === "USG" && T212_2<5) ||
-				(["USW", "USS", "USL", "USB", "USK"].indexOf(UC1)>=0 && T212_2 <3) ||
+				(["USW", "USS", "USL", "USB", "USK"].indexOf(UC1) >= 0 && T212_2 < 3) ||
 				(UC1 === "UST" && T212_2 < 2) ||
 				(UC1 === "USP" && T212_2 < 1) 
 			) {
-				result = {b:'C', txt:""};
+				result = { b:'C', txt:"" };
 			}	
 		}
-		this.result=result;
+		this.result = result;
 	}
 }
 
@@ -1331,13 +1332,13 @@ function BewertungStillgewaesser_2_2() {
 	this.getKorrekturWert=function() {
 		return this.korrekturWert;
 	}
-	
+
 	this.berechneKorrekturWert=function(b) {
 		var T22_1 = b.getValue("T22");
 		var T22_2 = b.getTextValue("T22_2");
 		var korrekturWert;
-		if (T22_1===true) {
-			if (T22_2 && T22_2.length>3) {
+		if (T22_1 === true) {
+			if (T22_2 && T22_2.length > 3) {
 				korrekturWert = 1;
 			}
 			else {
@@ -1380,37 +1381,34 @@ function BewertungStillgewaesser_2_2_a() {
 }
 
 function BewertungStillgewaesser_3_1_1_a() {
-	
 	Bewertung.call(this);
 	
-    this.nr="3.1.1a";
-    this.txt="Seeuferstruktur-Index nach WRRL (nur für Stillgewässer >=50 ha";
-    this.lrtCodes=[3131, 3132, 3140, 3150];
+	this.nr = "3.1.1a";
+	this.txt = "Seeuferstruktur-Index nach WRRL (nur für Stillgewässer >=50 ha";
+	this.lrtCodes = [3131, 3132, 3140, 3150];
 	
-	this.bewerte=function(b) {
-        var result = -1;
+	this.bewerte = function(b) {
+		var result = -1;
 		var lrtCode = b.lrtCode;
-        var T311A_2 = b.getValue("T311A_2");
+		var T311A_2 = b.getValue("T311A_2");
 
 		if ([3131, 3132, 3140, 3150].indexOf(lrtCode)>=0) {
 			if (T311A_2 === 1 || T311A_2 === 2) {
 				result = {b:'A', txt:""};
 			}	
 			if (T311A_2 === 3) {
-				result = {b:'B', txt:""};
+				result = { b:'B', txt:"" };
 			}
 			if (T311A_2 === 4 || T311A_2 === 5) {
-				result = {b:'C', txt:""};
+				result = { b:'C', txt:"" };
 			}	
 		}
-		this.result=result;
+		this.result = result;
 	}
 
-	this.isRequired=function(b) {		
-		var flaeche = b.getFlaecheInHa();
-		return this.lrtCodes.indexOf(b.lrtCode)>=0 && flaeche>=50;
+	this.isRequired = function(b) {
+		return this.lrtCodes.indexOf(b.lrtCode) >= 0 && b.seeGr50ha();
 	}
-
 }
 
 function BewertungStillgewaesser_3_1_2b() {
@@ -1427,12 +1425,11 @@ function BewertungStillgewaesser_3_1_2b() {
 	
 	this.berechneKorrekturWert=function(b) {
 		var T311B_2 = b.getValue("T311B_2");
-		this.korrekturWert = T311B_2<3 ? 0 : -1;
+		this.korrekturWert = T311B_2 < 3 ? 0 : -1;
 	};
 	
-	this.isRequired=function(b) {		
-		var flaeche = b.getFlaecheInHa();
-		return this.lrtCodes.indexOf(b.lrtCode)>=0 && flaeche<50;
+	this.isRequired = function(b) {		
+		return this.lrtCodes.indexOf(b.lrtCode) >= 0 && !b.seeGr50ha();
 	}
 }
 
@@ -1457,10 +1454,8 @@ function BewertungStillgewaesser_3_1_2() {
 			}
 		}
 		
-		var flaeche = b.getFlaecheInHa();
-		
 		if ([3131,3132].indexOf(lrtCode)>=0) {
-			if (flaeche>50) {
+			if (b.seeGr50ha()) {
 				if (T312_1 === 1 || T312_1 === 2) {
 					result = {b:'A', txt:"keine Abwassereinleitungen, ausgenommen einzelne Kleineinleitungen (< 8 m3/d oder < 50 EW)"};
 				}
@@ -1501,17 +1496,17 @@ function BewertungStillgewaesser_3_1_3() {
 	
 	
 	this.bewerte=function(b) {
-		var result=-1;
-		var lrtCode=b.lrtCode;
-		var T313_1 = b.getValue("T313");
-		
-        var T313_4 = parseInt(b.getValue("T313_4"));
-		var T313_2 = parseFloat(b.getValue("T313_2"));
-		var T313_3 = parseInt(b.getValue("T313_3"));
-		
-		if (T313_1 || b.getFlaecheInHa()<2) {			
-			this.result = {skiped:true};
-			if (b.getFlaecheInHa()<2) {
+		var result = -1,
+				lrtCode=b.lrtCode,
+				T313_1 = b.getValue("T313"),
+				T313_4 = parseInt(b.getValue("T313_4")),
+				T313_2 = parseFloat(b.getValue("T313_2")),
+				T313_3 = parseInt(b.getValue("T313_3")),
+				flaeche = b.getFlaecheInHa(b.layerId, b.datensatzNr);
+
+		if (T313_1 || flaeche < 2) {			
+			this.result = { skiped:true };
+			if (flaeche < 2) {
 				this.result.msg = "Fläche kleiner als 2 ha."
 			}
 			return;
@@ -1691,9 +1686,9 @@ function BewertungStillgewaesser_3_2_1() {
 		let result = -1;
 		let lrtCode = b.lrtCode;
 		let T321_1 = Number.parseInt(b.getValue("T321_1"));
-        let T321_2 = parseInt(b.getValue("T321_2"));
-		let flaeche = b.getFlaecheInHa();
-		if (flaeche<50) {
+    let T321_2 = parseInt(b.getValue("T321_2"));
+
+		if (!b.seeGr50ha()) {
 			if ([3110, 3131, 3132, 3140, 3150, 3160].indexOf(lrtCode)>=0) {
 				// 1       2        3        4        5
 				// 100%    >=95%    >=75%    >=50%    <50%    
@@ -1722,11 +1717,10 @@ function BewertungStillgewaesser_3_2_1() {
 				}
 			}
 		}
-		this.result=result;
+		this.result = result;
 	}
 	this.isRequired=function(b) {
-		var flaeche = b.getFlaecheInHa();
-		return this.lrtCodes.indexOf(b.lrtCode)>=0 && flaeche<50;
+		return this.lrtCodes.indexOf(b.lrtCode)>=0 && !b.seeGr50ha();
 	}
 }
 
@@ -1745,7 +1739,7 @@ function BewertungStillgewaesser_3_2_2() {
         let T322_2 = parseInt(b.getValue("T322_2"));
 		
 		var flaeche = b.getFlaecheInHa(b.layerId, b.datensatzNr);
-		if (flaeche<1) {
+		if (flaeche < 1) {
 			if ([3110, 3131, 3132, 3140, 3150, 3160].indexOf(lrtCode)>=0) {
 				if (Number.isInteger(T322_2) && T322_2 > 0) {
 					// 1        2       3       4       5
@@ -1772,12 +1766,12 @@ function BewertungStillgewaesser_3_2_2() {
 				}
 			}
 		}
-		this.result=result;
+		this.result = result;
 	}
 	
 	this.isRequired=function(b) {
 		var flaeche = b.getFlaecheInHa(b.layerId, b.datensatzNr);
-		return this.lrtCodes.indexOf(b.lrtCode)>=0 && flaeche<1;
+		return this.lrtCodes.indexOf(b.lrtCode) >= 0 && flaeche < 1;
 	}
 }
 
@@ -4408,7 +4402,7 @@ function BewertungKueste_2_2() {
 		var T22_2 = b.getTextValue("T22_2");
 		var korrekturWert;
 		if (T22_1===true) {
-			if (T22_2 && T22_2.length>3) {
+			if (T22_2 && T22_2.length > 3) {
 				korrekturWert = 1;
 			}
 			else {
@@ -4974,12 +4968,14 @@ function GesamtBewertung(dsBewertung) {
 	this.inputTargetUserA = document.getElementById(dsBewertung.layerId+"_bea_erhalt_0_"+dsBewertung.datensatzNr);
 	this.inputTargetUserB = document.getElementById(dsBewertung.layerId+"_bea_erhalt_1_"+dsBewertung.datensatzNr);
 	this.inputTargetUserC = document.getElementById(dsBewertung.layerId+"_bea_erhalt_2_"+dsBewertung.datensatzNr);	
-	this.inputTargetA.disabled=true;
-	this.inputTargetB.disabled=true;
-	this.inputTargetC.disabled=true;
-	this.inputTargetUserA.disabled=true;
-	this.inputTargetUserB.disabled=true;
-	this.inputTargetUserC.disabled=true;
+
+    this.inputTargetA.readOnly =true;
+	this.inputTargetB.readOnly =true;
+	this.inputTargetC.readOnly =true;
+	this.inputTargetUserA.readOnly =true;
+	this.inputTargetUserB.readOnly =true;
+	this.inputTargetUserC.readOnly =true;
+
 	
 	this.inputBemerkung =  document.getElementById(dsBewertung.layerId+"_bemerkung_"+dsBewertung.datensatzNr);
 
@@ -5131,7 +5127,7 @@ function Gruppenbewertung(dsBewertung, grpNr) {
 			this.result = {b:resultKorrigiert};
 			
 			if (this.korrekturen.length===1) {
-				this.korrekturen[0].result = result+" "+String.fromCodePoint(129094)+" "+resultKorrigiert;
+				this.korrekturen[0].result = result + " &#8594; " + resultKorrigiert;
 				this.korrekturen[0].resultKorrigiert = resultKorrigiert;
 			}			
 			this.inputTargetA.checked='A'===resultKorrigiert;
@@ -5910,19 +5906,51 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	
 	}
 
-    this._getLRTCode = function() {
-        var s = this.layerId+"_lrt_code_"+this.datensatzNr;
+	this._getLRTCode = function() {
+		var s = this.layerId+"_lrt_code_"+this.datensatzNr;
 		var el = document.getElementById(s);
 		if (el) {
 			var value = document.getElementById(s).value;
 			return parseInt(value);
 		}
-    }
+	}
 
-	this.getFlaecheInHa = function(layerId, datensatzNr) {		
+	this.seeGr50ha = function() {
+		var el_gr_50ha = document.getElementById(this.layerId + "_see_gr_50ha_0_" + this.datensatzNr),
+				el_kl_50ha = document.getElementById(this.layerId + "_see_gr_50ha_1_" + this.datensatzNr),
+				ret = null;
+
+		if (el_gr_50ha) {
+			if (el_gr_50ha.checked) {
+				ret = true;
+			}
+		}
+		else {
+			throw new Error("Das Seegrösse Optionsfeld > 50ha fehlt.");
+		}
+
+		if (el_kl_50ha) {
+			if (el_kl_50ha.checked) {
+				ret = false;
+			}
+		}
+		else {
+			throw new Error("Das Seegrösse Optionsfeld < 50ha fehlt.");
+		}
+
+		if (ret == null) {
+			throw new Error("Die Angabe der Seegrösse fehlt!");
+		}
+
+		console.log('seeGr50ha: ', ret);
+		return ret;
+	}
+
+	this.getFlaecheInHa = function(layerId, datensatzNr) {
 		var el = document.getElementById(this.layerId+"_flaeche_"+this.datensatzNr);
 		if (el && el.value) {
-			return parseFloat(el.value) *0.0001;
+			console.log('flaeche: %s', el.value);
+			return parseFloat(el.value);
 		}
 		else {
 			throw new Error("Kein Wert für die Fläche.");

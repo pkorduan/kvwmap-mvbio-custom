@@ -4,7 +4,7 @@
 	display: none;
 }
 
-.use_for_dataset {
+.copy_dataset {
 	display: none;
 }
 
@@ -133,4 +133,20 @@
 
 .pflanzen_s input{
 	font-family: 'SourceSansPro2';
+}
+
+#sachdatendruck_table_105 select[name=aktivesLayout] {
+	pointer-events: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: '';
+	border: none;
+	background-color: transparent;
+	font-size: 20;
+	margin-left: -4px;
+}
+
+#sachdatendruck_title_105 {
+	display: none;
 }

@@ -1,12 +1,12 @@
 <?php
+include_once(CLASSPATH . 'PgObject.php');
+$kampagne = new PgObject($this, 'mvbio', 'kampagnen');
 if ($this->go == 'Stelle_waehlen') {
-	include_once(CLASSPATH . 'PgObject.php');
 	$kartiergebiet = new PgObject($this, 'mvbio', 'kartiergebiete');
 	$kartierebene = new PgObject($this, 'mvbio', 'kartierebenen2kampagne');
 	$bogenart = new PgObject($this, 'mvbio', 'bogenarten2kartierebenen');
 	#$this->add_message('warning', 'kartiergebiete: ' . print_r(array_map(function($kg) { return $kg->get('kampagne_id'); }, $kartiergebiete), true)); ?>
 	<script>
-		
 		var kartiergebiete = [<?php
 			echo implode(
 				', ',
@@ -48,7 +48,6 @@ if ($this->go == 'Stelle_waehlen') {
 			onload_functionsCore.apply(this, arguments);
 
 			filterKartiergebiete = function(kampagne_id) {
-				//console.log('function filterKartiergebiete mit kampagne_id: ' + kampagne_id);
 				if (kampagne_id == 0) {
 					$('#layer_parameter_kartiergebietfilter option').show();
 					$('#layer_parameter_kartiergebietfilter').val("0");
@@ -147,6 +146,13 @@ if ($this->go == 'Stelle_waehlen') {
 			$('#save_check_button').addClass('green');
 		};
 	</script><?
+} else { ?>
+	<script>
+		var onload_functionsCore = onload_functions;
+		onload_functions = function() {
+			onload_functionsCore.apply(this, arguments);
+		}
+	</script><?
 }
 ?>
 
@@ -162,28 +168,36 @@ if ($this->go == 'Stelle_waehlen') {
 		if ($params['kampagne_id']) {
 			foreach ($params['kampagne_id']['options'] AS $param) {
 				if ($param['value'] == rolle::$layer_params['kampagne_id']) {
-					if ($param['output'] != 'alle') $title[] = $param['output'];
+					if ($param['output'] != 'alle') {
+						$title[] = $param['output'];
+					}
 				}
 			}
 		}
 		if ($params['kartiergebietfilter']) {
 			foreach ($params['kartiergebietfilter']['options'] AS $param) {
 				if ($param['value'] == rolle::$layer_params['kartiergebietfilter']) {
-					if ($param['output'] != 'alle') $title[] = $param['output'];
+					if ($param['output'] != 'alle') {
+						$title[] = $param['output'];
+					}
 				}
 			}
 		}
 		if ($params['kartierebenenfilter']) {
 			foreach ($params['kartierebenenfilter']['options'] AS $param) {
 				if ($param['value'] == rolle::$layer_params['kartierebenenfilter']) {
-					if ($param['output'] != 'alle') $title[] = $param['output'];
+					if ($param['output'] != 'alle') {
+						$title[] = $param['output'];
+					}
 				}
 			}
 		}
 		if ($params['bogenartfilter']) {
 			foreach ($params['bogenartfilter']['options'] AS $param) {
 				if ($param['value'] == rolle::$layer_params['bogenartfilter']) {
-					if ($param['output'] != 'alle') $title[] = $param['output'];
+					if ($param['output'] != 'alle') {
+						$title[] = $param['output'];
+					}
 				}
 			}
 		} ?>

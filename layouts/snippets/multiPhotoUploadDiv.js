@@ -1,4 +1,5 @@
 function createMultiPhotoUploadDiv(layerId, fotoTableName, fotoLayerId, joinAttributeName, joinAttributeId) {
+	console.log('createMultiplePhotoUploadDiv');
 	fotoLayerId_ = fotoLayerId; // make the var global
   fotoTableName_ = fotoTableName;
 

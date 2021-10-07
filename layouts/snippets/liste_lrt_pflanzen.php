@@ -1,6 +1,6 @@
 <?
-	include(CLASSPATH . 'PgObject.php');
-	include(CLASSPATH . 'FormObject.php');
+	include_once(CLASSPATH . 'PgObject.php');
+	include_once(CLASSPATH . 'FormObject.php');
 ?>
 <link rel="stylesheet" href="<?php echo BOOTSTRAP_PATH; ?>css/bootstrap.min.css" type="text/css">
 <link rel="stylesheet" href="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.css" type="text/css">

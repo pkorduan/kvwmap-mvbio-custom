@@ -73,13 +73,13 @@
 
 			# Eintragen der Nebencodes für das neue Kartierobjekt
 			$sql = "
-				INSERT INTO mvbio.biotoptypen_nebencodes_verlustobjekte (verlustobjekt_id, code, flaechendeckung_prozent, vegeinheit)
+				INSERT INTO mvbio.biotoptypen_nebencodes_verlustobjekte (verlustobjekt_id, code, flaechendeckung_prozent)
 				SELECT
-					" . $new_verlustobjekt_id . ", nc.code, nc.flaechendeckung_prozent, nc.vegeinheit
+					" . $new_verlustobjekt_id . ", nc.code, nc.flaechendeckung_prozent
 				FROM
 					archiv.biotoptypen_nebencodes nc
 				WHERE
-					nc.kartierung_id = " . $this->formvars['bogen_id'] . "
+					nc.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
 			";
 			#echo '<br>SQL zum Eintragen der Nebencodes für Verlustobjekt: ' . $sql;
 			$ret = $this->pgdatabase->execSQL($sql, 4, 0);

@@ -134,7 +134,7 @@
 				data-switchable="true"
 			>Kampagne</th>
 			<th
-				data-field="kampagne"
+				data-field="bezeichnung"
 				data-sortable="true"
 				data-visible="true"
 				data-switchable="true"

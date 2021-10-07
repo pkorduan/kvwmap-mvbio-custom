@@ -42,16 +42,20 @@
 		$select_columns['bearbeitungsstufe'] = 1;
 		$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
 		$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
-#    $select_columns['e_datum'] = 'NULL';
-    $select_columns['l_datum'] = 'NULL';
-    if ($this->formvars['bogenart_id'] == '') {
-  		if ($archivtabelle == 'bewertungsboegen') {
-      	$select_columns['bogenart_id'] = 2;
-  		}
-    }
-    else {
+#		$select_columns['e_datum'] = 'NULL';
+		$select_columns['l_datum'] = 'NULL';
+		$select_columns['foto'] = 0;
+		if (rolle::$layer_params['kartierebenenfilter'] != '') {
+			$select_columns['kartierebene_id'] = rolle::$layer_params['kartierebenenfilter'];
+		}
+		if ($this->formvars['bogenart_id'] == '') {
+			if ($archivtabelle == 'bewertungsboegen') {
+				$select_columns['bogenart_id'] = 2;
+			}
+		}
+		else {
 			$select_columns['bogenart_id'] = $this->formvars['bogenart_id'];
-    }
+		}
 		# Eintragen des neuen Kartierobjektes mit den Daten des ausgewählten Bogens
 		$sql = '
 			INSERT INTO mvbio.kartierobjekte ("' . implode('", "', $insert_columns) . '", stelle_id, user_id)
@@ -72,12 +76,12 @@
 /* Pflanzenvorkommen sollen nicht übernommen werden
 			# Eintragen der Pflanzenvorkommen
 			$sql = "
-				INSERT INTO mvbio.pflanzenvorkommen (kartierung_id, species_nr, valid_nr, dzv, fsk, rl, cf, tax, bav)
+				INSERT INTO mvbio.pflanzenvorkommen (kartierobjekt_id, species_nr, valid_nr, dzv, fsk, rl, cf, tax, bav)
 				SELECT
 					" . $new_kartierobjekt_id . ", pv.species_nr, pv.valid_nr, pv.dzv, pv.fsk, pv.rl, pv.cf, pv.tax, pv.bav
 				FROM
 					archiv.erfassungsboegen eb JOIN
-					archiv.pflanzenvorkommen pv ON eb.kartierobjekt_id = pv.kartierung_id
+					archiv.pflanzenvorkommen pv ON eb.kartierobjekt_id = pv.kartierobjekt_id
 				WHERE
 					eb.id = " . $this->formvars['bogen_id'] . "
 			";
@@ -88,13 +92,13 @@
 
 				# Eintragen der Nebencodes für das neue Kartierobjekt
 				$sql = "
-					INSERT INTO mvbio.biotoptypen_nebencodes (kartierung_id, code, flaechendeckung_prozent, vegeinheit)
+					INSERT INTO mvbio.biotoptypen_nebencodes (kartierung_id, code, flaechendeckung_prozent)
 					SELECT
-						" . $new_kartierobjekt_id . ", nc.code, nc.flaechendeckung_prozent, nc.vegeinheit
+						" . $new_kartierobjekt_id . ", nc.code, nc.flaechendeckung_prozent
 					FROM
 						archiv.biotoptypen_nebencodes nc
 					WHERE
-						nc.kartierung_id = " . $this->formvars['bogen_id'] . "
+						nc.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
 				";
 				#echo '<br>SQL zum Eintragen der Nebencodes: ' . $sql;
 				$ret = $this->pgdatabase->execSQL($sql, 4, 0);
@@ -108,7 +112,7 @@
 						FROM
 							archiv.habitatvorkommen hv
 						WHERE
-							hv.kartierung_id = " . $this->formvars['bogen_id'] . "
+							hv.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
 					";
 					#echo '<br>SQL zum Eintragen der Habitatvorkommen: ' . $sql;
 					$ret = $this->pgdatabase->execSQL($sql, 4, 0);
@@ -122,7 +126,7 @@
 							FROM
 								archiv.empfehlungen_massnahmen em
 							WHERE
-								em.kartierung_id = " . $this->formvars['bogen_id'] . "
+								em.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
 						";
 						#echo '<br>SQL zum Eintragen des Empfehlungen und Massnahmen: ' . $sql;
 						$ret = $this->pgdatabase->execSQL($sql, 4, 0);
@@ -136,7 +140,7 @@
 								FROM
 									archiv.beeintraechtigungen_gefaehrdungen bg
 								WHERE
-									bg.kartierung_id = " . $this->formvars['bogen_id'] . "
+									bg.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
 							";
 							#echo '<br>SQL zum Eintragen des Beeintraechtigungen und Gefaehrdungen: ' . $sql;
 							$ret = $this->pgdatabase->execSQL($sql, 4, 0);
@@ -172,7 +176,7 @@
 												information_schema.columns k ON b.column_name = k.column_name
 											WHERE
 												b.table_schema = 'archiv' AND	b.table_name = '" . $archivtabelle . "' AND
-												k.table_schema = 'mvbio' AND k.table_name = '" . $mvbiotabelle .  "' AND
+												k.table_schema = 'mvbio' AND k.table_name = '" . $mvbiotabelle .	"' AND
 												k.column_name NOT IN (
 													'id',
 													'kartierobjekt_id',
@@ -200,9 +204,9 @@
 												$select_columns[$rs['column_name']] = $rs['column_name'];
 											}
 											$select_columns['bearbeitungsstufe'] = 1;
-											# Hinzufügen der Kartierobjekt_id, die in den Bewertungen kartierung_id heißt zu Abfrage- und Insertattributen
-											$insert_columns['kartierobjekt_id'] = 'kartierung_id';
-											$select_columns['kartierobjekt_id'] = $new_kartierobjekt_id;
+											# Hinzufügen der kartierobjekt_id zu Abfrage- und Insertattributen
+											$insert_columns['kartierung_id'] = 'kartierung_id';
+											$select_columns['kartierung_id'] = $new_kartierobjekt_id;
 											$sql = '
 												INSERT INTO mvbio.' . $mvbiotabelle . ' ("' . implode('", "', $insert_columns) . '")
 												SELECT
@@ -283,37 +287,37 @@
 /*
 -- Angaben zur Erstkartierung von Kurzbögen und Kampagne 1 übernehmen an Hand einer Zuordnungstabelle
 UPDATE
-  mvbio.kartierobjekte ko
+	mvbio.kartierobjekte ko
 SET
-  giscode = b.giscode,
-  alt_giscod = b.alt_giscod,
-  alt_lfd_nr = b.alt_lfd_nr,
-  alt_bearb = b.alt_bearb,
-  alt_datp20 = b.alt_datp20
+	giscode = b.giscode,
+	alt_giscod = b.alt_giscod,
+	alt_lfd_nr = b.alt_lfd_nr,
+	alt_bearb = b.alt_bearb,
+	alt_datp20 = b.alt_datp20
 FROM
-  mvbio.zuordnungstabelle z JOIN
-  archiv.grundboegen b ON z.giscode = b.giscode
+	mvbio.zuordnungstabelle z JOIN
+	archiv.grundboegen b ON z.giscode = b.giscode
 WHERE
-  z.label = ko.label AND
-  b.kampagne_id = 1
+	z.label = ko.label AND
+	b.kampagne_id = 1
 
 -- Und das ganze noch mal für Grundbögen
 
 UPDATE
-  mvbio.kartierobjekte ko
+	mvbio.kartierobjekte ko
 SET
-  giscode = b.giscode,
-  alt_giscod = b.alt_giscod,
-  alt_lfd_nr = b.alt_lfd_nr,
-  see_nr = b.see_nr,
-  alt_bearb = b.alt_bearb,
-  alt_datp20 = b.alt_datp20,
-  alt_datffh = b.alt_datffh
+	giscode = b.giscode,
+	alt_giscod = b.alt_giscod,
+	alt_lfd_nr = b.alt_lfd_nr,
+	see_nr = b.see_nr,
+	alt_bearb = b.alt_bearb,
+	alt_datp20 = b.alt_datp20,
+	alt_datffh = b.alt_datffh
 FROM
-  mvbio.msommer m JOIN
-  archiv.grundboegen b ON m.giscode = b.giscode
+	mvbio.msommer m JOIN
+	archiv.grundboegen b ON m.giscode = b.giscode
 WHERE
-  m.label = ko.label AND
-  b.kampagne_id = 1
+	m.label = ko.label AND
+	b.kampagne_id = 1
 */
 ?>

@@ -1,6 +1,6 @@
 <?
-	include(CLASSPATH . 'PgObject.php');
-	include(CLASSPATH . 'FormObject.php');
+	include_once(CLASSPATH . 'PgObject.php');
+	include_once(CLASSPATH . 'FormObject.php');
 	include_once(CLASSPATH . 'LayerAttributeRolleSetting.php');
 	$layer_id = 255;
 	$larsObj = new LayerAttributeRolleSetting($this, $this->Stelle->id, $this->user->id, $layer_id);
@@ -33,7 +33,8 @@
 <script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap.min.js"></script>
 <script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap-table-flatJSON.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.js"></script>
-<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extension/bootstrap-table-export.min.js"></script>
+<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extensions/export/bootstrap-table-export.min.js"></script>
+<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
 <script src="funktionen/bootstrap-table-settings.js"></script>
 
@@ -155,6 +156,14 @@
 					stufe="<? echo $bearbeitungsstufe->get('next_stufe'); ?>"
 					value="<? echo $bearbeitungsstufe->get('next_stand'); ?>"
 				><?
+			}
+			if (in_array($this->Stelle->id, array(1, 4, 5)) AND $this->formvars['bearbeitungsstufe'] == 3) { ?>
+				<input id="abgabe_name_field" type="text" size="12" placeholder="Abgabename" style="margin-left: 10px">
+				<input
+				  id="update_abgabe_name_button"
+					type="button"
+					value="übernehmen für ausgewählte"
+				><?
 			} ?>
 		</div>
 		<table
@@ -175,7 +184,7 @@
 			data-show-columns="true"
 			data-query-params="go=Layer-Suche_Suchen&selected_layer_id=<?php echo $layer_id; ?><?php echo $filter; ?>&anzahl=10000&mime_type=formatter&format=json"
 			data-pagination="true"
-			data-page-size="100"
+			data-page-list=[10,25,50,100,250,500,1000,all]
 			data-toggle="table"
 			data-toolbar="#toolbar"	
 			style="position:relative;overflow:auto;height:50%"
@@ -194,21 +203,24 @@
 					<th
 						data-field="kartierung_id"
 						data-visible="true"
+						data-sortable="true"
 						data-formatter="kartierungEditFunctionsFormatter"
 						data-switchable="false"
+						data-filter-control="input"
 					>ID</th>
-
 					<th
 						data-field="label"
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('label', $rolle_attribute_settings) OR $rolle_attribute_settings['label']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
+						data-filter-control="input"
 					>Objekt-Code</th>
 					<th
 						data-field="arbeits_id"
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('arbeits_id', $rolle_attribute_settings) OR $rolle_attribute_settings['arbeits_id']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
+						data-filter-control="input"
 					>Arbeits-ID</th>
 					<th
 						data-field="kampagne_id"
@@ -221,12 +233,14 @@
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('kampagne_abk', $rolle_attribute_settings) OR $rolle_attribute_settings['kampagne_abk']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
+						data-filter-control="select"
 					>Kampagne</th>
 					<th
 						data-field="kampagne"
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('kampagne', $rolle_attribute_settings) OR $rolle_attribute_settings['kampagne']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
+						data-filter-control="select"
 					>Kampagne Bezeichnung</th>
 					<th
 						data-field="kartiergebiet_id"
@@ -239,6 +253,7 @@
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('kartiergebiet', $rolle_attribute_settings) OR $rolle_attribute_settings['kartiergebiet']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
+						data-filter-control="select"
 					>Kartiergebiet</th>
 					<th
 						data-field="kartierebene_id"
@@ -251,12 +266,14 @@
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('kartierebene', $rolle_attribute_settings) OR $rolle_attribute_settings['kartierebene']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
+						data-filter-control="select"
 					>Kartierebene</th>
 					<th
 						data-field="hc"
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('hc', $rolle_attribute_settings) OR $rolle_attribute_settings['hc']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
+						data-filter-control="select"
 					>Hauptcode</th>
 					<th
 						data-field="biotopname"
@@ -264,6 +281,7 @@
 						data-visible="<? echo ((!array_key_exists('biotopname', $rolle_attribute_settings) OR $rolle_attribute_settings['biotopname']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
 						data-width="400px"
+						data-filter-control="input"
 					>Biotopname</th>
 					<th
 						data-field="koordinator_rueckweisung"
@@ -271,38 +289,44 @@
 						data-visible="<? echo ((!array_key_exists('koordinator_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['koordinator_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 						data-formatter="boolTypeFormatter"
+						data-filter-control="select"
 					>Rückweisung durch Koordinator</th>
+					<th
+						data-field="abgabe_name"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('abgabe_name', $rolle_attribute_settings) OR $rolle_attribute_settings['abgabe_name']['switched_on'] == 1) ? 'true': 'false'); ?>"
+						data-switchable="true"
+						data-filter-control="select"
+					>Abgabename</th>
 					<th
 						data-field="pruefer_rueckweisung"
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('pruefer_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['pruefer_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
 						data-switchable="true"
 						data-formatter="boolTypeFormatter"
+						data-filter-control="select"
 					>Rückweisung durch Prüfer</th>
 					<th
 						data-field="kartierer_name"
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('kartierer_name', $rolle_attribute_settings) OR $rolle_attribute_settings['kartierer_name']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
+						data-filter-control="select"
 					>Kartierer</th>
 					<th
 						data-field="user_id"
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('user_id', $rolle_attribute_settings) OR $rolle_attribute_settings['user_id']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
+						data-filter-control="select"
 					>User-ID</th>
 					<th
 						data-field="stand"
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('stand', $rolle_attribute_settings) OR $rolle_attribute_settings['stand']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 						data-switchable="true"
+						data-filter-control="select"
 					>Bearbeitungsstand</th>
-					<th
-						data-field="kartierung_id"
-						data-visible="true"
-						data-formatter="kartierungEditFunctionsFormatter"
-						data-switchable="false"
-					>&nbsp;</th>
 				</tr>
 			</thead>
 		</table>
@@ -310,7 +334,7 @@
 			$('#gui-table').css('width', '100%');
 			$('#container_paint').css('height', 'auto');
 			resizeBootstrapTable = function() {
-				$('.bootstrap-table').css('width', (document.GUI.browserwidth.value - 240) + 'px');
+				$('.bootstrap-table').css('width', (document.body.offsetWidth - 240) + 'px');
 			};
 			window.addEventListener('resize', resizeBootstrapTable);
 
@@ -355,6 +379,13 @@
 					}
 				);
 
+				$('#update_abgabe_name_button').on(
+					'click',
+					function(e) {
+						updateAbgabename($('#abgabe_name_field').val());
+					}
+				);
+
 			});
 
 			loescheKartierung = function(e) {
@@ -396,34 +427,27 @@
 					if (kartierung_ids.length > 0) {
 						//console.log('Update selected kartierung_ids: ' + kartierung_ids)
 						$.ajax({
+							type: "POST",
 							url: 'index.php',
 							data: {
 								go: "show_snippet",
 								snippet: "update_bearbeitungsstaende",
-								objektart: "Verlustobjekte",
 								mime_type: "application/json",
 								format: "json",
 								stufe_alt: <? echo $this->formvars['bearbeitungsstufe']; ?>,
 								stufe_neu: stufe,
-								kartierung_ids: kartierung_ids
+								objektart: 'Verlustobjekte',
+								kartierung_ids: kartierung_ids.join(',')
 							},
 							success: function(response) {
 								var result = JSON.parse(response)[0];
 								//console.log(result);
-								if (result.kartierung_ids.length > 0) {
-									$.map(
-										selected_rows,
-										function (row) {
-											if ($.inArray(row.kartierung_id, result.kartierung_ids) > -1) {
-												row.stand = stand;
-												$('#kartierungen_table').bootstrapTable('updateByUniqueId', {
-													id: row.kartierung_id,
-													row: row
-												});
-											}
-										}
-									);
-									message([{ type: 'notice', msg: 'Bearbeitungsstufe erfolgreich geändert für Objekte mit Id: ' + result.kartierung_ids.join(', ') }]);
+								if (result.kartierung_ids != '') {
+									$('#kartierungen_table').bootstrapTable('refresh', {silent: true});
+									message([
+										{ type: 'notice', msg: 'Bearbeitungsstufe erfolgreich geändert für Objekte mit Id: ' + result.kartierung_ids },
+										{ type: 'notice', msg: 'Bitte Warten. Tabelle wird neu geladen!'}
+									]);
 								}
 								if (result.success == false) {
 									message([{ type: 'error', msg: result.msg}]);
@@ -435,9 +459,59 @@
 						});
 					}
 					else {
-						message('Keine änderbaren Verlustobjekte ausgewählt!');
+						message('Keine änderbaren Kartierobjekte ausgewählt!');
 					} <?
 				} ?>
+			}
+
+			function updateAbgabename(abgabe_name) {
+				//console.log('update Abgabename: %s', abgabe_name);
+
+				var selected_rows = $('#kartierungen_table').bootstrapTable('getSelections'),
+						objectIds = $.map(
+							selected_rows,
+							function(row) {
+								return row.kartierung_id;
+							}
+						);
+
+				if (objectIds.length > 0) {
+					//console.log('Update selected objectIds: ' + objectIds);
+
+					$.ajax({
+						type: "Post",
+						url: 'index.php',
+						data: {
+							go: "show_snippet",
+							snippet: "update_abgabe_name",
+							mime_type: "application/json",
+							format: "json",
+							abgabe_name: abgabe_name,
+							objektart: 'Verlustobjekte',
+							object_ids: objectIds.join(',')
+						},
+						success: function(response) {
+							var result = JSON.parse(response)[0];
+							//console.log('Die Antwort vom Server ist da: %o', result);
+							if (result.object_ids != '') {
+								$('#kartierungen_table').bootstrapTable('refresh', {silent: true});
+								message([
+									{ type: 'notice', msg: 'Abgabename erfolgreich geändert für Objekte mit Id: ' + result.object_ids},
+									{ type: 'notice', msg: 'Bitte Warten. Tabelle wird neu geladen!'}
+								]);
+							}
+							if (result.success == false) {
+								message([{ type: 'error', msg: result.msg}]);
+							}
+						},
+						error: function(xhr) {
+							alert('Fehler beim Ändern des Abgabenamen der Objekte mit ID: ' + objectIds.join(', ') + ' Fehlerstatus: ' + xhr.status + ' Meldung: ' + xhr.statusText);
+						}
+					});
+				}
+				else {
+					message('Keine änderbaren Objekte ausgewählt!');
+				}
 			}
 
 			function checkboxFormatter(value, row, index) {

@@ -5225,9 +5225,11 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	
 	this.habitate = null;
 	this.gefcodes = null;
+	this.nebencodes = null;
+
 
 	this.start=function() {
-
+		console.info("start layerId="+this.layerId+" datensatzNr="+this.datensatzNr);
 		if (this.layerId===109) {
 		}
 		
@@ -5266,40 +5268,63 @@ function DatensatzBewertung(layerId, datensatzNr) {
 			this.frame=new BewertungFrame(this.datensatzNr, this.bewertung);
 			this.createExtraColumns();
 
-			this.prepareHTML();			
-			this.bewerte();
+			// this.prepareHTML();			
+			// this.bewerte();
 
 		}
 		else {
 			alert("keine Bewertungen für LayerId=\""+this.layerId+"\"");
 		}
-		
-		let f = this;
-		let callback = function() {
-			
-			return function() {
-				// console.info("callback");
-				f.readHabitate();
-				f.readGefaehrdungen();
-			}();
+
+		console.info("root.open_subform_requests="+root.open_subform_requests);
+		if (root.open_subform_requests===0) {
+			this.prepareHTML();
+			this.bewerte();
+			this.submit();
 		}
-		var config = { attributes: true, childList: true, subtree: true };
-		let observer = new MutationObserver(callback);
-		let elem = document.getElementById(this.layerId+"_habitate_"+this.datensatzNr);
-		if (elem && elem.parentNode) {
-			observer.observe(elem.parentNode, config);
-		}
-		elem = document.getElementById(this.layerId+"_gefcode_"+this.datensatzNr);
-		if (elem && elem.parentNode) {
-			observer.observe(elem.parentNode, config);
+		else {
+			let self = this;
+			let callback = function(evt) {
+					console.info("MutationObserver", evt);
+					if (root.open_subform_requests===0) {
+						self.readHabitate();
+						self.readGefaehrdungen();
+						self.readNebencodes();
+						if (self.habitate && self.gefcodes && self.nebencodes) {
+							self.prepareHTML();
+							self.bewerte();
+						};
+						self.submit();
+					}
+			}
+			var config = { attributes: true, childList: true, subtree: true };
+			let observer = new MutationObserver(callback);
+			let elem = document.getElementById(this.layerId+"_habitate_"+this.datensatzNr);
+			if (elem && elem.parentNode) {
+				observer.observe(elem.parentNode, config);
+			}
+			elem = document.getElementById(this.layerId+"_gefcode_"+this.datensatzNr);
+			if (elem && elem.parentNode) {
+				observer.observe(elem.parentNode, config);
+			}
+			elem = document.getElementById(this.layerId+"_nc_"+this.datensatzNr);
+			if (elem && elem.parentNode) {
+				observer.observe(elem.parentNode, config);
+			}
+			elem = document.getElementById(this.layerId+"_fotos_"+this.datensatzNr);
+			if (elem && elem.parentNode) {
+				observer.observe(elem.parentNode, config);
+			}
 		}
 		
 		this.printHTML();
+		
 	}
 	
 	this.readHabitate=function() {
-		// console.info("readHabitate");
+		
 		let e = document.getElementById(this.layerId+"_habitate_"+this.datensatzNr).parentNode;
+		console.info(e);
 		var elements = e.getElementsByClassName("subFormListItem");
 
 		this.habitate = [];
@@ -5317,7 +5342,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 				}
 			}
 		}
-		this.bewerte();
+		// this.bewerte();
 	}
 
 	this.readGefaehrdungen=function() {
@@ -5343,9 +5368,37 @@ function DatensatzBewertung(layerId, datensatzNr) {
 					}
 				}
 			}
-			this.bewerte();
+			// this.bewerte();
 		}
 	}	
+
+	this.readNebencodes = function() {
+		
+		try {
+			const results = [];
+			let s = this.layerId+"_nc_"+this.datensatzNr;
+			let e = document.getElementById(s);
+			let elements = e.getElementsByClassName("subFormListItem");
+			let count=elements.length;
+			let f;
+			for (let i=0; i<count; i++) {
+				f = elements[i];
+				let a = f.getElementsByTagName("a");
+				let sA = a[0].innerText.split(" ");			
+				let code = sA[0]
+				let name = "";
+				for (let aNr=0; aNr<sA.length-2; aNr++) {
+					name +=sA[aNr];
+				}
+				let percentage = Number(sA[sA.length-2]);
+				results.push(new NebenCodeRecord(code, name, percentage));
+			}
+			this.nebencodes = results;
+		} catch (e) {
+			console.error(e);
+		}		
+	}
+
 
 	this.isVisible = function(elem) {
 		return elem.offsetHeight>0;
@@ -5516,12 +5569,14 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	}
 
     this.bewerte=function() {
-        // console.info("bewerte "+this.layerId+" Datensatz="+this.datensatzNr);
+        console.info(`bewerte ${this.layerId} Datensatz=${this.datensatzNr}`, this.habitate, this.nebencodes, this.gefcodes);
 		var s = "", value;
-		
+
 		if (!this.habitate) {
 			this.readHabitate();
 			this.readGefaehrdungen();
+			this.readNebencodes();
+			console.info("bewerte nach read"+this.layerId+" Datensatz="+this.datensatzNr, this.habitate, this.nebencodes, this.gefcodes);
 		}
 		
         if (this.bewertung) {
@@ -5965,9 +6020,46 @@ function DatensatzBewertung(layerId, datensatzNr) {
 		return ["FFN", "FFB", "FFA"].indexOf(this.getValue("hc"))>=0;
     }
 	
-	this.validate = function(evt) {
-		console.info("validate", this);
-		return this.bewertung.validate();
+	this.validate = function(evt) {		
+		if (this.bewertung) {
+			console.info("validate", this);
+			return this.bewertung.validate();
+		} else {
+			console.info("no validating "+this.layerId +" "+this.datensatzNr);
+			return true;
+		}
+
+	}
+
+	this.submited = function(evt) {
+		if (evt.target.status === 200) {
+			console.info("Data saved");
+		} else {
+			console.info("Data not saved?", evt);
+		}
+
+	}
+
+	this.submit = function() {
+		let submitted = false;
+		try {
+			// damit kvwmap weiß, dass sich der Datensatz geändert hat
+			const isDataChanged = setDataChanged(this.layerId, this.datensatzNr);
+			if (isDataChanged) {
+				const formElement = document.querySelector("form");
+				formElement.go.value = 'Sachdaten_speichern';
+				const formData = new FormData(formElement);
+				const request = new XMLHttpRequest();
+				const self = this;
+				request.addEventListener('loadend', self.submited);
+				request.open("POST", "index.php");
+				request.send(formData);
+				submitted = true;
+			}
+		} catch(err) {
+			console.error(err);
+		}
+		console.info('werte wurden submitted? ' + submitted);
 	}
 
 }
@@ -5982,14 +6074,12 @@ function BewertungApp() {
 
 			var id = inputElements[i].id;
 
-			
-			
 			var idA = id.split("_");
 			var datensatzNr = Number.parseInt(idA[idA.length-1], 10);
 			var layerId = Number.parseInt(idA[0], 10);
 			
-			 
-			if (!isNaN(datensatzNr) && !isNaN(layerId)) {
+			
+			if (!isNaN(datensatzNr) && !isNaN(layerId) && datensatzNr!=109) {
 				if (!this.map[layerId+datensatzNr]) {
 					this.map[layerId+datensatzNr]=new DatensatzBewertung(layerId, datensatzNr);
 				}
@@ -6099,6 +6189,31 @@ function BewertungApp() {
 	}						
 	
 
+
+}
+
+/**
+ * setzt das Flag zur Kontrolle, ob das sich der Datensatz geändert hat
+ * wird durch kvwmap ausgewertet
+ * @param {*} layerId 
+ * @param {*} datensatzNr 
+ * @returns true, wenn das flag gesetzt werden konnte, sonst false
+ */
+function setDataChanged(layerId, datensatzNr) {
+	const dsDiv = document.getElementById('datensatz_' + layerId +'_'+datensatzNr); 
+	const dsCb = document.getElementById(layerId +'_'+datensatzNr);
+	if (dsCb && dsCb.type === 'checkbox') {			
+		const sA = dsCb.name.split(';');
+		if (sA.length===5) {
+			const qs = '[name=changed_' + layerId +'_'+sA[3]+']';			
+			const hiddenField = dsDiv.querySelector(qs);
+			if (hiddenField) {
+				hiddenField.value = 1;
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 /*

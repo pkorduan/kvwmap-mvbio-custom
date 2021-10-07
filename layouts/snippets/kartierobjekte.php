@@ -13,7 +13,7 @@
 	}
 
 	td.gle_attribute_value {
-		white-space: nowrap;
+/*		white-space: nowrap;*/
 	}
 
 	#group145_92_0 td {

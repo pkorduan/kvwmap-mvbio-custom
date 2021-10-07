@@ -1,6 +1,6 @@
 <?
-	include(CLASSPATH . 'PgObject.php');
-	include(CLASSPATH . 'FormObject.php');
+	include_once(CLASSPATH . 'PgObject.php');
+	include_once(CLASSPATH . 'FormObject.php');
 	include_once(CLASSPATH . 'LayerAttributeRolleSetting.php');
 	$layer_id = 146;
 	$larsObj = new LayerAttributeRolleSetting($this, $this->Stelle->id, $this->user->id, $layer_id);
@@ -33,11 +33,14 @@
 <script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap.min.js"></script>
 <script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap-table-flatJSON.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.js"></script>
-<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extension/bootstrap-table-export.min.js"></script>
-<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extension/bootstrap-table-filter-control.min.js"></script>
+<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extensions/export/bootstrap-table-export.min.js"></script>
+<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
 <script src="funktionen/bootstrap-table-settings.js"></script>
-
+<div id="waiting_div">
+	<i class="fa fa-spinner fa-spin fa-3x fa-fw" style="color: gray"></i>
+	<br><br><br><span>Lade Daten ...</span>
+</div>
 <div style="min-height: 500px; height: 100%"><?php
 	# Filter auf nur eigene, wenn user_id belegt ist oder bearbeitungsstufe auf in Erfassung
 	if ($this->formvars['user_id'] != '' OR $this->formvars['bearbeitungsstufe'] == 1) {
@@ -140,7 +143,16 @@
 		<div style="margin-top: 23px; margin-left: 13px; float:left"><?php
 			if ($this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('aenderungsberechtigte_stelle') : '' == $this->Stelle->Bezeichnung) { ?>
 				<span style=""><sub>&#8625;</sub></span>Bearbeitungsstand für ausgewählte Datensätze ändern in:<?
-				if ($this->formvars['bearbeitungsstufe'] > 1) { ?>
+				if ($this->formvars['bearbeitungsstufe'] > 1) {
+					if ($this->Stelle->id == 5 AND $this->formvars['bearbeitungsstufe'] == 4) { ?>
+						<input
+							class="change-bearbeitungsstand"
+							type="button"
+							name="prev_stufe"
+							stufe="2"
+							value="Zur Info freigegeben"
+						><?
+					} ?>
 					<input
 						class="change-bearbeitungsstand"
 						type="button"
@@ -155,6 +167,14 @@
 					name="next_stufe"
 					stufe="<? echo $bearbeitungsstufe->get('next_stufe'); ?>"
 					value="<? echo $bearbeitungsstufe->get('next_stand'); ?>"
+				><?
+			}
+			if (in_array($this->Stelle->id, array(1, 4, 5)) AND $this->formvars['bearbeitungsstufe'] == 3) { ?>
+				<input id="abgabe_name_field" type="text" size="12" placeholder="Abgabename" style="margin-left: 10px">
+				<input
+				  id="update_abgabe_name_button"
+					type="button"
+					value="übernehmen für ausgewählte"
 				><?
 			} ?>
 		</div>
@@ -201,6 +221,13 @@
 						data-switchable="false"
 						data-filter-control="input"
 					>ID</th>
+					<th
+						data-field="lfd_nr_kr"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('lfd_nr_kr', $rolle_attribute_settings) OR $rolle_attribute_settings['lfd_nr_kr']['switched_on'] == 1) ? 'true' : 'false'); ?>"
+						data-switchable="true"
+						data-filter-control="input"
+					>Lfd Nr KG</th>
 					<th
 						data-field="label"
 						data-sortable="true"
@@ -328,6 +355,13 @@
 						data-filter-control="select"
 					>Rückweisung durch Koordinator</th>
 					<th
+						data-field="abgabe_name"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('abgabe_name', $rolle_attribute_settings) OR $rolle_attribute_settings['abgabe_name']['switched_on'] == 1) ? 'true': 'false'); ?>"
+						data-switchable="true"
+						data-filter-control="select"
+					>Abgabename</th>
+					<th
 						data-field="pruefer_rueckweisung"
 						data-sortable="true"
 						data-visible="<? echo ((!array_key_exists('pruefer_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['pruefer_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
@@ -335,6 +369,13 @@
 						data-formatter="boolTypeFormatter"
 						data-filter-control="select"
 					>Rückweisung durch Prüfer</th>
+					<th
+						data-field="korrektur_nr"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('korrektur_nr', $rolle_attribute_settings) OR $rolle_attribute_settings['korrektur_nr']['switched_on'] == 1) ? 'true': 'false'); ?>"
+						data-switchable="true"
+						data-filter-control="select"
+					>Rückgabe</th>
 					<th
 						data-field="kartierer_name"
 						data-sortable="true"
@@ -356,6 +397,13 @@
 						data-switchable="true"
 						data-filter-control="select"
 					>Bearbeitungsstand</th>
+					<th
+						data-field="rueckgabewunsch"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('rueckgabewunsch', $rolle_attribute_settings) OR $rolle_attribute_settings['rueckgabewunsch']['switched_on'] == 1) ? 'true': 'false'); ?>"
+						data-switchable="true"
+						data-filter-control="select"
+					>Rueckgabewunsch</th>
 				</tr>
 			</thead>
 		</table>
@@ -363,7 +411,8 @@
 			$('#gui-table').css('width', '100%');
 			$('#container_paint').css('height', 'auto');
 			resizeBootstrapTable = function() {
-				$('.bootstrap-table').css('width', (document.GUI.browserwidth.value - 240) + 'px');
+				console.log('browserwidth: ' + document.body.width);
+				$('.bootstrap-table').css('width', (document.body.offsetWidth - 240) + 'px');
 			};
 			window.addEventListener('resize', resizeBootstrapTable);
 
@@ -398,6 +447,16 @@
 					console.log('loaderror');
 					result.error('Event: load-error.bs.table');
 				});
+/*
+				.on('all.bs.table', function(e, name, args) {
+					console.log('event: %s', name);
+				})
+				.on('sort.bs.table', function(e, spalte, richtung) {
+					//$('#waiting_div').show();
+					//console.log('Sortiere Spalte: %s Richtung: %s', spalte, richtung);
+					//message([{ type: 'notice', msg: 'Sortiere Spalte: ' + spalte + ' Richtung: ' + (richtung == 'desc' ? 'absteigend' : 'aufsteigend')}])
+				})
+*/
 				// more examples for register events on data tables: http://jsfiddle.net/wenyi/e3nk137y/36/
 
 				$('.change-bearbeitungsstand').on(
@@ -405,6 +464,13 @@
 					function (e) {
 						//console.log('Ändere Bearbeitungsstand');
 						updateBearbeitungsstand(e.target.getAttribute('stufe'), e.target.value);
+					}
+				);
+
+				$('#update_abgabe_name_button').on(
+					'click',
+					function(e) {
+						updateAbgabename($('#abgabe_name_field').val());
 					}
 				);
 
@@ -449,6 +515,7 @@
 					if (kartierung_ids.length > 0) {
 						//console.log('Update selected kartierung_ids: ' + kartierung_ids)
 						$.ajax({
+							type: "POST",
 							url: 'index.php',
 							data: {
 								go: "show_snippet",
@@ -457,25 +524,18 @@
 								format: "json",
 								stufe_alt: <? echo $this->formvars['bearbeitungsstufe']; ?>,
 								stufe_neu: stufe,
-								kartierung_ids: kartierung_ids
+								objektart: 'Kartierobjekte',
+								kartierung_ids: kartierung_ids.join(',')
 							},
 							success: function(response) {
 								var result = JSON.parse(response)[0];
 								//console.log(result);
-								if (result.kartierung_ids.length > 0) {
-									$.map(
-										selected_rows,
-										function (row) {
-											if ($.inArray(row.kartierung_id, result.kartierung_ids) > -1) {
-												row.stand = stand;
-												$('#kartierungen_table').bootstrapTable('updateByUniqueId', {
-													id: row.kartierung_id,
-													row: row
-												});
-											}
-										}
-									);
-									message([{ type: 'notice', msg: 'Bearbeitungsstufe erfolgreich geändert für Objekte mit Id: ' + result.kartierung_ids.join(', ') }]);
+								if (result.kartierung_ids != '') {
+									$('#kartierungen_table').bootstrapTable('refresh', {silent: true});
+									message([
+										{ type: 'notice', msg: 'Bearbeitungsstufe erfolgreich geändert für Objekte mit Id: ' + result.kartierung_ids },
+										{ type: 'notice', msg: 'Bitte Warten. Tabelle wird neu geladen!'}
+									]);
 								}
 								if (result.success == false) {
 									message([{ type: 'error', msg: result.msg}]);
@@ -490,6 +550,56 @@
 						message('Keine änderbaren Kartierobjekte ausgewählt!');
 					} <?
 				} ?>
+			}
+
+			function updateAbgabename(abgabe_name) {
+				//console.log('update Abgabename: %s', abgabe_name);
+
+				var selected_rows = $('#kartierungen_table').bootstrapTable('getSelections'),
+						objectIds = $.map(
+							selected_rows,
+							function(row) {
+								return row.kartierung_id;
+							}
+						);
+
+				if (objectIds.length > 0) {
+					//console.log('Update selected objectIds: ' + objectIds);
+
+					$.ajax({
+						type: "Post",
+						url: 'index.php',
+						data: {
+							go: "show_snippet",
+							snippet: "update_abgabe_name",
+							mime_type: "application/json",
+							format: "json",
+							abgabe_name: abgabe_name,
+							objektart: 'Kartierobjekte',
+							object_ids: objectIds.join(',')
+						},
+						success: function(response) {
+							var result = JSON.parse(response)[0];
+							//console.log('Die Antwort vom Server ist da: %o', result);
+							if (result.object_ids != '') {
+								$('#kartierungen_table').bootstrapTable('refresh', {silent: true});
+								message([
+									{ type: 'notice', msg: 'Abgabename erfolgreich geändert für Objekte mit Id: ' + result.object_ids},
+									{ type: 'notice', msg: 'Bitte Warten. Tabelle wird neu geladen!'}
+								]);
+							}
+							if (result.success == false) {
+								message([{ type: 'error', msg: result.msg}]);
+							}
+						},
+						error: function(xhr) {
+							alert('Fehler beim Ändern des Abgabenamen der Objekte mit ID: ' + objectIds.join(', ') + ' Fehlerstatus: ' + xhr.status + ' Meldung: ' + xhr.statusText);
+						}
+					});
+				}
+				else {
+					message('Keine änderbaren Objekte ausgewählt!');
+				}
 			}
 
 			function checkboxFormatter(value, row, index) {

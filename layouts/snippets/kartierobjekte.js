@@ -1,3 +1,22 @@
+/*
+$('.datensatz ').each(function(i) {
+	var layer_id = $(this).attr('layer_id'),
+			oid = $(this).attr('oid'),
+			i = $(this).attr('dataset_form_index'),
+			kampagne_field = $('#' + layer_id + '_kampagne_id_' + i),
+			old_namekampagne_form_field_name = layer_id + ';id;kampagnen;;Auswahlfeld_not_saveable;1;int4;1',
+			kampagne_id = kampagne_field.next().val();
+
+	$(this).attr('name', layer_id);
+
+105;id;kampagnen;;Auswahlfeld_not_saveable;1;int4;1: 13
+
+<input type="hidden" name="105;id;kampagnen;;Auswahlfeld_not_saveable;1;int4;1" class="" onchange="set_changed_flag(currentform.changed_105_);" value="13">
+
+		kampagne_field.after('<input type="hidden" name="' + kampagne_form_field_name + '" value="' + kampagne_id + '"></input>');
+		$('input[name="form_field_names"]').val($('input[name="form_field_names"]').val() + '|' + kampagne_form_field_name);
+});
+*/
 // Schaltet die Auswahl der Verlustbögen bei der Neuerfassung auch aus wenn eine andere Kartierebene gewählt wird.
 $('#105_kartierebene_id_-1').on(
   'change',
@@ -63,21 +82,19 @@ function DatensatzValidator(layerId, datensatzNr) {
 	}
 
 	this.start=function() {
-
 		label = this.getValue("label");
-
-		if (!label || label.length===0) {
-			// console.info("new record");		   
+		if (!label || label.length === 0) {
+			// console.info("new record");
 			this.hideElementsByRecordCreation();
-			
-		} else {
+		}
+		else {
 			// console.info("not new record");
-			this.disableDropbox(document.getElementById(this.layerId+"_kampagne_id_"+datensatzNr));
-			this.disableDropbox(document.getElementById(this.layerId+"_kartierebene_id_"+datensatzNr));
+			this.disableDropbox(document.getElementById(this.layerId + "_kampagne_id_" + datensatzNr));
+			this.disableDropbox(document.getElementById(this.layerId + "_kartierebene_id_" + datensatzNr));
 
-			this.disableDropbox(document.getElementById(this.layerId+"_kartiergebiet_id_"+datensatzNr));
-			this.disableDropbox(document.getElementById(this.layerId+"_bogenart_id_"+datensatzNr));
-			this.disableDropbox(document.getElementById(this.layerId+"_lrt_gr_"+datensatzNr));
+			this.disableDropbox(document.getElementById(this.layerId + "_kartiergebiet_id_" + datensatzNr));
+			this.disableDropbox(document.getElementById(this.layerId + "_bogenart_id_" + datensatzNr));
+			this.disableDropbox(document.getElementById(this.layerId + "_lrt_gr_" + datensatzNr));
 		}
 
 		this.startCheckCodeSum();
@@ -156,22 +173,21 @@ function DatensatzValidator(layerId, datensatzNr) {
 		this.checkCodeSum();
 		
 	}
-	
-	
-	this.disableDropbox = function(elem) {
-		if (elem.selectedOptions) {
-			let text = elem.selectedOptions[0].innerText;
-			let hiddenElem = document.createElement("input");
-			hiddenElem.type = "hidden";
-			hiddenElem.id = elem.id;
-			hiddenElem.name = elem.name;
-			hiddenElem.value = elem.value;		
-			elem.parentNode.appendChild(hiddenElem);
 
-			let lblElem = document.createElement("label");
-			lblElem.innerText = text;
-			elem.replaceWith(lblElem);
-		}
+	this.disableDropbox = function(elem) {
+//		console.log(elem.name, elem.id, elem.tagName, elem.type);
+//		return;
+		let hiddenElem = document.createElement("input");
+		hiddenElem.type = "hidden";
+		hiddenElem.id = elem.id;
+		hiddenElem.name = elem.name;
+		hiddenElem.value = elem.value;
+		elem.parentNode.appendChild(hiddenElem);
+
+		let lblElem = document.createElement("label");
+		lblElem.innerText = elem.value;
+		elem.replaceWith(lblElem);
+		console.log('replace');
 	}
 
 	this.hideElementsByRecordCreation = function() {

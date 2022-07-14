@@ -25,6 +25,27 @@
 #	echo '<p>Sortierattribute: ' . $sort_attribute['attributename'];
 #	echo '<br>Sortierrichtung:' . $sort_attribute['sort_direction'];
 ?>
+
+<script src="<? echo JQUERY_PATH; ?>jquery.min.js"></script>
+
+<link rel="stylesheet" href="<? echo BOOTSTRAP_PATH; ?>css/bootstrap.min.css">
+<script src="<? echo BOOTSTRAP_PATH; ?>lib/popper-1.16.1.min.js"></script>
+<script src="<? echo BOOTSTRAP_PATH; ?>js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="<? echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.css">
+<script src="<? echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.js"></script>
+<script src="<? echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
+<script type="text/javascript" src="<? echo BOOTSTRAPTABLE_PATH; ?>/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+<link rel="stylesheet" href="<? echo BOOTSTRAPTABLE_PATH; ?>/extensions/filter-control/bootstrap-table-filter-control.min.css">
+<!--
+<script type="text/javascript" src="<?php echo BOOTSTRAPTABLE_PATH; ?>libs/FileSaver/FileSaver.min.js"></script>
+<script type="text/javascript" src="<?php echo BOOTSTRAPTABLE_PATH; ?>libs/js-xlsx/xlsx.core.min.js"></script>
+//-->
+
+
+
+
+<!--
 <link rel="stylesheet" href="<?php echo BOOTSTRAP_PATH; ?>css/bootstrap.min.css" type="text/css">
 <link rel="stylesheet" href="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.css" type="text/css">
 
@@ -36,6 +57,8 @@
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extensions/export/bootstrap-table-export.min.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
+
+//-->
 <script src="funktionen/bootstrap-table-settings.js"></script>
 <div id="waiting_div">
 	<i class="fa fa-spinner fa-spin fa-3x fa-fw" style="color: gray"></i>
@@ -114,7 +137,7 @@
 	else {
 		$filter = $user_id_filter . $bearbeitungsstufe_filter;
 	}
-	#echo '<p>go=Layer-Suche_Suchen&selected_layer_id=146' . $filter . '&anzahl=10000&mime_type=formatter&format=json';
+	#echo '<p>go=Layer-Suche_Suchen&selected_layer_id=146' . $filter . '&anzahl=100000&mime_type=formatter&format=json';
 	
 	 ?>
 	<h2 style="display: inline">Kartierobjekte</h2><?
@@ -124,7 +147,7 @@
 		$this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('stufe') : '',
 		1,
 		'float: right; margin-right: 10px; margin-top: 9px; width: 248px;',
-		"window.location.href='index.php?go=show_snippet&snippet=liste_kartierobjekte&bearbeitungsstufe=' + $(this).val() + '&user_id=" . $this->formvars['user_id'] . "'"
+		"window.location.href='index.php?go=show_snippet&snippet=liste_kartierobjekte&bearbeitungsstufe=' + $(this).val() + '&user_id=" . $this->formvars['user_id'] . "&csrf_token=" . $_SESSION['csrf_token'] . "'"
 	);
 	if ($this->Stelle->Bezeichnung == 'Kartierung' AND $bearbeitungsstufe->get('stufe') > 1) {
 		echo FormObject::createSelectField(
@@ -136,7 +159,7 @@
 			$this->formvars['user_id'],
 			1,
 			'float: right; margin-right: 8px; margin-top: 9px;',
-			"window.location.href='index.php?go=show_snippet&snippet=liste_kartierobjekte&bearbeitungsstufe=" . $this->formvars['bearbeitungsstufe'] . "&user_id=' + $(this).val()"
+			"window.location.href='index.php?go=show_snippet&snippet=liste_kartierobjekte&bearbeitungsstufe=" . $this->formvars['bearbeitungsstufe'] . "&user_id=' + $(this).val() + '&csrf_token=" . $_SESSION['csrf_token'] . "'"
 		);
 	} ?>
 	<div style="padding-left:10px;padding-right:10px;">
@@ -178,235 +201,238 @@
 				><?
 			} ?>
 		</div>
-		<table
-			id="kartierungen_table"
-			data-unique-id="kartierung_id"
-			data-toggle="table"
-			data-url="index.php"
-			data-height="100%"
-			data-click-to-select="true"
-			data-filter-control="true" 
-			data-sort-name="<?php echo $sort_attribute['attributename']; ?>"
-			data-sort-order="<?php echo $sort_attribute['sort_direction']; ?>"
-			data-search="true"
-			data-show-export="false"
-			data-export_types=['json', 'xml', 'csv', 'txt', 'sql', 'excel']
-			data-show-refresh="false"
-			data-show-toggle="true"
-			data-show-columns="true"
-			data-query-params="go=Layer-Suche_Suchen&selected_layer_id=<?php echo $layer_id; ?><?php echo $filter; ?>&anzahl=10000&mime_type=formatter&format=json"
-			data-pagination="true"
-			data-page-list=[10,25,50,100,250,500,1000,all]
-			data-page-size="100"
-			data-toggle="table"
-			data-toolbar="#toolbar"	
-			style="position:relative;overflow:auto;height:50%"
-		>
-			<thead>
-				<tr><?
-					if (($this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('aenderungsberechtigte_stelle') : '') == $this->Stelle->Bezeichnung) { ?>
+		<div class="table-wrapper">
+			<table
+				id="kartierungen_table"
+				data-unique-id="kartierung_id"
+				data-toggle="table"
+				data-url="index.php"
+				data-height="100%"
+				data-click-to-select="true"
+				data-filter-control="true" 
+				data-sort-name="<?php echo $sort_attribute['attributename']; ?>"
+				data-sort-order="<?php echo $sort_attribute['sort_direction']; ?>"
+				data-search="true"
+				data-show-export="false"
+				data-export_types=['json', 'xml', 'csv', 'txt', 'sql', 'excel']
+				data-show-refresh="false"
+				data-show-toggle="true"
+				data-show-columns="true"
+				data-query-params="go=Layer-Suche_Suchen&selected_layer_id=<?php echo $layer_id; ?><?php echo $filter; ?>&anzahl=100000&mime_type=formatter&format=json"
+				data-pagination="true"
+				data-page-list=[10,25,50,100,250,500,1000,all]
+				data-page-size="100"
+				data-toggle="table"
+				data-toolbar="#toolbar"	
+				style="position:relative;overflow:auto;height:50%"
+			>
+				<thead>
+					<tr><?
+						if (($this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('aenderungsberechtigte_stelle') : '') == $this->Stelle->Bezeichnung) { ?>
+							<th
+								data-sortable="false"
+								data-visible="true"
+								data-switchable="true"
+								data-checkbox="true"
+								data-formatter="checkboxFormatter"
+							></th><?
+						} ?>
 						<th
-							data-sortable="false"
+							data-field="kartierung_id"
 							data-visible="true"
+							data-sortable="true"
+							data-formatter="kartierungEditFunctionsFormatter"
+							data-switchable="false"
+							data-filter-control="input"
+						>ID</th>
+						<th
+							data-field="lfd_nr_kr"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('lfd_nr_kr', $rolle_attribute_settings) OR $rolle_attribute_settings['lfd_nr_kr']['switched_on'] == 1) ? 'true' : 'false'); ?>"
 							data-switchable="true"
-							data-checkbox="true"
-							data-formatter="checkboxFormatter"
-						></th><?
-					} ?>
-					<th
-						data-field="kartierung_id"
-						data-visible="true"
-						data-sortable="true"
-						data-formatter="kartierungEditFunctionsFormatter"
-						data-switchable="false"
-						data-filter-control="input"
-					>ID</th>
-					<th
-						data-field="lfd_nr_kr"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('lfd_nr_kr', $rolle_attribute_settings) OR $rolle_attribute_settings['lfd_nr_kr']['switched_on'] == 1) ? 'true' : 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="input"
-					>Lfd Nr KG</th>
-					<th
-						data-field="label"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('label', $rolle_attribute_settings) OR $rolle_attribute_settings['label']['switched_on'] == 1) ? 'true' : 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="input"
-					>Objekt-Code</th>
-					<th
-						data-field="arbeits_id"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('arbeits_id', $rolle_attribute_settings) OR $rolle_attribute_settings['arbeits_id']['switched_on'] == 1) ? 'true' : 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="input"
-					>Arbeits-ID</th>
-					<th
-						data-field="hat_geom"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('hat_geom', $rolle_attribute_settings) OR $rolle_attribute_settings['hat_geom']['switched_on'] == 1) ? 'true' : 'false'); ?>"
-						data-formatter="boolTypeFormatter"
-						data-switchable="true"
-						data-filter-control="select"
-					>hat Geom</th>
-					<th
-						data-field="flaeche"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('flaeche', $rolle_attribute_settings) OR $rolle_attribute_settings['flaeche']['switched_on'] == 1) ? 'true' : 'false'); ?>"
-						data-switchable="true"
-					>Fläche</th>
-					<th
-						data-field="hat_fotos"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('hat_fotos', $rolle_attribute_settings) OR $rolle_attribute_settings['hat_fotos']['switched_on'] == 1) ? 'true' : 'false'); ?>"
-						data-formatter="boolTypeFormatter"
-						data-switchable="true"
-						data-filter-control="select"
-					>hat Fotos</th>
-					<th
-						data-field="kampagne_id"
-						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kampagne_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
-						data-switchable="true"
-					>Kampagne ID</th>
-					<th
-						data-field="kampagne_abk"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('kampagne_abk', $rolle_attribute_settings) OR $rolle_attribute_settings['kampagne_abk']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Kampagne</th>
-					<th
-						data-field="kampagne"
-						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kampagne']['switched_on'] == 1 ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Kampagne Bezeichnung</th>
-					<th
-						data-field="kartiergebiet_id"
-						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kartiergebiet_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
-						data-switchable="true"
-					>Kartiergebiet ID</th>
-					<th
-						data-field="kartiergebiet"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('kartiergebiet', $rolle_attribute_settings) OR $rolle_attribute_settings['kartiergebiet']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Kartiergebiet</th>
-					<th
-						data-field="kartierebene_id"
-						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['kartierebene_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Kartierebene Id</th>
-					<th
-						data-field="kartierebene"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('kartierebene', $rolle_attribute_settings) OR $rolle_attribute_settings['kartierebene']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Kartierebene</th>
-					<th
-						data-field="bogenart_id"
-						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['bogenart_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
-						data-switchable="true"
-					>Bogenart Id</th>
-					<th
-						data-field="bogenart"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('bogenart', $rolle_attribute_settings) OR $rolle_attribute_settings['bogenart']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Bogenart</th>
-					<th
-						data-field="hc"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('hc', $rolle_attribute_settings) OR $rolle_attribute_settings['hc']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Hauptcode</th>
-					<th
-						data-field="lrt_info_code"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('lrt_info_code', $rolle_attribute_settings) OR $rolle_attribute_settings['lrt_info_code']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>LRT-Code</th>
-					<th
-						data-field="biotopname"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('biotopname', $rolle_attribute_settings) OR $rolle_attribute_settings['biotopname']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-width="40px"
-						data-filter-control="input"
-					>Biotopname</th>
-					<th
-						data-field="koordinator_rueckweisung"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('koordinator_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['koordinator_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-formatter="boolTypeFormatter"
-						data-filter-control="select"
-					>Rückweisung durch Koordinator</th>
-					<th
-						data-field="abgabe_name"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('abgabe_name', $rolle_attribute_settings) OR $rolle_attribute_settings['abgabe_name']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Abgabename</th>
-					<th
-						data-field="pruefer_rueckweisung"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('pruefer_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['pruefer_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-formatter="boolTypeFormatter"
-						data-filter-control="select"
-					>Rückweisung durch Prüfer</th>
-					<th
-						data-field="korrektur_nr"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('korrektur_nr', $rolle_attribute_settings) OR $rolle_attribute_settings['korrektur_nr']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Rückgabe</th>
-					<th
-						data-field="kartierer_name"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('kartierer_name', $rolle_attribute_settings) OR $rolle_attribute_settings['kartierer_name']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Kartierer</th>
-					<th
-						data-field="user_id"
-						data-sortable="true"
-						data-visible="<? echo ($rolle_attribute_settings['user_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>User-ID</th>
-					<th
-						data-field="stand"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('stand', $rolle_attribute_settings) OR $rolle_attribute_settings['stand']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Bearbeitungsstand</th>
-					<th
-						data-field="rueckgabewunsch"
-						data-sortable="true"
-						data-visible="<? echo ((!array_key_exists('rueckgabewunsch', $rolle_attribute_settings) OR $rolle_attribute_settings['rueckgabewunsch']['switched_on'] == 1) ? 'true': 'false'); ?>"
-						data-switchable="true"
-						data-filter-control="select"
-					>Rueckgabewunsch</th>
-				</tr>
-			</thead>
-		</table>
+							data-filter-control="input"
+						>Lfd Nr KG</th>
+						<th
+							data-field="label"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('label', $rolle_attribute_settings) OR $rolle_attribute_settings['label']['switched_on'] == 1) ? 'true' : 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="input"
+						>Objekt-Code</th>
+						<th
+							data-field="arbeits_id"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('arbeits_id', $rolle_attribute_settings) OR $rolle_attribute_settings['arbeits_id']['switched_on'] == 1) ? 'true' : 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="input"
+						>Arbeits-ID</th>
+						<th
+							data-field="hat_geom"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('hat_geom', $rolle_attribute_settings) OR $rolle_attribute_settings['hat_geom']['switched_on'] == 1) ? 'true' : 'false'); ?>"
+							data-formatter="boolTypeFormatter"
+							data-switchable="true"
+							data-filter-control="select"
+						>hat Geom</th>
+						<th
+							data-field="flaeche"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('flaeche', $rolle_attribute_settings) OR $rolle_attribute_settings['flaeche']['switched_on'] == 1) ? 'true' : 'false'); ?>"
+							data-switchable="true"
+						>Fläche</th>
+						<th
+							data-field="hat_fotos"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('hat_fotos', $rolle_attribute_settings) OR $rolle_attribute_settings['hat_fotos']['switched_on'] == 1) ? 'true' : 'false'); ?>"
+							data-formatter="boolTypeFormatter"
+							data-switchable="true"
+							data-filter-control="select"
+						>hat Fotos</th>
+						<th
+							data-field="kampagne_id"
+							data-sortable="true"
+							data-visible="<? echo ($rolle_attribute_settings['kampagne_id']['switched_on'] == 1 ? 'true' : 'false'); ?>"
+							data-switchable="true"
+						>Kampagne ID</th>
+						<th
+							data-field="kampagne_abk"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('kampagne_abk', $rolle_attribute_settings) OR $rolle_attribute_settings['kampagne_abk']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Kampagne</th>
+						<th
+							data-field="kampagne"
+							data-sortable="true"
+							data-visible="<? echo ($rolle_attribute_settings['kampagne']['switched_on'] == 1 ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Kampagne Bezeichnung</th>
+						<th
+							data-field="kartiergebiet_id"
+							data-sortable="true"
+							data-visible="<? echo ($rolle_attribute_settings['kartiergebiet_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
+							data-switchable="true"
+						>Kartiergebiet ID</th>
+						<th
+							data-field="kartiergebiet"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('kartiergebiet', $rolle_attribute_settings) OR $rolle_attribute_settings['kartiergebiet']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Kartiergebiet</th>
+						<th
+							data-field="kartierebene_id"
+							data-sortable="true"
+							data-visible="<? echo ($rolle_attribute_settings['kartierebene_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Kartierebene Id</th>
+						<th
+							data-field="kartierebene"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('kartierebene', $rolle_attribute_settings) OR $rolle_attribute_settings['kartierebene']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Kartierebene</th>
+						<th
+							data-field="bogenart_id"
+							data-sortable="true"
+							data-visible="<? echo ($rolle_attribute_settings['bogenart_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
+							data-switchable="true"
+						>Bogenart Id</th>
+						<th
+							data-field="bogenart"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('bogenart', $rolle_attribute_settings) OR $rolle_attribute_settings['bogenart']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Bogenart</th>
+						<th
+							data-field="hc"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('hc', $rolle_attribute_settings) OR $rolle_attribute_settings['hc']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Hauptcode</th>
+						<th
+							data-field="lrt_info_code"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('lrt_info_code', $rolle_attribute_settings) OR $rolle_attribute_settings['lrt_info_code']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>LRT-Code</th>
+						<th
+							data-field="biotopname"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('biotopname', $rolle_attribute_settings) OR $rolle_attribute_settings['biotopname']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-width="40px"
+							data-filter-control="input"
+						>Biotopname</th>
+						<th
+							data-field="koordinator_rueckweisung"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('koordinator_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['koordinator_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-formatter="boolTypeFormatter"
+							data-filter-control="select"
+						>Rückweisung durch Koordinator</th>
+						<th
+							data-field="abgabe_name"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('abgabe_name', $rolle_attribute_settings) OR $rolle_attribute_settings['abgabe_name']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Abgabename</th>
+						<th
+							data-field="pruefer_rueckweisung"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('pruefer_rueckweisung', $rolle_attribute_settings) OR $rolle_attribute_settings['pruefer_rueckweisung']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-formatter="boolTypeFormatter"
+							data-filter-control="select"
+						>Rückweisung durch Prüfer</th>
+						<th
+							data-field="korrektur_nr"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('korrektur_nr', $rolle_attribute_settings) OR $rolle_attribute_settings['korrektur_nr']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Rückgabe</th>
+						<th
+							data-field="kartierer_name"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('kartierer_name', $rolle_attribute_settings) OR $rolle_attribute_settings['kartierer_name']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Kartierer</th>
+						<th
+							data-field="user_id"
+							data-sortable="true"
+							data-visible="<? echo ($rolle_attribute_settings['user_id']['switched_on'] == 1 ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>User-ID</th>
+						<th
+							data-field="stand"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('stand', $rolle_attribute_settings) OR $rolle_attribute_settings['stand']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="select"
+						>Bearbeitungsstand</th>
+						<th
+							data-field="rueckgabewunsch"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('rueckgabewunsch', $rolle_attribute_settings) OR $rolle_attribute_settings['rueckgabewunsch']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-formatter="boolTypeFormatter"
+							data-filter-control="select"
+						>Rueckgabewunsch</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
 		<script language="javascript" type="text/javascript">
 			$('#gui-table').css('width', '100%');
 			$('#container_paint').css('height', 'auto');
@@ -419,7 +445,7 @@
 			$(function () {
 				result = $('#eventsResult');
 				result.success = function(text) {
-					message([{ type: 'notice', msg: text}], 1000, 500, '13%');
+					message([{ type: 'notice', msg: text}], 1000, 500);
 		/*			result.text(text);
 					result.removeClass('alert-danger');
 					result.addClass('alert-success');*/
@@ -525,11 +551,14 @@
 								stufe_alt: <? echo $this->formvars['bearbeitungsstufe']; ?>,
 								stufe_neu: stufe,
 								objektart: 'Kartierobjekte',
-								kartierung_ids: kartierung_ids.join(',')
+								kartierung_ids: kartierung_ids.join(','),
+								csrf_token: '<? echo $_SESSION['csrf_token']; ?>'
 							},
 							success: function(response) {
+								debug_resp = response;
+//								console.log('response: %s', response);
 								var result = JSON.parse(response)[0];
-								//console.log(result);
+//								console.log('result: %o', result);
 								if (result.kartierung_ids != '') {
 									$('#kartierungen_table').bootstrapTable('refresh', {silent: true});
 									message([
@@ -576,7 +605,8 @@
 							format: "json",
 							abgabe_name: abgabe_name,
 							objektart: 'Kartierobjekte',
-							object_ids: objectIds.join(',')
+							object_ids: objectIds.join(','),
+							csrf_token: '<? echo $_SESSION['csrf_token']; ?>'
 						},
 						success: function(response) {
 							var result = JSON.parse(response)[0];
@@ -628,7 +658,7 @@
 			}
 
 			function kartierungEditFunctionsFormatter(value, row) {
-				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=105&value_kartierung_id=' + value + '&operator_kartierung_id==">' + row.kartierung_id + '</a>';
+				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=105&value_kartierung_id=' + value + '&operator_kartierung_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>">' + row.kartierung_id + '</a>';
 				//console.log(output);
 				return output;
 			}

@@ -5229,7 +5229,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 
 
 	this.start=function() {
-		console.info("start layerId="+this.layerId+" datensatzNr="+this.datensatzNr);
+		console.info("start layerId="+this.layerId+" datensatzNr="+this.datensatzNr, this);
 		if (this.layerId===109) {
 		}
 		
@@ -5276,23 +5276,32 @@ function DatensatzBewertung(layerId, datensatzNr) {
 			alert("keine Bewertungen für LayerId=\""+this.layerId+"\"");
 		}
 
-		console.info("root.open_subform_requests="+root.open_subform_requests);
+		const self = this;
+		const bSelf = this;
+		// console.error("root.open_subform_requests="+root.open_subform_requests, this, self);
 		if (root.open_subform_requests===0) {
 			this.prepareHTML();
 			this.bewerte();
 			this.submit();
 		}
 		else {
-			let self = this;
+			// const self = this;
 			let callback = function(evt) {
-					console.info("MutationObserver", evt);
+					// console.error("MutationObserver root.open_subform_requests="+root.open_subform_requests, evt);
 					if (root.open_subform_requests===0) {
 						self.readHabitate();
 						self.readGefaehrdungen();
 						self.readNebencodes();
-						if (self.habitate && self.gefcodes && self.nebencodes) {
-							self.prepareHTML();
-							self.bewerte();
+						if (self.habitate && self.nebencodes) {
+							if (self.gefcodes || self.layerId===144 || self.layerId===145 || self.layerId===160) {							
+								self.prepareHTML();
+								self.bewerte();
+							} else {
+								console.error("gefcodes are null");
+							}	
+						} else {
+							console.error("sth is null habitate or nebencodes", self.habitate, self.nebencodes);
+							console.info("scope", self);
 						};
 						self.submit();
 					}
@@ -5681,6 +5690,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 				new showText(s);
 			}
         }
+		console.info(`bewerte ${this.layerId} Datensatz=${this.datensatzNr} done`);
     }
 
     this.addElement=function(inputElement) {
@@ -6079,7 +6089,7 @@ function BewertungApp() {
 			var layerId = Number.parseInt(idA[0], 10);
 			
 			
-			if (!isNaN(datensatzNr) && !isNaN(layerId) && datensatzNr!=109) {
+			if (!isNaN(datensatzNr) && !isNaN(layerId) && datensatzNr>=0 && datensatzNr!=109) {
 				if (!this.map[layerId+datensatzNr]) {
 					this.map[layerId+datensatzNr]=new DatensatzBewertung(layerId, datensatzNr);
 				}

@@ -77,7 +77,7 @@
 		var icon = 'pencil',
 				output;
 
-				output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=131&value_kartiergebiet_id=' + value + '&operator_kartiergebiet_id==">ansehen</a>';
+				output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=131&value_kartiergebiet_id=' + value + '&operator_kartiergebiet_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>">ansehen</a>';
 		return output;
 	}
 </script>

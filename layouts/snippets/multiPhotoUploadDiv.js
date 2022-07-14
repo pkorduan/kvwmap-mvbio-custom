@@ -28,7 +28,7 @@ function createMultiPhotoUploadDiv(layerId, fotoTableName, fotoLayerId, joinAttr
 				<div>\
 					Verbleibende Dateien zum Hochladen: <span id="count">0</span>\
 				</div>\
-				<input type="hidden" id="upload_foto_url" value="index.php?go=show_snippet&snippet=upload_foto&only_main=1&only_create=1&foto_table_name=' + fotoTableName + '&foto_layer_id=' + fotoLayerId + '&join_attribute_name=' + joinAttributeName + '&join_attribute_id=' + joinAttributeId + '"/>\
+				<input type="hidden" id="upload_foto_url" value="index.php?go=show_snippet&snippet=upload_foto&only_main=1&only_create=1&foto_table_name=' + fotoTableName + '&foto_layer_id=' + fotoLayerId + '&join_attribute_name=' + joinAttributeName + '&join_attribute_id=' + joinAttributeId + '&csrf_token=' + csrf_token + '"/>\
 				<h2>Ergebnis:</h2>\
 				<div id="result"></div>\
 				<canvas width="500" height="20"></canvas>\

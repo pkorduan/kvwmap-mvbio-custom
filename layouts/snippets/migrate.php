@@ -114,7 +114,7 @@
 						show_complete_msg();
 					}
 					else { ?>
-						<p>Korrigiere Migrationsdatei!<p><a href="index.php?go=show_snippet&snippet=migrate">Zurück zur Liste</a><?
+						<p>Korrigiere Migrationsdatei!<p><a href="index.php?go=show_snippet&snippet=migrate&csrf_token=<? echo $_SESSION['csrf_token']; ?>">Zurück zur Liste</a><?
 					}
 				}
 				else { ?>

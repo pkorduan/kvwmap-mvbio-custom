@@ -1,4 +1,11 @@
 <?php
+	# ToDo
+	# Abfragen ob sich an dieser Stelle wo der neue Bogen eingetragen werden soll schon ein Kartierobjekt befindet
+	# Wenn ja Abbruch mit aussagekräftiger Meldung
+	# Bedingung für Abbruch wurde per E-Mail angefragt bei Dirk und Stefan Goen 2021-10-14.
+
+
+
 	# Übernahme der Daten des Boges mit der ID $bogen_id in ein neues Kartierobjekt
 	# Wenn es ein Bewertungsbogen ist, wird sowohl eine Kartierung und eine Bewertung angelegt
 	# Es werden alle Felder übernommen, die passen, außer bei Bewertungen. Dabei werden
@@ -36,222 +43,251 @@
 			$archivtabelle = $rs['archivtabelle'];
 		}
 
-		# Übernahme von Auto-Werten für die neue Kartierung
-		$select_columns['stelle_id'] = $this->Stelle->id;
-		$select_columns['user_id'] = $this->user->id;
-		$select_columns['bearbeitungsstufe'] = 1;
-		$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
-		$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
-#		$select_columns['e_datum'] = 'NULL';
-		$select_columns['l_datum'] = 'NULL';
-		$select_columns['foto'] = 0;
-		if (rolle::$layer_params['kartierebenenfilter'] != '') {
-			$select_columns['kartierebene_id'] = rolle::$layer_params['kartierebenenfilter'];
-		}
-		if ($this->formvars['bogenart_id'] == '') {
-			if ($archivtabelle == 'bewertungsboegen') {
-				$select_columns['bogenart_id'] = 2;
-			}
-		}
-		else {
-			$select_columns['bogenart_id'] = $this->formvars['bogenart_id'];
-		}
-		# Eintragen des neuen Kartierobjektes mit den Daten des ausgewählten Bogens
-		$sql = '
-			INSERT INTO mvbio.kartierobjekte ("' . implode('", "', $insert_columns) . '", stelle_id, user_id)
+		$sql = "
 			SELECT
-				' . implode(', ', $select_columns) . '
+				*
 			FROM
-				archiv.' . $archivtabelle . '
+				archiv." . $archivtabelle . "
 			WHERE
-				id = ' . $this->formvars['bogen_id'] . '
-			RETURNING id
-		';
-		#echo '<br>SQL zum Eintragen des Kartierobjektes' . $sql;
+				id = " . $this->formvars['bogen_id'] . "
+		";
 		$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 		if ($ret['success']) {
-			$rs = pg_fetch_assoc($ret[1]);
-			$new_kartierobjekt_id = $rs['id'];
+			$altbogen = pg_fetch_assoc($ret[1]);
+			#print_r($select_columns);
+			# Übernahme von Auto-Werten für die neue Kartierung
+			$select_columns['stelle_id'] = $this->Stelle->id;
+			$select_columns['user_id'] = $this->user->id;
+			$select_columns['created_at'] = "'" . date('Y-m-d H:i:s') . "'";
+			$select_columns['created_from'] = "'" . $this->user->Vorname . ' ' . $this->user->Name . "'";
+			$select_columns['bearbeitungsstufe'] = 1;
+			$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
+			$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
+			$select_columns['e_datum'] = ($altbogen['e_datum'] == '01.01.1970' ? 'NULL' : "'" . $altbogen['e_datum'] . "'");
+			$select_columns['l_datum'] = 'NULL';
+			$select_columns['foto'] = 0;
+			$alt_datp20 = implode('-', array_reverse(explode('.', $altbogen['l_datum'] ?: ($altbogen['e_datum'] == '01.01.1970' ? 'NULL' : $altbogen['e_datum']) ?: 'NULL')));
+			if ($alt_datp20 != 'NULL') {
+				$alt_datp20 = "'" . $alt_datp20 . "'";
+			}
+			$select_columns['alt_datp20'] = $alt_datp20;
+			$select_columns['kartierer'] = "'" . $this->user->Vorname . ' ' . $this->user->Name . "'";
+			$select_columns['fb_id'] = 'NULL';
 
-/* Pflanzenvorkommen sollen nicht übernommen werden
-			# Eintragen der Pflanzenvorkommen
-			$sql = "
-				INSERT INTO mvbio.pflanzenvorkommen (kartierobjekt_id, species_nr, valid_nr, dzv, fsk, rl, cf, tax, bav)
+
+			if (rolle::$layer_params['kartierebenenfilter'] != '') {
+				$select_columns['kartierebene_id'] = rolle::$layer_params['kartierebenenfilter'];
+			}
+			if ($this->formvars['bogenart_id'] == '') {
+				if ($archivtabelle == 'bewertungsboegen') {
+					$select_columns['bogenart_id'] = 2;
+				}
+			}
+			else {
+				$select_columns['bogenart_id'] = $this->formvars['bogenart_id'];
+			}
+			# Eintragen des neuen Kartierobjektes mit den Daten des ausgewählten Bogens
+			#print_r(implode(', ', array_keys($select_columns)));
+			$sql = '
+				INSERT INTO mvbio.kartierobjekte ("' . implode('", "', $insert_columns) . '", stelle_id, user_id, created_from)
 				SELECT
-					" . $new_kartierobjekt_id . ", pv.species_nr, pv.valid_nr, pv.dzv, pv.fsk, pv.rl, pv.cf, pv.tax, pv.bav
+					' . implode(', ', $select_columns) . '
 				FROM
-					archiv.erfassungsboegen eb JOIN
-					archiv.pflanzenvorkommen pv ON eb.kartierobjekt_id = pv.kartierobjekt_id
+					archiv.' . $archivtabelle . '
 				WHERE
-					eb.id = " . $this->formvars['bogen_id'] . "
-			";
-			#echo '<br>SQL zum Eintragen der Pflanzenvorkommen: ' . $sql;
-			#$ret = $this->pgdatabase->execSQL($sql, 4, 0);
-*/
+					id = ' . $this->formvars['bogen_id'] . '
+				RETURNING id
+			';
+			#echo '<br>SQL zum Eintragen des Kartierobjektes' . $sql;
+			$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 			if ($ret['success']) {
+				$rs = pg_fetch_assoc($ret[1]);
+				$new_kartierobjekt_id = $rs['id'];
 
-				# Eintragen der Nebencodes für das neue Kartierobjekt
+	/* Pflanzenvorkommen sollen nicht übernommen werden
+				# Eintragen der Pflanzenvorkommen
 				$sql = "
-					INSERT INTO mvbio.biotoptypen_nebencodes (kartierung_id, code, flaechendeckung_prozent)
+					INSERT INTO mvbio.pflanzenvorkommen (kartierobjekt_id, species_nr, valid_nr, dzv, fsk, rl, cf, tax, bav)
 					SELECT
-						" . $new_kartierobjekt_id . ", nc.code, nc.flaechendeckung_prozent
+						" . $new_kartierobjekt_id . ", pv.species_nr, pv.valid_nr, pv.dzv, pv.fsk, pv.rl, pv.cf, pv.tax, pv.bav
 					FROM
-						archiv.biotoptypen_nebencodes nc
+						archiv.erfassungsboegen eb JOIN
+						archiv.pflanzenvorkommen pv ON eb.kartierobjekt_id = pv.kartierobjekt_id
 					WHERE
-						nc.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
+						eb.id = " . $this->formvars['bogen_id'] . "
 				";
-				#echo '<br>SQL zum Eintragen der Nebencodes: ' . $sql;
-				$ret = $this->pgdatabase->execSQL($sql, 4, 0);
+				#echo '<br>SQL zum Eintragen der Pflanzenvorkommen: ' . $sql;
+				#$ret = $this->pgdatabase->execSQL($sql, 4, 0);
+	*/
 				if ($ret['success']) {
 
-					# Eintragen der Habitatvorkommen für das neue Kartierobjekt
+					# Eintragen der Nebencodes für das neue Kartierobjekt
 					$sql = "
-						INSERT INTO mvbio.habitatvorkommen (kartierung_id, code)
+						INSERT INTO mvbio.biotoptypen_nebencodes (kartierung_id, code, flaechendeckung_prozent)
 						SELECT
-							" . $new_kartierobjekt_id . ", hv.code
+							" . $new_kartierobjekt_id . ", nc.code, nc.flaechendeckung_prozent
 						FROM
-							archiv.habitatvorkommen hv
+							archiv.biotoptypen_nebencodes nc
 						WHERE
-							hv.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
+							nc.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
 					";
-					#echo '<br>SQL zum Eintragen der Habitatvorkommen: ' . $sql;
+					#echo '<br>SQL zum Eintragen der Nebencodes: ' . $sql;
 					$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 					if ($ret['success']) {
 
-						# Eintragen der Empfehlungen und Massnahmen für das neue Kartierobjekt
+						# Eintragen der Habitatvorkommen für das neue Kartierobjekt
 						$sql = "
-							INSERT INTO mvbio.empfehlungen_massnahmen (kartierung_id, code)
+							INSERT INTO mvbio.habitatvorkommen (kartierung_id, code)
 							SELECT
-								" . $new_kartierobjekt_id . ", em.code
+								" . $new_kartierobjekt_id . ", hv.code
 							FROM
-								archiv.empfehlungen_massnahmen em
+								archiv.habitatvorkommen hv
 							WHERE
-								em.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
+								hv.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
 						";
-						#echo '<br>SQL zum Eintragen des Empfehlungen und Massnahmen: ' . $sql;
+						#echo '<br>SQL zum Eintragen der Habitatvorkommen: ' . $sql;
 						$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 						if ($ret['success']) {
 
-							# Eintragen der Beeintraechtigungen und Gefaehrdungen für das neue Kartierobjekt
+							# Eintragen der Empfehlungen und Massnahmen für das neue Kartierobjekt
 							$sql = "
-								INSERT INTO mvbio.beeintraechtigungen_gefaehrdungen (kartierung_id, code)
+								INSERT INTO mvbio.empfehlungen_massnahmen (kartierung_id, code)
 								SELECT
-									" . $new_kartierobjekt_id . ", bg.code
+									" . $new_kartierobjekt_id . ", em.code
 								FROM
-									archiv.beeintraechtigungen_gefaehrdungen bg
+									archiv.empfehlungen_massnahmen em
 								WHERE
-									bg.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
+									em.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
 							";
-							#echo '<br>SQL zum Eintragen des Beeintraechtigungen und Gefaehrdungen: ' . $sql;
+							#echo '<br>SQL zum Eintragen des Empfehlungen und Massnahmen: ' . $sql;
 							$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 							if ($ret['success']) {
 
-								#echo '<p>Alles erfolgreich eingetragen';
-								$this->add_message('success', 'Neues Kartierobjekt mit id: ' . $new_kartierobjekt_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Kartierobjekt jetzt bearbeiten.');
+								# Eintragen der Beeintraechtigungen und Gefaehrdungen für das neue Kartierobjekt
+								$sql = "
+									INSERT INTO mvbio.beeintraechtigungen_gefaehrdungen (kartierung_id, code)
+									SELECT
+										" . $new_kartierobjekt_id . ", bg.code
+									FROM
+										archiv.beeintraechtigungen_gefaehrdungen bg
+									WHERE
+										bg.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
+								";
+								#echo '<br>SQL zum Eintragen des Beeintraechtigungen und Gefaehrdungen: ' . $sql;
+								$ret = $this->pgdatabase->execSQL($sql, 4, 0);
+								if ($ret['success']) {
 
-								if ($archivtabelle == 'bewertungsboegen') {
-									# Abfrage der LRT-Gruppe
-									$sql = "
-										SELECT
-											gr.tabelle_postfix
-										FROM
-											archiv.bewertungsboegen bb JOIN
-											mvbio.lrt_gruppen gr ON bb.lrt_gr::integer = gr.id
-										WHERE
-											bb.id = " . $this->formvars['bogen_id'] . "
-									";
-									#echo '<br>SQL zum Abfragen des Bewertungsbogentabellennamenzusatzes für Tabelle aus der übernommen und in die geschrieben werden sollen: ' . $sql;
-									$ret = $this->pgdatabase->execSQL($sql, 4, 0);
-									if ($ret['success']) {
-										$rs = pg_fetch_assoc($ret[1]);
-										$archivtabelle = 'bewertungsboegen_' . $rs['tabelle_postfix'];
-										$mvbiotabelle = 'bewertungen_' . $rs['tabelle_postfix'];
+									#echo '<p>Alles erfolgreich eingetragen';
+									$this->add_message('success', 'Neues Kartierobjekt mit id: ' . $new_kartierobjekt_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Kartierobjekt jetzt bearbeiten.');
 
-										# Abfrage der zwischen Bewertungsbogen und Bewertung übereinstimmenden Spaltennamen
+									if ($archivtabelle == 'bewertungsboegen') {
+										# Abfrage der LRT-Gruppe
 										$sql = "
 											SELECT
-												b.column_name
+												gr.tabelle_postfix
 											FROM
-												information_schema.columns b JOIN
-												information_schema.columns k ON b.column_name = k.column_name
+												archiv.bewertungsboegen bb JOIN
+												mvbio.lrt_gruppen gr ON bb.lrt_gr::integer = gr.id
 											WHERE
-												b.table_schema = 'archiv' AND	b.table_name = '" . $archivtabelle . "' AND
-												k.table_schema = 'mvbio' AND k.table_name = '" . $mvbiotabelle .	"' AND
-												k.column_name NOT IN (
-													'id',
-													'kartierobjekt_id',
-													'kampagne_id',
-													'kampagne',
-													'kartiergebiet_id',
-													'kartiergebiet_name',
-													'userid',
-													'sys_habit',
-													'sys_leben',
-													'sys_beein',
-													'sys_erhalt',
-													'bea_habit',
-													'bea_leben',
-													'bea_beein',
-													'bea_erhalt'
-												)
+												bb.id = " . $this->formvars['bogen_id'] . "
 										";
-										#echo '<br>SQL zum Abfragen der Spaltennamen, die übernommen werden sollen.' . $sql;
+										#echo '<br>SQL zum Abfragen des Bewertungsbogentabellennamenzusatzes für Tabelle aus der übernommen und in die geschrieben werden sollen: ' . $sql;
 										$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 										if ($ret['success']) {
-											$insert_columns = $select_columns = array();
-											while ($rs = pg_fetch_assoc($ret[1])) {
-												$insert_columns[$rs['column_name']] = $rs['column_name'];
-												$select_columns[$rs['column_name']] = $rs['column_name'];
-											}
-											$select_columns['bearbeitungsstufe'] = 1;
-											# Hinzufügen der kartierobjekt_id zu Abfrage- und Insertattributen
-											$insert_columns['kartierung_id'] = 'kartierung_id';
-											$select_columns['kartierung_id'] = $new_kartierobjekt_id;
-											$sql = '
-												INSERT INTO mvbio.' . $mvbiotabelle . ' ("' . implode('", "', $insert_columns) . '")
+											$rs = pg_fetch_assoc($ret[1]);
+											$archivtabelle = 'bewertungsboegen_' . $rs['tabelle_postfix'];
+											$mvbiotabelle = 'bewertungen_' . $rs['tabelle_postfix'];
+
+											# Abfrage der zwischen Bewertungsbogen und Bewertung übereinstimmenden Spaltennamen
+											$sql = "
 												SELECT
-													' . implode(', ', $select_columns) . '
+													b.column_name
 												FROM
-													archiv.' . $archivtabelle . '
+													information_schema.columns b JOIN
+													information_schema.columns k ON b.column_name = k.column_name
 												WHERE
-													id = ' . $this->formvars['bogen_id'] . '
-											';
-											#echo '<br>SQL zum Eintragen des Kartierobjektes' . $sql;
+													b.table_schema = 'archiv' AND	b.table_name = '" . $archivtabelle . "' AND
+													k.table_schema = 'mvbio' AND k.table_name = '" . $mvbiotabelle .	"' AND
+													k.column_name NOT IN (
+														'id',
+														'kartierobjekt_id',
+														'kampagne_id',
+														'kampagne',
+														'kartiergebiet_id',
+														'kartiergebiet_name',
+														'userid',
+														'sys_habit',
+														'sys_leben',
+														'sys_beein',
+														'sys_erhalt',
+														'bea_habit',
+														'bea_leben',
+														'bea_beein',
+														'bea_erhalt'
+													)
+											";
+											#echo '<br>SQL zum Abfragen der Spaltennamen, die übernommen werden sollen.' . $sql;
 											$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 											if ($ret['success']) {
-												$this->add_message('success', 'Neue Bewertung für Kartierobjekt: ' . $new_kartierobjekt_id . ' angelegt.');
-											}
-											else {
-												$this->add_message('error', 'Fehler bei dem Eintragen der neuen Bewertung auf der Basis des Bewertungsbogens der Kartierung: ' . $this->formvars['bogen_id'] . '!');
-												$fehler = true;
+												$insert_columns = $select_columns = array();
+												while ($rs = pg_fetch_assoc($ret[1])) {
+													$insert_columns[$rs['column_name']] = $rs['column_name'];
+													$select_columns[$rs['column_name']] = $rs['column_name'];
+												}
+												$select_columns['bearbeitungsstufe'] = 1;
+												# Hinzufügen der kartierobjekt_id zu Abfrage- und Insertattributen
+												$insert_columns['kartierung_id'] = 'kartierung_id';
+												$select_columns['kartierung_id'] = $new_kartierobjekt_id;
+												$sql = '
+													INSERT INTO mvbio.' . $mvbiotabelle . ' ("' . implode('", "', $insert_columns) . '")
+													SELECT
+														' . implode(', ', $select_columns) . '
+													FROM
+														archiv.' . $archivtabelle . '
+													WHERE
+														id = ' . $this->formvars['bogen_id'] . '
+												';
+												#echo '<br>SQL zum Eintragen des Kartierobjektes' . $sql;
+												$ret = $this->pgdatabase->execSQL($sql, 4, 0);
+												if ($ret['success']) {
+													$this->add_message('success', 'Neue Bewertung für Kartierobjekt: ' . $new_kartierobjekt_id . ' angelegt.');
+												}
+												else {
+													$this->add_message('error', 'Fehler bei dem Eintragen der neuen Bewertung auf der Basis des Bewertungsbogens der Kartierung: ' . $this->formvars['bogen_id'] . '!');
+													$fehler = true;
+												}
 											}
 										}
-									}
-									else {
-										$this->add_message('error', 'Fehler bei der Abfrage des Namen der Bewertungsbogenarchivtabelle!');
-										$fehler = true;
-									}
-								} # end processing bewertungsbogen
+										else {
+											$this->add_message('error', 'Fehler bei der Abfrage des Namen der Bewertungsbogenarchivtabelle!');
+											$fehler = true;
+										}
+									} # end processing bewertungsbogen
+								}
+								else {
+									$this->add_message('error', 'Fehler beim Eintragen der Empfehlungen.');
+								}
 							}
 							else {
-								$this->add_message('error', 'Fehler beim Eintragen der Empfehlungen.');
+								$this->add_message('error', 'Fehler beim Eintragen der Gefahrencodes.');
 							}
 						}
 						else {
-							$this->add_message('error', 'Fehler beim Eintragen der Gefahrencodes.');
+							$this->add_message('error', 'Fehler beim Eintragen der Habitate und Stukturen.');
 						}
 					}
 					else {
-						$this->add_message('error', 'Fehler beim Eintragen der Habitate und Stukturen.');
+						$this->add_message('error', 'Fehler beim Eintragen der Nebencodes.');
 					}
 				}
-				else {
-					$this->add_message('error', 'Fehler beim Eintragen der Nebencodes.');
-				}
+			}
+			else {
+				$this->add_message('error', 'Fehler beim Eintragen des Bogens id: ' . $this->formvars['bogen_id'] . ' als neue Kartierung!<br>Hinweis: Wählen Sie immer vor der Übernahme unter Einstellungen eine Kampagne und ein Kartiergebiet.');
+				$fehler = true;
 			}
 		}
 		else {
-			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neue Kartierung!<br>Hinweis: Wählen Sie immer vor der Übernahme unter Einstellungen eine Kampagne und ein Kartiergebiet.');
+			$this->add_message('error', 'Fehler bei der Abfrage des zu übernehmenden Bogens!');
 			$fehler = true;
 		}
 	}

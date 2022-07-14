@@ -121,7 +121,7 @@
 		$this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('stufe') : '',
 		1,
 		'float: right; margin-right: 10px; margin-top: 9px; width: 248px;',
-		"window.location.href='index.php?go=show_snippet&snippet=liste_verlustobjekte&bearbeitungsstufe=' + $(this).val() + '&user_id=" . $this->formvars['user_id'] . "'"
+		"window.location.href='index.php?go=show_snippet&snippet=liste_verlustobjekte&bearbeitungsstufe=' + $(this).val() + '&user_id=" . $this->formvars['user_id'] . "&csrf_token=" . $_SESSION['csrf_token'] . "'"
 	);
 	if ($this->Stelle->Bezeichnung == 'Kartierung' AND $bearbeitungsstufe->get('stufe') > 1) {
 		echo FormObject::createSelectField(
@@ -133,7 +133,7 @@
 			$this->formvars['user_id'],
 			1,
 			'float: right; margin-right: 8px; margin-top: 9px;',
-			"window.location.href='index.php?go=show_snippet&snippet=liste_verlustobjekte&bearbeitungsstufe=" . $this->formvars['bearbeitungsstufe'] . "&user_id=' + $(this).val()"
+			"window.location.href='index.php?go=show_snippet&snippet=liste_verlustobjekte&bearbeitungsstufe=" . $this->formvars['bearbeitungsstufe'] . "&user_id=' + $(this).val() + '&csrf_token=" . $_SESSION['csrf_token'] . "'"
 		);
 	} ?>
 	<div style="padding-left:10px;padding-right:10px;">
@@ -222,6 +222,14 @@
 						data-switchable="true"
 						data-filter-control="input"
 					>Arbeits-ID</th>
+					<th
+						data-field="hat_fotos"
+						data-sortable="true"
+						data-visible="<? echo ((!array_key_exists('hat_fotos', $rolle_attribute_settings) OR $rolle_attribute_settings['hat_fotos']['switched_on'] == 1) ? 'true' : 'false'); ?>"
+						data-formatter="boolTypeFormatter"
+						data-switchable="true"
+						data-filter-control="select"
+					>hat Fotos</th>
 					<th
 						data-field="kampagne_id"
 						data-sortable="true"
@@ -437,7 +445,8 @@
 								stufe_alt: <? echo $this->formvars['bearbeitungsstufe']; ?>,
 								stufe_neu: stufe,
 								objektart: 'Verlustobjekte',
-								kartierung_ids: kartierung_ids.join(',')
+								kartierung_ids: kartierung_ids.join(','),
+								csrf_token: '<? echo $_SESSION['csrf_token']; ?>'
 							},
 							success: function(response) {
 								var result = JSON.parse(response)[0];
@@ -488,7 +497,8 @@
 							format: "json",
 							abgabe_name: abgabe_name,
 							objektart: 'Verlustobjekte',
-							object_ids: objectIds.join(',')
+							object_ids: objectIds.join(','),
+							csrf_token: '<? echo $_SESSION['csrf_token']; ?>'
 						},
 						success: function(response) {
 							var result = JSON.parse(response)[0];
@@ -551,7 +561,7 @@
 			}
 
 			function kartierungEditFunctionsFormatter(value, row) {
-				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=240&value_verlustobjekt_id=' + value + '&operator_verlustobjekt_id==">' + row.kartierung_id + '</a>';
+				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=240&value_verlustobjekt_id=' + value + '&operator_verlustobjekt_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>">' + row.kartierung_id + '</a>';
 				//console.log(output);
 				return output;
 			}

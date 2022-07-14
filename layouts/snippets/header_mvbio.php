@@ -1,7 +1,7 @@
 <?php
 include_once(CLASSPATH . 'PgObject.php');
 $kampagne = new PgObject($this, 'mvbio', 'kampagnen');
-if ($this->go == 'Stelle_waehlen') {
+if ($this->go == 'Stelle_waehlen' OR in_array($this->user->id, array(1, 47))) {
 	$kartiergebiet = new PgObject($this, 'mvbio', 'kartiergebiete');
 	$kartierebene = new PgObject($this, 'mvbio', 'kartierebenen2kampagne');
 	$bogenart = new PgObject($this, 'mvbio', 'bogenarten2kartierebenen');
@@ -54,18 +54,25 @@ if ($this->go == 'Stelle_waehlen') {
 					$('#layer_parameter_kartiergebietfilter_tr').hide();
 				}
 				else {
+					var num_option_char = 4;
 					$('#layer_parameter_kartiergebietfilter_tr').show();
-					$('#layer_parameter_kartiergebietfilter option').each(function(i, option) {
-						if (option.value > 0 && $.inArray(kampagne_id + '-' + option.value, kartiergebiete) == -1) {
-							if (option.selected) {
-								$('#layer_parameter_kartiergebietfilter').val("0");
+					$('#layer_parameter_kartiergebietfilter option').each(
+						function(i, option) {
+							if (option.value > 0 && $.inArray(kampagne_id + '-' + option.value, kartiergebiete) == -1) {
+								if (option.selected) {
+									$('#layer_parameter_kartiergebietfilter').val("0");
+								}
+								$(option).hide();
 							}
-							$(option).hide();
+							else {
+								if (num_option_char < $(option).html().length) {
+									num_option_char = $(option).html().length;
+								}
+								$(option).show();
+							}
 						}
-						else {
-							$(option).show();
-						}
-					});
+					);
+					$('#layer_parameter_kartiergebietfilter').css('width', (num_option_char + 4) + 'ch');
 				}
 			};
 
@@ -77,6 +84,7 @@ if ($this->go == 'Stelle_waehlen') {
 					$('#layer_parameter_kartierebenenfilter_tr').hide();
 				}
 				else {
+					var num_option_char = 4;
 					$('#layer_parameter_kartierebenenfilter_tr').show();
 					$('#layer_parameter_kartierebenenfilter option').each(function(i, option) {
 						if (option.value > 0 && $.inArray(kampagne_id + '-' + option.value, kartierebenen) == -1) {
@@ -86,9 +94,13 @@ if ($this->go == 'Stelle_waehlen') {
 							$(option).hide();
 						}
 						else {
+							if (num_option_char < $(option).html().length) {
+								num_option_char = $(option).html().length;
+							}
 							$(option).show();
 						}
 					});
+					$('#layer_parameter_kartierebenenfilter').css('width', (num_option_char + 4) + 'ch');
 				}
 			};
 
@@ -100,6 +112,7 @@ if ($this->go == 'Stelle_waehlen') {
 					$('#layer_parameter_bogenartfilter_tr').hide();
 				}
 				else {
+					var num_option_char = 4;
 					$('#layer_parameter_bogenartfilter_tr').show();
 					$('#layer_parameter_bogenartfilter option').each(function(i, option) {
 						if (option.value > 0 && $.inArray(kartierebene_id + '-' + option.value, bogenarten) == -1) {
@@ -109,9 +122,13 @@ if ($this->go == 'Stelle_waehlen') {
 							$(option).hide();
 						}
 						else {
+							if (num_option_char < $(option).html().length) {
+								num_option_char = $(option).html().length;
+							}
 							$(option).show();
 						}
 					});
+					$('#layer_parameter_bogenartfilter').css('width', (num_option_char + 4) + 'ch');
 				}
 			};
 
@@ -127,9 +144,10 @@ if ($this->go == 'Stelle_waehlen') {
 
 			onLayerParameterChanged = function(parameter) {
 				switch (parameter.id) {
-					case 'layer_parameter_kampagne_id':
+					case 'layer_parameter_kampagne_id' : {
 						filterKartiergebiete(parameter.value);
 						filterKartierebenen(parameter.value);
+					}
 					break;
 					case 'layer_parameter_kartierebenenfilter':
 						filterBogenarten(parameter.value);
@@ -138,7 +156,18 @@ if ($this->go == 'Stelle_waehlen') {
 					  filterTest(parameter.value);
 					break;
 				}
+				var updateLayerParameterButton = $('#update_layer_parameter_button');
+				updateLayerParameterButton.fadeIn();
 			};
+
+			var num_option_char = 4;
+			$('#layer_parameter_kampagne_id option').each(function(i, option) {
+				if (num_option_char < $(option).html().length) {
+					num_option_char = $(option).html().length;
+				}
+			});
+			$('#layer_parameter_kampagne_id').css('width', (num_option_char + 4) + 'ch');
+
 			filterKartiergebiete($('#layer_parameter_kampagne_id').val());
 			filterKartierebenen($('#layer_parameter_kampagne_id').val());
 			filterBogenarten($('#layer_parameter_kartierebenenfilter').val());
@@ -146,23 +175,23 @@ if ($this->go == 'Stelle_waehlen') {
 			$('#save_check_button').addClass('green');
 		};
 	</script><?
-} else { ?>
+}
+else { ?>
 	<script>
 		var onload_functionsCore = onload_functions;
 		onload_functions = function() {
 			onload_functionsCore.apply(this, arguments);
 		}
 	</script><?
-}
-?>
+} ?>
 
 <div style="
 	width: 100%;
 	height: 100%;
 	background: linear-gradient(<? echo BG_GLEATTRIBUTE; ?> 0%, <? echo BG_DEFAULT ?> 100%);
-">
-
-	<div style="padding: 6px; float: left; width: 54%; text-align: left;"><?
+"><?
+	$title_width = (in_array($this->user->id, array(1, 47)) ? '203px' : '54%'); ?>
+	<div style="padding: 6px; float: left; width: <? echo $title_width; ?>; text-align: left;"><?
 		$params = $this->user->rolle->get_layer_params($this->Stelle->selectable_layer_params, $this->pgdatabase);
 		$title = array();
 		if ($params['kampagne_id']) {
@@ -204,8 +233,12 @@ if ($this->go == 'Stelle_waehlen') {
 		<span class="fett px20"><?php
 			echo $this->Stelle->Bezeichnung . (rolle::$layer_params['umgebung'] == 'Test' ? ' <span style="color: red">Testumgebung</span>' : '') . ' ' . implode(', ', $title); ?>
 		</span>
-	</div>
-
+	</div><?
+	if (in_array($this->user->id, array(1, 47))) { ?>
+		<div style="float: left; margin-top: 6px;"><?
+			include(WWWROOT . APPLVERSION . CUSTOM_PATH . 'layouts/snippets/params_mvbio.php'); ?>
+		</div><?
+	} ?>
 	<div title="Einstellungen">
 		<i class="fa fa-user header-button" aria-hidden="true" onclick="
 		$('#user_options').toggle();
@@ -224,7 +257,7 @@ if ($this->go == 'Stelle_waehlen') {
 					class="user-option"
 					style="margin-left: 0px" <?
 					if ($this->user->Stellen['ID'][$id] != $this->user->stelle_id) { ?>
-						onclick="window.location.href='index.php?browserwidth=' + $('input[name=browserwidth]').val() + '&browserheight=' + $('input[name=browserheight]').val() + '&Stelle_ID=<? echo $this->user->Stellen['ID'][$id]; ?>'" <?
+						onclick="window.location.href='index.php?browserwidth=' + $('input[name=browserwidth]').val() + '&browserheight=' + $('input[name=browserheight]').val() + '&Stelle_ID=<? echo $this->user->Stellen['ID'][$id]; ?>&csrf_token=<? echo $_SESSION['csrf_token']; ?>'" <?
 					} ?>
 				><? echo $this->user->Stellen['Bezeichnung'][$id];
 				if ($this->user->Stellen['ID'][$id] == $this->user->stelle_id) {
@@ -235,7 +268,7 @@ if ($this->go == 'Stelle_waehlen') {
 			<div class="options-devider"></div>
 			<div
 				class="user-option"
-				onclick="window.location.href='index.php?go=Stelle_waehlen&show_layer_parameter=1&hide_stellenwahl=1'"
+				onclick="window.location.href='index.php?go=Stelle_waehlen&show_layer_parameter=<? echo (in_array($this->user->id, array(1, 47)) ? '0' : '1');?>&hide_stellenwahl=1&csrf_token=<? echo $_SESSION['csrf_token']; ?>'"
 			><i class="fa fa-ellipsis-v options-button"></i>Einstellungen</div>
 		<div class="options-devider"></div>
 		<div
@@ -243,6 +276,32 @@ if ($this->go == 'Stelle_waehlen') {
 			onclick="window.location.href='index.php?go=logout'"
 		><i class="fa fa-sign-out options-button"></i>Logout</div>
 		</div>
+	</div>
+
+	<div title="Hinweise" style="float: right; display: block;">
+		<a href="#" onclick="message('<b>Achtung Wartungsarbeiten!</b><br><br>Die Anwendung wird so umgebaut, dass die Layeroptionen zur Einstellung von Kampagne, Kartiergebiet, Kartierebene und Bogenart im Kopf der Anwendung zu sehen ist! Die Anwendung kann während des Umbaus weiter wie gewohnt genutzt werden.');">
+			<i class="fa fa-bell" aria-hidden="true" style="
+				font-size: 150%;
+				padding: 5px 0px 4px 0;
+			"
+			></i>
+			<div
+				style="
+					margin: -27 0 0 14;
+					width: 12;
+					height: 12;
+					border-radius: 8px;
+					background-color: orange;
+					font-size: 10px;
+					font-weight: bold;
+					font-family: arial;
+					color: white;
+					padding: 0px 2px 3px 2px;
+					position: relative;
+					text-align: center;
+					"
+			>1</div>
+		</a>
 	</div>
 
 	<div title="Kartenausschnitt Drucken">

@@ -33,7 +33,7 @@ if ($this->user->funktion == 'admin') {
 		</li>
 	</ul>
 
-	<p>Die Synchronisierung <a href="index.php?go=show_snippet&snippet=Nutzersynchronisierung&los=1">jetzt</a> vornehmen.<?php
+	<p>Die Synchronisierung <a href="index.php?go=show_snippet&snippet=Nutzersynchronisierung&los=1&csrf_token=<? echo $_SESSION['csrf_token']; ?>">jetzt</a> vornehmen.<?php
 	if ($this->formvars['los'] == 1) { ?>
 		<p>los gehts ...<?php
 		$myobject = new MyObject($this, 'user');

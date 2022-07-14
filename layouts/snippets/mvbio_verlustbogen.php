@@ -41,8 +41,10 @@
 
 		# Übernahme von Auto-Werten für die neue Kartierung
 		$insert_columns['user_id'] = 'user_id';
+		$insert_columns['created_from'] = 'created_from';
 		$insert_columns['stelle_id'] = 'stelle_id';
 		$select_columns['user_id'] = $this->user->id;
+		$select_columns['created_from'] = quote($this->user->Vorname . ' ' . $this->user->Name);
 		$select_columns['stelle_id'] = $this->Stelle->id;
 		$select_columns['bearbeitungsstufe'] = 1;
 		$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);

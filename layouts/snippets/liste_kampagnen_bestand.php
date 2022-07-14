@@ -86,14 +86,14 @@
 	}
 
 	function kartiergebieteFormatter(value, row) {
-		var output = '<a href="index.php?go=show_snippet&snippet=liste_kartiergebiete_bestand&kampagne_id=' + value + '">anzeigen</a>';
+		var output = '<a href="index.php?go=show_snippet&snippet=liste_kartiergebiete_bestand&kampagne_id=' + value + '&csrf_token=<? echo $_SESSION['csrf_token']; ?>">anzeigen</a>';
 		return output;
 	}
 
 	function kartiergebieteDetailsFormatter(value, row) {
 		var output;
 
-				output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=122&value_kampagne_id=' + value + '&operator_kampagne_id==">ansehen</a>';
+				output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=122&value_kampagne_id=' + value + '&operator_kampagne_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>">ansehen</a>';
 		return output;
 	}
 </script>

@@ -14,7 +14,7 @@
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
 <script>
 			function anzeigePflanzenListeFormatter(value, row) {
-				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=203&value_lrt_code=' + value + '&operator_lrt_code==">ansehen</a>';
+				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=203&value_lrt_code=' + value + '&operator_lrt_code==&csrf_token=<? echo $_SESSION['csrf_token']; ?>">ansehen</a>';
 				return output;
 			}
 </script>

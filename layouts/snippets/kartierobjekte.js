@@ -69,7 +69,7 @@ function getTextfieldId(layerId, datensatzNr, variableName) {
 
 
 function DatensatzValidator(layerId, datensatzNr) {
-	// console.info("layerid=" + layerId + " datensatzNr=" + datensatzNr);
+	//console.info("layerid=" + layerId + " datensatzNr=" + datensatzNr);
 	this.datensatzNr = datensatzNr;
 	this.layerId = layerId;
 	
@@ -81,7 +81,8 @@ function DatensatzValidator(layerId, datensatzNr) {
 		this.hideElementsByRecordCreation();
 	}
 
-	this.start=function() {
+	this.start = function() {
+		//console.info('getValue for label');
 		label = this.getValue("label");
 		if (!label || label.length === 0) {
 			// console.info("new record");
@@ -89,6 +90,7 @@ function DatensatzValidator(layerId, datensatzNr) {
 		}
 		else {
 			// console.info("not new record");
+			// console.info(this.layerId + "_kampagne_id_" + datensatzNr);
 			this.disableDropbox(document.getElementById(this.layerId + "_kampagne_id_" + datensatzNr));
 			this.disableDropbox(document.getElementById(this.layerId + "_kartierebene_id_" + datensatzNr));
 
@@ -211,17 +213,17 @@ function DatensatzValidator(layerId, datensatzNr) {
 		this.hide("105_group_Rest");
 		this.hide("105_group_Schutzmerkmale");
 
-
 		$('#value_105_bogenart_id_' + datensatzNr).children().children('option[value="3"]').hide();
-		document.getElementById("tr_105_bearbeitungsstufe_"+datensatzNr).style.display = 'none';
-		document.getElementById("tr_105_pruefhinweis_koordinator_"+datensatzNr).style.display = 'none';
-		document.getElementById("tr_105_biotopname_"+datensatzNr).style.display = 'none';
-		document.getElementById("tr_105_standort_"+datensatzNr).style.display = 'none';
-		document.getElementById("tr_105_la_sper_"+datensatzNr).style.display = 'none';
-		document.getElementById("tr_105_la_sper_"+datensatzNr).style.display = 'none';
-		document.getElementById("tr_105_fb_id_"+datensatzNr).style.display = 'none';
+		document.getElementById("tr_105_bearbeitungsstufe_" + datensatzNr).style.display = 'none';
+		if (document.getElementById("tr_105_pruefhinweis_koordinator_" + datensatzNr)) {
+			document.getElementById("tr_105_pruefhinweis_koordinator_" + datensatzNr).style.display = 'none';
+		}
+		document.getElementById("tr_105_biotopname_" + datensatzNr).style.display = 'none';
+		document.getElementById("tr_105_standort_" + datensatzNr).style.display = 'none';
+		document.getElementById("tr_105_la_sper_" + datensatzNr).style.display = 'none';
+		document.getElementById("tr_105_la_sper_" + datensatzNr).style.display = 'none';
+		document.getElementById("tr_105_fb_id_" + datensatzNr).style.display = 'none';
 	}
-
 
 	this.hide = function(className) {
 		let elems = document.getElementsByClassName(className);
@@ -304,13 +306,13 @@ function DatensatzValidator(layerId, datensatzNr) {
 	}
 
 	this.onClick=function(event) {
-		console.info("onClick "+this.layerId+":"+this.datensatzNr);
+		//console.info("onClick "+this.layerId+":"+this.datensatzNr);
 		
 		var kartEb = getValue("kartierebene_id");
 		if (kartEb===2) {
 			var lrtCode = getValue("lrt_code");
 			var  lrt_gr = getValue("lrt_gr");
-			console.info(lrt_gr+"  "+lrtCode);
+			//console.info(lrt_gr+"  "+lrtCode);
 		}
 		event.preventDefault();
 		event.stopPropagation();
@@ -363,7 +365,7 @@ function DatensatzValidator(layerId, datensatzNr) {
 				this.map[variableName].push(inputElement);
 			}
 			catch {
-				console.info(inputElement.id);
+				//console.info(inputElement.id);
 			}
 		}
 				
@@ -415,30 +417,30 @@ function DatensatzValidator(layerId, datensatzNr) {
 		var result = [];
 		var multiChoices = false;
 		if (!elements || elements.length===0) {
-			console.info("elements null oder leer bei getValue(\""+valueName+"\") "+elements);
+			//console.info("elements null oder leer bei getValue(\"" + valueName + "\") " + elements);
 		}
 		if (elements) {
-			if (elements.length===1) {
-				if (elements[0].type==="checkbox") {
+			if (elements.length === 1) {
+				if (elements[0].type === "checkbox") {
 					return elements[0].checked;
 				}
 				return elements[0].value;
 				// console.info("getValue "+k+"  "+this.datensatzNr+"  => ["+elements[0].value+"] single");
 			}
 			else {
-				for (var i=0; i<elements.length; i++) {
-					multiChoices = elements[i].type==="checkbox";
+				for (var i = 0; i < elements.length; i++) {
+					multiChoices = elements[i].type === "checkbox";
 					if (elements[i].checked) {
 						ele = elements[i];
-						if (ele.type==="radio") {
+						if (ele.type === "radio") {
 							sValue=ele.value;
 						}
-						if (ele.type==="checkbox") {
+						if (ele.type === "checkbox") {
 							id = elements[i].id;
 							idA = id.split("_");
 							sValue = idA[idA.length-2];
 						}
-						value=parseInt(sValue);
+						value = parseInt(sValue);
 						result.push(value);
 					}
 				}
@@ -458,7 +460,7 @@ function DatensatzValidator(layerId, datensatzNr) {
         var result = [];
 		var multiChoices = false;
 		if (!elements || elements.length===0) {
-			console.info("elements null oder leer bei getValue(\""+valueName+"\") "+elements);
+			//console.info("elements null oder leer bei getValue(\""+valueName+"\") "+elements);
 		}
 		if (elements) {
 			for (var i=0; i<elements.length; i++) {
@@ -478,33 +480,31 @@ function App(layerId) {
 
 	this.map = {};
 
-	this.parse=function(tagName) {
+	this.parse = function(tagName) {
 		var inputElements = document.querySelectorAll(tagName);
 		for (var i = 0; i < inputElements.length; i++) {
-
 			var id = inputElements[i].id;
-			
 			var idA = id.split("_");
-			var datensatzNr = Number.parseInt(idA[idA.length-1], 10);
+			var datensatzNr = Number.parseInt(idA[idA.length - 1], 10);
 			var layerId = Number.parseInt(idA[0], 10);
-			if (layerId==this.layerId) {			 
-				if (!isNaN(datensatzNr) && !isNaN(layerId)) {
-					if (!this.map[layerId+datensatzNr]) {
-						this.map[layerId+datensatzNr]=new DatensatzValidator(layerId, datensatzNr);
+			if (layerId == this.layerId) {
+				if (!isNaN(datensatzNr) && !isNaN(layerId) && datensatzNr>=0) {
+					if (!this.map[layerId + datensatzNr]) {
+						this.map[layerId + datensatzNr] = new DatensatzValidator(layerId, datensatzNr);
 					}
-					this.map[layerId+datensatzNr].addElement(inputElements[i]);
+					this.map[layerId + datensatzNr].addElement(inputElements[i]);
 				}
+			} else if (datensatzNr === -1) {
+				console.info("nicht erwartete ID '"+id+"'");
 			}
-		}
-		
-
+			
+		} 
 	}
 
-	this.start=function() {
+	this.start = function() {
 		this.parse("textarea");
 		this.parse("input");
 		this.parse("select");
-		
 		for (k in this.map) {
 			this.map[k].start();
 		}

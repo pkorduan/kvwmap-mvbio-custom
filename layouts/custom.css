@@ -164,3 +164,24 @@
 #sachdatendruck_title_105 {
 	display: none;
 }
+
+/*rtr*/
+.table-wrapper .btn:not(:disabled):not(.disabled) {
+  background-color: white;
+}
+
+.table-wrapper .dropdown-toggle::after {
+	color: black;
+}
+
+.table-wrapper .btn {
+	padding: 0.35rem 0.35rem;
+}
+
+.table-wrapper .table td, .table-wrapper .table th {
+	padding: 0.35rem;
+}
+
+.page-size {
+	color: black;
+}

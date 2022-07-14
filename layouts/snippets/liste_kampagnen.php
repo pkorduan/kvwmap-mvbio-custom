@@ -3,12 +3,13 @@
 <link rel="stylesheet" href="plugins/xplankonverter/styles/design.css" type="text/css">
 <link rel="stylesheet" href="plugins/xplankonverter/styles/styles.css" type="text/css">
 
-<script src="<?php echo JQUERY_PATH; ?>jquery-1.12.0.min.js"></script>
+<script src="<?php echo JQUERY_PATH; ?>jquery-3.6.0.min.js"></script>
 <script src="<?php echo JQUERY_PATH; ?>jquery.base64.js"></script>
+<script src="<?php echo BOOTSTRAP_PATH; ?>lib/popper-1.16.1.min.js"></script>
 <script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap.min.js"></script>
-<script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap-table-flatJSON.js"></script>
+<!-- <script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap-table-flatJSON.js"></script> -->
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.js"></script>
-<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extension/bootstrap-table-export.min.js"></script>
+<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extensions/export/bootstrap-table-export.min.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
 
 <script language="javascript" type="text/javascript">
@@ -86,12 +87,12 @@
 	}
 
 	function kartiergebieteFormatter(value, row) {
-		var output = '<a href="index.php?go=show_snippet&snippet=liste_kartiergebiete&kampagne_id=' + value + '">anzeigen</a>';
+		var output = '<a href="index.php?go=show_snippet&snippet=liste_kartiergebiete&kampagne_id=' + value + '&csrf_token=<? echo $_SESSION['csrf_token']; ?>">anzeigen</a>';
 		return output;
 	}
 
 	function editFormatter(value, row) {
-		var output = (row.abgeschlossen == 't' ? '' : '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=153&value_kampagne_id=' + value + '&operator_kampagne_id=="><i class="btn-link fa fa-lg fa-pencil"></i></a>');
+		var output = (row.abgeschlossen == 't' ? '' : '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=153&value_kampagne_id=' + value + '&operator_kampagne_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>"><i class="btn-link fa fa-lg fa-pencil"></i></a>');
 		return output;
 	}
 

@@ -142,11 +142,11 @@ function saveSamplesToWerbeo() {
   kampagne_id=${1}
   log "saveSamplesToWerbeo kampagne_id=${kampagne_id}"
 
-  sql="SELECT count(*) FROM archiv.grundboegen gb LEFT JOIN archiv.kartierobjekte ko ON ko.id = gb.kartierobjekt_id WHERE gb.kartierebene_id = 1 AND gb.kampagne_id = ${kampagne_id} AND ko.${WERBEO_SAMPLE_ID} IS NULL AND mvbio.as_werbeo_sample(gb.kartierobjekt_id) is not null";
+  sql="SELECT count(*) FROM archiv.grundboegen gb LEFT JOIN archiv.kartierobjekte ko ON ko.id = gb.kartierobjekt_id WHERE gb.kartierebene_id = 1 AND gb.kampagne_id = ${kampagne_id} AND ko.${WERBEO_SAMPLE_ID} IS NULL AND mvbio.as_werbeo_test_sample(gb.kartierobjekt_id) is not null";
   recordCount=`psql -X -c "$sql" --no-align -t --field-separator '|' --quiet -h ${pgsqlHost} -U kvwmap kvwmapsp`
   log "Anzahl grundboegen: ${recordCount}"
 
-  sql="SELECT ko.id AS kartierobjekt_id, mvbio.as_werbeo_sample(gb.id) FROM archiv.grundboegen gb JOIN archiv.kartierobjekte ko ON ko.id = gb.kartierobjekt_id WHERE gb.kartierebene_id = 1 AND gb.kampagne_id = ${kampagne_id} AND ko.${WERBEO_SAMPLE_ID} IS NULL AND mvbio.as_werbeo_sample(gb.kartierobjekt_id) is not null";
+  sql="SELECT ko.id AS kartierobjekt_id, mvbio.as_werbeo_test_sample(gb.id) FROM archiv.grundboegen gb JOIN archiv.kartierobjekte ko ON ko.id = gb.kartierobjekt_id WHERE gb.kartierebene_id = 1 AND gb.kampagne_id = ${kampagne_id} AND ko.${WERBEO_SAMPLE_ID} IS NULL AND mvbio.as_werbeo_test_sample(gb.kartierobjekt_id) is not null limit 300";
   log "Frage Kartierobjekt als Webeo Sample ab mit sql: $sql"
   i=1
   psql -X -c "$sql" --no-align -t --field-separator '|' --quiet -h ${pgsqlHost} -U kvwmap kvwmapsp |
@@ -162,7 +162,7 @@ function saveSamplesToWerbeo() {
     sample=$(curl -s -S --location --request POST "${WERBEO_URL}/5/samples" --header 'Content-Type: application/json' --header 'Authorization: Bearer '${WERBEO_TOKEN} --data-raw "${grundbogen}")
     exitCode=$?
     if [ $exitCode -ne 0 ]; then 
-	logErr "Error saving samples ${kartierobjekt_id}; curlExitcode=${exitCode}; response=${sample} sent json:\"${grundbogen}\""
+	logErr "Error saving samples ${kartierobjekt_id}; curlExitcode=${exitCode}; response=${sample}"
     else 
       sample_id=$(echo ${sample} | jq -r .entityId)
       if ! [ -z "$sample_id" ]  ; then

@@ -53,7 +53,7 @@ if ($err_msg) {
 else { ?>
 	Die Geometrie wurde erfolgreich normalisiert!<?
 } ?><p>
-<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=<? echo $this->formvars['selected_layer_id']; ?>&value_kartierung_id=<?php echo $this->formvars['oid']; ?>&operator_kartierung_id==">zurück zum Kartierobjekt</a><p>
+<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=<? echo $this->formvars['selected_layer_id']; ?>&value_kartierung_id=<?php echo $this->formvars['oid']; ?>&operator_kartierung_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>">zurück zum Kartierobjekt</a><p>
 Layer ID: <? echo $this->formvars['selected_layer_id']; ?><br>
 Layer Name: <? echo $layerset[0]['Name']; ?><br>
 Tabelle: <? echo $table; ?><br>

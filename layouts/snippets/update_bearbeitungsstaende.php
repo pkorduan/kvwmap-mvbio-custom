@@ -1,55 +1,53 @@
 <?
 	include_once(CLASSPATH . 'PgObject.php');
-	$success = false;
+	$success = true;
 	$kartierung_ids = array();
-	$sql = '';
+	$selected_kartierung_ids = array();
+	$sql = $err_sqls = $messages = '';
 	if ($this->formvars['kartierung_ids'] != '') {
 		# Beschränkung auf Kartierer wenn Änderungsberechtigte Stelle Kartierung ist
 		$kartiererfilter = ($this->Stelle->Bezeichnung == 'Karterung' ? " AND k.user_id = " . $this->user->id : "");
-		# Update Objekte
-		$sql = "
-			UPDATE
-				mvbio." . ($this->formvars['objektart'] == 'Verlustobjekte' ? 'verlustobjekte' : 'kartierobjekte') . " k
-			SET
-				lock = true,
-				bearbeitungsstufe = " . $this->formvars['stufe_neu'] . "
-			FROM
-				mvbio.code_bearbeitungsstufen b
-			WHERE
-				b.stufe = k.bearbeitungsstufe AND
-				b.aenderungsberechtigte_stelle = '" . $this->Stelle->Bezeichnung . "' AND
-				k.bearbeitungsstufe = " . $this->formvars['stufe_alt'] . " AND
-				k.id IN (" . $this->formvars['kartierung_ids'] . ")" .
-				$kartiererfilter . "
-			RETURNING
-				k.id
-		";
-		#echo $sql;
-		$ret = $this->pgdatabase->execSQL($sql, 4, 0);
-		if ($ret['success']) {
-			while ($rs = pg_fetch_assoc($ret[1])) {
+		foreach (explode(',', $this->formvars['kartierung_ids']) AS $kartierung_id) {
+			# Update Objekt
+			$sql = "
+				UPDATE
+					mvbio." . ($this->formvars['objektart'] == 'Verlustobjekte' ? 'verlustobjekte' : 'kartierobjekte') . " k
+				SET
+					lock = true,
+					bearbeitungsstufe = " . $this->formvars['stufe_neu'] . "
+				FROM
+					mvbio.code_bearbeitungsstufen b
+				WHERE
+					b.stufe = k.bearbeitungsstufe AND
+					b.aenderungsberechtigte_stelle = '" . $this->Stelle->Bezeichnung . "' AND
+					k.bearbeitungsstufe = " . $this->formvars['stufe_alt'] . " AND
+					k.id = " . $kartierung_id .
+					$kartiererfilter . "
+				RETURNING
+					k.id
+			";
+			#echo 'SQL zum Update der Bearbeitungsstände:<br>' . $sql; exit;
+			$ret = $this->pgdatabase->execSQL($sql, 4, 0);
+			if ($ret['success']) {
+				$rs = pg_fetch_assoc($ret[1]);
 				$kartierung_ids[] = $rs['id'];
-			}
-			if (count($kartierung_ids) > 0) {
-				$success = true;
-				$msg = 'Bearbeitungsstände der Kartierobjekte erfolgreich geändert.';
+				$messages .= '<br>' . 'Bearbeitungsstand von Kartierobjekt ' . $rs['id'] . ' erfolgreich geändert!';
 			}
 			else {
-				$msg = 'Es konnten keine Kartierobjekte geändert werden.<br>Prüfen Sie Ihre Rechte.';
+				$success = false;
+				$messages .= '<p>Fehler:<br>' . $ret['msg'];
+				$err_sqls .= '<p>SQL:<br>' . $sql;
 			}
-		}
-		else {
-			$msg = $ret['msg'];
 		}
 	}
 	else {
-		$msg = 'Es wurden keine Kartierobjekt-IDs zur Änderung des Abgabenamen übergeben!';
+		$messages = 'Es wurden keine Kartierobjekt-IDs zur Änderung des Status übergeben!';
 	}
 
 	$this->qlayerset[0]['shape'][0] = array(
 		'kartierung_ids' => implode(', ', $kartierung_ids),
 		'success' => $success,
-		'msg' => $msg,
-		'sql' => $sql
+		'msg' => $messages,
+		'sql' => $err_sqls
 	);
 ?>

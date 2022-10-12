@@ -5,13 +5,26 @@
 <link rel="stylesheet" href="<?php echo BOOTSTRAP_PATH; ?>css/bootstrap.min.css" type="text/css">
 <link rel="stylesheet" href="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.css" type="text/css">
 
-<script src="<?php echo JQUERY_PATH; ?>jquery-1.12.0.min.js"></script>
-<script src="<?php echo JQUERY_PATH; ?>jquery.base64.js"></script>
-<script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap.min.js"></script>
-<script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap-table-flatJSON.js"></script>
-<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.js"></script>
-<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extension/bootstrap-table-export.min.js"></script>
-<script src="<?php echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
+<!--script src="<?php echo JQUERY_PATH; ?>jquery-1.12.0.min.js"></script//-->
+<!--script src="<?php echo JQUERY_PATH; ?>jquery.base64.js"></script//-->
+<!--script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap.min.js"></script//-->
+<!--script src="<?php echo BOOTSTRAP_PATH; ?>js/bootstrap-table-flatJSON.js"></script//-->
+<!--script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extension/bootstrap-table-export.min.js"></script//-->
+
+
+<script src="<? echo JQUERY_PATH; ?>jquery.min.js"></script>
+
+<link rel="stylesheet" href="<? echo BOOTSTRAP_PATH; ?>css/bootstrap.min.css">
+<script src="<? echo BOOTSTRAP_PATH; ?>lib/popper-1.16.1.min.js"></script>
+<script src="<? echo BOOTSTRAP_PATH; ?>js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="<? echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.css">
+<script src="<? echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.js"></script>
+<script src="<? echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
+<script type="text/javascript" src="<? echo BOOTSTRAPTABLE_PATH; ?>/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+<link rel="stylesheet" href="<? echo BOOTSTRAPTABLE_PATH; ?>/extensions/filter-control/bootstrap-table-filter-control.min.css">
+
+
 <script>
 			function anzeigePflanzenListeFormatter(value, row) {
 				var output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=203&value_lrt_code=' + value + '&operator_lrt_code==&csrf_token=<? echo $_SESSION['csrf_token']; ?>">ansehen</a>';
@@ -23,52 +36,54 @@
 	<h2 style="display: inline">LRT und Pflanzenlisten</h2>
 	
 	<div style="padding-left:10px;padding-right:10px;">
-		<table
-			id="lrt_pflanzen_table"
-			data-unique-id="lrt_code"
-			data-toggle="table"
-			data-url="index.php"
-			data-height="100%"
-			data-click-to-select="true"
-			data-filter-control="true" 
-			data-sort-name="lrt_code"
-			data-sort-order="asc"
-			data-search="true"
-			data-show-export="false"
-			data-export_types=['json', 'xml', 'csv', 'txt', 'sql', 'excel']
-			data-show-refresh="false"
-			data-show-toggle="true"
-			data-show-columns="true"
-			data-query-params="go=Layer-Suche_Suchen&selected_layer_id=203&anzahl=10000&mime_type=formatter&format=json"
-			data-pagination="true"
-			data-page-size="100"
-			data-toggle="table"
-			data-toolbar="#toolbar"	
-			style="position:relative;overflow:auto;height:50%"
-		>
-			<thead>
-				<tr>
-					<th
-						data-field="lrt_code"
-						data-sortable="true"
-						data-visible="true"
-						data-switchable="true"
-					>LRT-Code</th>
-					<th
-						data-field="lrt_name"
-						data-sortable="true"
-						data-visible="true"
-						data-switchable="true"
-					>Name</th>
-					<th
-						data-field="lrt_code"
-						data-visible="true"
-						data-formatter="anzeigePflanzenListeFormatter"
-						data-switchable="false"
-					>&nbsp;</th>
-				</tr>
-			</thead>
-		</table>
+		<div class="table-wrapper">
+			<table
+				id="lrt_pflanzen_table"
+				data-unique-id="lrt_code"
+				data-toggle="table"
+				data-url="index.php"
+				data-height="100%"
+				data-click-to-select="true"
+				data-filter-control="true" 
+				data-sort-name="lrt_code"
+				data-sort-order="asc"
+				data-search="true"
+				data-show-export="false"
+				data-export_types=['json', 'xml', 'csv', 'txt', 'sql', 'excel']
+				data-show-refresh="false"
+				data-show-toggle="true"
+				data-show-columns="true"
+				data-query-params="go=Layer-Suche_Suchen&selected_layer_id=203&anzahl=10000&mime_type=formatter&format=json"
+				data-pagination="true"
+				data-page-size="100"
+				data-toggle="table"
+				data-toolbar="#toolbar"	
+				style="position:relative;overflow:auto;height:50%"
+			>
+				<thead>
+					<tr>
+						<th
+							data-field="lrt_code"
+							data-sortable="true"
+							data-visible="true"
+							data-switchable="true"
+						>LRT-Code</th>
+						<th
+							data-field="lrt_name"
+							data-sortable="true"
+							data-visible="true"
+							data-switchable="true"
+						>Name</th>
+						<th
+							data-field="lrt_code"
+							data-visible="true"
+							data-formatter="anzeigePflanzenListeFormatter"
+							data-switchable="false"
+						>&nbsp;</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
 		<script language="javascript" type="text/javascript">
 			$('#gui-table').css('width', '100%');
 			$('#container_paint').css('height', 'auto');
@@ -116,10 +131,10 @@
 			function checkboxFormatter(value, row, index) {
 				if (
 					(
-						'<? echo $this->Stelle->Bezeichnung; ?>' == 'Kartierung' &&
-						row.user_id != <? echo $this->user->id; ?>
+						'<? #echo $this->Stelle->Bezeichnung; ?>' == 'Kartierung' &&
+						row.user_id != <? #echo $this->user->id; ?>
 					) ||
-					row.stand != '<? echo $bearbeitungsstufe->get('stand'); ?>'
+					row.stand != '<? #echo $bearbeitungsstufe->get('stand'); ?>'
 				) {
 					return { disabled: true }
 				}

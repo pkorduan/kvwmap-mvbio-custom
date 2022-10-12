@@ -1,4 +1,8 @@
 <?
+	$this->sanitize([
+		'user_id' => 'int',
+		'bearbeitungsstufe' => 'int'
+	]);
 	include_once(CLASSPATH . 'PgObject.php');
 	include_once(CLASSPATH . 'FormObject.php');
 	include_once(CLASSPATH . 'LayerAttributeRolleSetting.php');
@@ -21,6 +25,7 @@
 			'sort_direction' => 'asc'
 		);
 	}
+
 #	echo '<p>' . print_r($sort_attribute, true);
 #	echo '<p>Sortierattribute: ' . $sort_attribute['attributename'];
 #	echo '<br>Sortierrichtung:' . $sort_attribute['sort_direction'];
@@ -60,6 +65,7 @@
 
 //-->
 <script src="funktionen/bootstrap-table-settings.js"></script>
+
 <div id="waiting_div">
 	<i class="fa fa-spinner fa-spin fa-3x fa-fw" style="color: gray"></i>
 	<br><br><br><span>Lade Daten ...</span>
@@ -73,21 +79,34 @@
 
 	$bearbeitungsstufe = new PgObject($this, 'mvbio', 'code_bearbeitungsstufen');
 	$bearbeitungsstufen = $bearbeitungsstufe->getSQLResults("
-		SELECT
+		SELECT DISTINCT
 			b.stufe AS value,
 			b.stand AS output
 		FROM
 			mvbio.sichtbarkeit_bearbeitungsstufen s JOIN
 			mvbio.code_bearbeitungsstufen b ON s.stufe = b.stufe
 		WHERE
-			stelle_id = " . $this->Stelle->id . "
+			stelle_id = " . $this->Stelle->id . " OR
+			(
+				3 = " . $this->Stelle->id . " AND
+				b.stufe IN (4, 5)
+			) OR
+			(
+				4 = " . $this->Stelle->id . " AND
+				b.stufe IN (1, 2, 5)
+			)
 	");
 	if ($this->formvars['bearbeitungsstufe'] == '') {
 		array_unshift($bearbeitungsstufen, array('value' => '', 'output' => '--- Bearbeitungsstufe wählen ---'));
 	}
 	$bearbeitungsstufe_filter = '';
 	if ($this->formvars['bearbeitungsstufe'] != '') {
-		$bearbeitungsstufe_filter = '&value_bearbeitungsstufe=' . $this->formvars['bearbeitungsstufe'] . '&operator_bearbeitungsstufe==';
+		if ($this->Stelle->Bezeichnung == 'Kartierung' AND $this->formvars['bearbeitungsstufe'] == 3) {
+			$bearbeitungsstufe_filter = '&value_bearbeitungsstufe=3,4&operator_bearbeitungsstufe=IN';
+		}
+		else {
+			$bearbeitungsstufe_filter = '&value_bearbeitungsstufe=' . $this->formvars['bearbeitungsstufe'] . '&operator_bearbeitungsstufe==';
+		}
 		$bearbeitungsstufe->data = $bearbeitungsstufe->getSQLResults("
 			SELECT
 				*
@@ -130,8 +149,13 @@
 		*/
 	}
 
+	$gesperrt_fuer_kartierer = (in_array($this->formvars['bearbeitungsstufe'], array(3, 4)) AND $this->Stelle->Bezeichnung == 'Kartierung');
+
 	# Stellen den Filter so ein, dass Kartierer keine Kartierungen von anderen sehen, die noch in der Erfassung sind
 	if ($bearbeitungsstufe_filter == '' AND $user_id_filter == '') {
+		if ($this->user->id == 1) {
+			echo '<br>filter leer:';
+		}
 		$filter = '&searchmask_count=1&value_user_id=' . $this->user->id . '&operator_user_id==&boolean_operator_1=OR&1_value_bearbeitungsstufe=1&1_operator_bearbeitungsstufe=%3E';
 	}
 	else {
@@ -156,16 +180,20 @@
 				array('value' => '', 'output' => 'alle Kartierer'),
 				array('value' => 'nureigene', 'output' => 'nur eigene')
 			),
-			$this->formvars['user_id'],
+			($this->formvars['user_id'] == $this->user->id ? 'nureigene' : ''),
 			1,
 			'float: right; margin-right: 8px; margin-top: 9px;',
-			"window.location.href='index.php?go=show_snippet&snippet=liste_kartierobjekte&bearbeitungsstufe=" . $this->formvars['bearbeitungsstufe'] . "&user_id=' + $(this).val() + '&csrf_token=" . $_SESSION['csrf_token'] . "'"
+			'',
+			'',
+			'',
+			'',
+			''
 		);
 	} ?>
 	<div style="padding-left:10px;padding-right:10px;">
 		<div style="margin-top: 23px; margin-left: 13px; float:left"><?php
-			if ($this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('aenderungsberechtigte_stelle') : '' == $this->Stelle->Bezeichnung) { ?>
-				<span style=""><sub>&#8625;</sub></span>Bearbeitungsstand für ausgewählte Datensätze ändern in:<?
+			if (($this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('aenderungsberechtigte_stelle') : '') == $this->Stelle->Bezeichnung) { ?>
+				<span style="font-size: 25px"><sub>&#8625;</sub></span>Bearbeitungsstand für ausgewählte Datensätze ändern in:<?
 				if ($this->formvars['bearbeitungsstufe'] > 1) {
 					if ($this->Stelle->id == 5 AND $this->formvars['bearbeitungsstufe'] == 4) { ?>
 						<input
@@ -192,6 +220,15 @@
 					value="<? echo $bearbeitungsstufe->get('next_stand'); ?>"
 				><?
 			}
+			if ($gesperrt_fuer_kartierer) { ?>
+				<span style="font-size: 25px"><sub>&#8625;</sub></span> für ausgewählte Datensätze:
+				<input
+					id="rueckgabewuensche_button"
+					type="button"
+					name="rueckgabewuensche"
+					value="Rückgabewunsch setzen"
+				><?
+			} 
 			if (in_array($this->Stelle->id, array(1, 4, 5)) AND $this->formvars['bearbeitungsstufe'] == 3) { ?>
 				<input id="abgabe_name_field" type="text" size="12" placeholder="Abgabename" style="margin-left: 10px">
 				<input
@@ -228,7 +265,10 @@
 			>
 				<thead>
 					<tr><?
-						if (($this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('aenderungsberechtigte_stelle') : '') == $this->Stelle->Bezeichnung) { ?>
+						if (
+							($this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('aenderungsberechtigte_stelle') : '') == $this->Stelle->Bezeichnung OR
+							$gesperrt_fuer_kartierer
+						) { ?>
 							<th
 								data-sortable="false"
 								data-visible="true"
@@ -394,6 +434,13 @@
 							data-filter-control="select"
 						>Rückweisung durch Prüfer</th>
 						<th
+							data-field="pruefer_pruefhinweis"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('pruefer_pruefhinweis', $rolle_attribute_settings) OR $rolle_attribute_settings['pruefer_pruefhinweis']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="input"
+						>Prüfhinweise</th>
+						<th
 							data-field="korrektur_nr"
 							data-sortable="true"
 							data-visible="<? echo ((!array_key_exists('korrektur_nr', $rolle_attribute_settings) OR $rolle_attribute_settings['korrektur_nr']['switched_on'] == 1) ? 'true': 'false'); ?>"
@@ -437,7 +484,7 @@
 			$('#gui-table').css('width', '100%');
 			$('#container_paint').css('height', 'auto');
 			resizeBootstrapTable = function() {
-				console.log('browserwidth: ' + document.body.width);
+				//console.log('browserwidth: ' + document.body.width);
 				$('.bootstrap-table').css('width', (document.body.offsetWidth - 240) + 'px');
 			};
 			window.addEventListener('resize', resizeBootstrapTable);
@@ -450,7 +497,7 @@
 					result.removeClass('alert-danger');
 					result.addClass('alert-success');*/
 				};
-				result.error = function(text){
+				result.error = function(text) {
 					message([{ type: 'error', msg: text}]);
 		/*			result.text(text);
 					result.removeClass('alert-success');
@@ -493,12 +540,27 @@
 					}
 				);
 
+				$('#user_filter_selector').on(
+					'click',
+					function(e) {
+						window.location.href = 'index.php?go=show_snippet&snippet=liste_kartierobjekte&bearbeitungsstufe=<? echo $this->formvars['bearbeitungsstufe']; ?>' + (e.target.value == 'nureigene' ? '&user_id=<? echo $this->user->id; ?>' : '') + '&csrf_token=<?php echo $_SESSION['csrf_token']; ?>';
+					}
+				);
+
 				$('#update_abgabe_name_button').on(
 					'click',
 					function(e) {
 						updateAbgabename($('#abgabe_name_field').val());
 					}
-				);
+				); <?
+				if ($gesperrt_fuer_kartierer) { ?>
+					$('#rueckgabewuensche_button').on(
+						'click',
+						function(e) {
+							set_rueckgabewuensche();
+						}
+					); <?
+				} ?>
 
 			});
 
@@ -632,13 +694,68 @@
 				}
 			}
 
+			function set_rueckgabewuensche() {
+				//console.log('set_rueckgabewuensche');
+
+				var selected_rows = $('#kartierungen_table').bootstrapTable('getSelections'),
+						objectIds = $.map(
+							selected_rows,
+							function(row) {
+								return row.kartierung_id;
+							}
+						);
+
+				if (objectIds.length > 0) {
+					//console.log('Update selected objectIds: ' + objectIds);
+
+					$.ajax({
+						type: "Post",
+						url: 'index.php',
+						data: {
+							go: "show_snippet",
+							snippet: "update_rueckgabewuensche",
+							mime_type: "application/json",
+							format: "json",
+							objektart: 'Kartierobjekte',
+							object_ids: objectIds.join(','),
+							csrf_token: '<? echo $_SESSION['csrf_token']; ?>'
+						},
+						success: function(response) {
+							//console.log(response);
+							var result = JSON.parse(response)[0];
+							//console.log('Die Antwort vom Server ist da: %o', result);
+							if (result.object_ids != '') {
+								$('#kartierungen_table').bootstrapTable('refresh', {silent: true});
+								message([
+									{ type: 'notice', msg: 'Rückgabewünsche erfolgreich eingetragen für Objekte mit Id: ' + result.object_ids},
+									{ type: 'notice', msg: 'Bitte Warten. Tabelle wird neu geladen!'}
+								]);
+							}
+							if (result.success == false) {
+								message([{ type: 'error', msg: result.msg}]);
+							}
+						},
+						error: function(xhr) {
+							alert('Fehler beim Eintragen der Rückgabewünsche der Objekte mit ID: ' + objectIds.join(', ') + ' Fehlerstatus: ' + xhr.status + ' Meldung: ' + xhr.statusText);
+						}
+					});
+				}
+				else {
+					message('Keine Objekte ausgewählt!');
+				}
+			}
+
 			function checkboxFormatter(value, row, index) {
 				if (
 					(
 						'<? echo $this->Stelle->Bezeichnung; ?>' == 'Kartierung' &&
 						row.user_id != <? echo $this->user->id; ?>
 					) ||
-					row.stand != '<? echo $bearbeitungsstufe->get('stand'); ?>'
+					row.stand != '<? echo $bearbeitungsstufe->get('stand'); ?>' ||
+					(
+						<? echo ($gesperrt_fuer_kartierer ? 'true' : 'false'); ?> &&
+						row.rueckgabewunsch == 't'
+					)
 				) {
 					return { disabled: true }
 				}

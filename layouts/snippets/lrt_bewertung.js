@@ -2793,14 +2793,14 @@ function BewertungOffenland_3_2_8() {
 
 // Moore
 function BewertungMoore_1_1_1() {
-	
 	Bewertung.call(this);
 	
-    this.nr="1.1.1";
-    this.txt="Deckung lebensraumtypischer Vegetation";
+	this.nr="1.1.1";
+	this.txt="Deckung lebensraumtypischer Vegetation";
 	this.lrtCodes=[7120, 7140, 7150, 7210, 7230];
-	
+
 	this.berechne=function(b) {
+		console.log('berechne 1.1.1');
 		let lrtCode = b.lrtCode;
 		let hc = b.getHauptCode();
 		let nc = b.getNebenCodes();
@@ -2830,7 +2830,7 @@ function BewertungMoore_1_1_1() {
 			aCodes = ["VRZ", "MZK", "MZC", "MPK"];
 		}
 
-		if (aCodes.indexOf(hc.code)>=0) {			
+		if (aCodes.indexOf(hc.code)>=0) {
 			sum += hc.percentage;
 		}
 		for (let i=0; i<nc.length; i++) {
@@ -2838,17 +2838,17 @@ function BewertungMoore_1_1_1() {
 				sum += nc[i].percentage;
 			}
 		}
-		// console.info("Summe Flächenanteile: "+sum);
+		console.info("Summe Flächenanteile: "+sum);
 		if (Number.isInteger(sum)) {
 			if (sum === 100) {
 				T111_2 = 1;
-			} if (sum > 90) {
+			} else if (sum > 90) {
 				T111_2 = 2;
-			} if (sum > 75) {
+			} else if (sum > 75) {
 				T111_2 = 3;
-			} if (sum > 49) {
+			} else if (sum > 49) {
 				T111_2 = 4;
-			} if (sum >=25 ) {
+			} else if (sum >=25 ) {
 				T111_2 = 5;
 			} else {
 				T111_2 = 6;
@@ -4896,9 +4896,7 @@ function LrtBewertung(dsBewertung, bewertungen) {
 	var gruppenBewertung;
 	
 	for (var i=0; i<bewertungen.length; i++) {
-		
 		var bewertung=bewertungen[i];
-			
 		if (bewertung.isRequired(this.dsBewertung)) {
 			if (!gruppenBewertung) {
 				grpNr = parseInt(bewertung.nr.substring(0, bewertung.nr.indexOf('.')));
@@ -5232,7 +5230,6 @@ function DatensatzBewertung(layerId, datensatzNr) {
 		console.info("start layerId="+this.layerId+" datensatzNr="+this.datensatzNr, this);
 		if (this.layerId===109) {
 		}
-		
 		this.lrtCode = this._getLRTCode();
 		if (this.layerId===144) {
 			this.bewertung = new LrtBewertung(this, bewertungenStillgewaesser);

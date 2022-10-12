@@ -2,7 +2,6 @@
 	include_once(CLASSPATH . 'PgObject.php');
 	$success = true;
 	$kartierung_ids = array();
-	$selected_kartierung_ids = array();
 	$sql = $err_sqls = $messages = '';
 	if ($this->formvars['kartierung_ids'] != '') {
 		# Beschränkung auf Kartierer wenn Änderungsberechtigte Stelle Kartierung ist

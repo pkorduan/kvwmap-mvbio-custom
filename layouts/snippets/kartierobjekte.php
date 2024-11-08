@@ -73,7 +73,7 @@
 				window.kvwmapApp105.start();
 			}
 		}
-		loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/kartierobjekte.js", callback);
+		loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/kartierobjekte.js?v=2", callback);
 		loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/multiPhotoUploadDiv.js");
 	}
 

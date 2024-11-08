@@ -30,7 +30,7 @@
 	}
 	
 	.fett {
-		white-space: pre;
+		/*white-space: pre;*/
 	}
 	
 	.under_title {
@@ -125,7 +125,7 @@ function loaded() {
 	var callback = function() {
 		(new BewertungApp()).start();
 	}
-	loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/lrt_bewertung.js", callback);	
+	loadScript("<?php echo CUSTOM_PATH; ?>layouts/snippets/lrt_bewertung.js?v=1", callback);	
 }
 
 

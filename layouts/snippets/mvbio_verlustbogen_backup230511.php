@@ -32,7 +32,7 @@
 				'hcp',
 				'uc1',
 				'uc2',
-				'beschreibg',
+				'standort',
 				'vegeinheit',
 				'giscode',
 				'eu_nr'
@@ -51,7 +51,6 @@
 		# Übernahme von Auto-Werten für die neue Kartierung
 		$insert_columns['user_id'] = 'user_id';
 		$insert_columns['created_from'] = 'created_from';
-		$select_columns['created_at'] = "'" . date('Y-m-d H:i:s') . "'";
 		$select_columns['user_id'] = $this->user->id;
 		$select_columns['created_from'] = quote($this->user->Vorname . ' ' . $this->user->Name);
 		$select_columns['bearbeitungsstufe'] = 1;
@@ -80,9 +79,27 @@
 		if ($ret['success']) {
 			$rs = pg_fetch_assoc($ret[1]);
 			$new_verlustobjekt_id = $rs['id'];
-			$this->add_message('success', 'Neues Verlustobjekt mit id: ' . $new_verlustobjekt_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Verlustobjekt jetzt bearbeiten.');
-			$fehler = false;
-			
+
+			# Eintragen der Nebencodes für das neue Kartierobjekt
+			 $sql = "
+				INSERT INTO mvbio.biotoptypen_nebencodes_verlustobjekte (verlustobjekt_id, code, flaechendeckung_prozent)
+				SELECT
+					" . $new_verlustobjekt_id . ", nc.code, nc.flaechendeckung_prozent
+				FROM
+					archiv.biotoptypen_nebencodes nc
+				WHERE
+					nc.kartierobjekt_id = " . $this->formvars['bogen_id'] . " 
+			"; 
+			#echo '<br>SQL zum Eintragen der Nebencodes für Verlustobjekt: ' . $sql;
+			$ret = $this->pgdatabase->execSQL($sql, 4, 0);
+			if ($ret['success']) {
+				$this->add_message('success', 'Neues Verlustobjekt mit id: ' . $new_verlustobjekt_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Verlustobjekt jetzt bearbeiten.');
+				$fehler = false;
+			}
+			else {
+				$this->add_message('error', 'Fehler beim Eintragen der Nebencodes.');
+				$fehler = true;
+			}
 		}
 		else {
 			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neues Verlustobjekt!<br>Hinweis: Wählen Sie immer vor der Übernahme unter Einstellungen die Kampagne und Kartiergebiet in die übernommen werden soll.');

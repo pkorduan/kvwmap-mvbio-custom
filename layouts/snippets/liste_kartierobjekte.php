@@ -401,6 +401,7 @@
 							data-visible="<? echo ((!array_key_exists('lrt_info_code', $rolle_attribute_settings) OR $rolle_attribute_settings['lrt_info_code']['switched_on'] == 1) ? 'true': 'false'); ?>"
 							data-switchable="true"
 							data-filter-control="select"
+							data-formatter="lrtCodeFormatter"
 						>LRT-Code</th>
 						<th
 							data-field="biotopname"
@@ -541,7 +542,7 @@
 				);
 
 				$('#user_filter_selector').on(
-					'click',
+					'change',
 					function(e) {
 						window.location.href = 'index.php?go=show_snippet&snippet=liste_kartierobjekte&bearbeitungsstufe=<? echo $this->formvars['bearbeitungsstufe']; ?>' + (e.target.value == 'nureigene' ? '&user_id=<? echo $this->user->id; ?>' : '') + '&csrf_token=<?php echo $_SESSION['csrf_token']; ?>';
 					}
@@ -772,6 +773,10 @@
 			function boolTypeFormatter(value, row) {
 				//console.log(value);
 				return (value == 't' ? 'ja' : 'nein');
+			}
+
+			function lrtCodeFormatter(value, row) {
+				return (row.lrt_info_code ? row.lrt_info_code : row.lrt_code);
 			}
 
 			function kartierungEditFunctionsFormatter(value, row) {

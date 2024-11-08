@@ -1,4 +1,8 @@
 <?php
+	$this->sanitize([
+		'bogen_id' => 'int',
+		'bogenart_id' => 'int'
+	]);
 	# ToDo
 	# Abfragen ob sich an dieser Stelle wo der neue Bogen eingetragen werden soll schon ein Kartierobjekt befindet
 	# Wenn ja Abbruch mit aussagekräftiger Meldung
@@ -56,23 +60,23 @@
 			$altbogen = pg_fetch_assoc($ret[1]);
 			#print_r($select_columns);
 			# Übernahme von Auto-Werten für die neue Kartierung
-			$select_columns['stelle_id'] = $this->Stelle->id;
 			$select_columns['user_id'] = $this->user->id;
-			$select_columns['created_at'] = "'" . date('Y-m-d H:i:s') . "'";
 			$select_columns['created_from'] = "'" . $this->user->Vorname . ' ' . $this->user->Name . "'";
+			$select_columns['created_at'] = "'" . date('Y-m-d H:i:s') . "'";
 			$select_columns['bearbeitungsstufe'] = 1;
 			$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
 			$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
-			$select_columns['e_datum'] = ($altbogen['e_datum'] == '01.01.1970' ? 'NULL' : "'" . $altbogen['e_datum'] . "'");
+			# Keine Übernahme des Datums, Anpassung S. Goen, alte Zeile:
+			# $select_columns['e_datum'] = ($altbogen['e_datum'] == '01.01.1970' ? 'NULL' : "'" . $altbogen['e_datum'] . "'");
+			$select_columns['e_datum'] = 'NULL';
 			$select_columns['l_datum'] = 'NULL';
 			$select_columns['foto'] = 0;
 			$alt_datp20 = implode('-', array_reverse(explode('.', $altbogen['l_datum'] ?: ($altbogen['e_datum'] == '01.01.1970' ? 'NULL' : $altbogen['e_datum']) ?: 'NULL')));
 			if ($alt_datp20 != 'NULL') {
 				$alt_datp20 = "'" . $alt_datp20 . "'";
 			}
-			$select_columns['alt_datp20'] = $alt_datp20;
+#			$select_columns['alt_datp20'] = $alt_datp20;
 			$select_columns['kartierer'] = "'" . $this->user->Vorname . ' ' . $this->user->Name . "'";
-			$select_columns['fb_id'] = 'NULL';
 
 
 			if (rolle::$layer_params['kartierebenenfilter'] != '') {
@@ -86,10 +90,11 @@
 			else {
 				$select_columns['bogenart_id'] = $this->formvars['bogenart_id'];
 			}
+			$select_columns['vorgaenger_id'] = $this->formvars['bogen_id'];
 			# Eintragen des neuen Kartierobjektes mit den Daten des ausgewählten Bogens
 			#print_r(implode(', ', array_keys($select_columns)));
 			$sql = '
-				INSERT INTO mvbio.kartierobjekte ("' . implode('", "', $insert_columns) . '", stelle_id, user_id, created_from)
+				INSERT INTO mvbio.kartierobjekte ("' . implode('", "', $insert_columns) . '", user_id, created_from, vorgaenger_id)
 				SELECT
 					' . implode(', ', $select_columns) . '
 				FROM
@@ -180,6 +185,7 @@
 									#echo '<p>Alles erfolgreich eingetragen';
 									$this->add_message('success', 'Neues Kartierobjekt mit id: ' . $new_kartierobjekt_id . ' erfolgreich aus Archivtabelle: ' . $archivtabelle . ' übernommen.<br>Sie können das Kartierobjekt jetzt bearbeiten.');
 
+									/* Wenn die Archivtabelle ein Bewertungsbogen war, soll die Bewertung nicht in eine neue Bewertung übernommen werden.
 									if ($archivtabelle == 'bewertungsboegen') {
 										# Abfrage der LRT-Gruppe
 										$sql = "
@@ -196,7 +202,7 @@
 										if ($ret['success']) {
 											$rs = pg_fetch_assoc($ret[1]);
 											$archivtabelle = 'bewertungsboegen_' . $rs['tabelle_postfix'];
-											$mvbiotabelle = 'bewertungen_' . $rs['tabelle_postfix'];
+											$mvbiotabelle = 'lrt_objekte_' . $rs['tabelle_postfix'];
 
 											# Abfrage der zwischen Bewertungsbogen und Bewertung übereinstimmenden Spaltennamen
 											$sql = "
@@ -234,7 +240,6 @@
 													$insert_columns[$rs['column_name']] = $rs['column_name'];
 													$select_columns[$rs['column_name']] = $rs['column_name'];
 												}
-												$select_columns['bearbeitungsstufe'] = 1;
 												# Hinzufügen der kartierobjekt_id zu Abfrage- und Insertattributen
 												$insert_columns['kartierung_id'] = 'kartierung_id';
 												$select_columns['kartierung_id'] = $new_kartierobjekt_id;
@@ -263,6 +268,7 @@
 											$fehler = true;
 										}
 									} # end processing bewertungsbogen
+									*/
 								}
 								else {
 									$this->add_message('error', 'Fehler beim Eintragen der Empfehlungen.');
@@ -325,14 +331,13 @@
 UPDATE
 	mvbio.kartierobjekte ko
 SET
-	giscode = b.giscode,
 	alt_giscod = b.alt_giscod,
 	alt_lfd_nr = b.alt_lfd_nr,
 	alt_bearb = b.alt_bearb,
 	alt_datp20 = b.alt_datp20
 FROM
 	mvbio.zuordnungstabelle z JOIN
-	archiv.grundboegen b ON z.giscode = b.giscode
+	archiv.grundboegen b ON z.alt_giscode = b.alt_giscode
 WHERE
 	z.label = ko.label AND
 	b.kampagne_id = 1
@@ -342,7 +347,6 @@ WHERE
 UPDATE
 	mvbio.kartierobjekte ko
 SET
-	giscode = b.giscode,
 	alt_giscod = b.alt_giscod,
 	alt_lfd_nr = b.alt_lfd_nr,
 	see_nr = b.see_nr,
@@ -351,7 +355,7 @@ SET
 	alt_datffh = b.alt_datffh
 FROM
 	mvbio.msommer m JOIN
-	archiv.grundboegen b ON m.giscode = b.giscode
+	archiv.grundboegen b ON m.alt_giscode = b.alt_giscode
 WHERE
 	m.label = ko.label AND
 	b.kampagne_id = 1

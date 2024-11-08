@@ -172,7 +172,16 @@
 		<div style="margin-top: 23px; margin-left: 13px; float:left"><?php
 			if (($this->formvars['bearbeitungsstufe'] ? $bearbeitungsstufe->get('aenderungsberechtigte_stelle') : '') == $this->Stelle->Bezeichnung) { ?>
 				<span style=""><sub>&#8625;</sub></span>Bearbeitungsstand für ausgewählte Datensätze ändern in:<?
-				if ($this->formvars['bearbeitungsstufe'] > 1) { ?>
+				if ($this->formvars['bearbeitungsstufe'] > 1) {
+					if ($this->Stelle->id == 5 AND $this->formvars['bearbeitungsstufe'] == 4) { ?>
+						<input
+							class="change-bearbeitungsstand"
+							type="button"
+							name="prev_stufe"
+							stufe="2"
+							value="Zur Info freigegeben"
+						><?
+					} ?>
 					<input
 						class="change-bearbeitungsstand"
 						type="button"
@@ -449,7 +458,7 @@
 				);
 
 				$('#user_filter_selector').on(
-					'click',
+					'change',
 					function(e) {
 						window.location.href = 'index.php?go=show_snippet&snippet=liste_verlustobjekte&bearbeitungsstufe=<? echo $this->formvars['bearbeitungsstufe']; ?>' + (e.target.value == 'nureigene' ? '&user_id=<? echo $this->user->id; ?>' : '') + '&csrf_token=<?php echo $_SESSION['csrf_token']; ?>';
 					}

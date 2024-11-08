@@ -3,6 +3,7 @@
 	$success = true;
 	$kartierung_ids = array();
 	$sql = $err_sqls = $messages = '';
+  $lock = 'false';
 	if ($this->formvars['kartierung_ids'] != '') {
 		# Beschränkung auf Kartierer wenn Änderungsberechtigte Stelle Kartierung ist
 		$kartiererfilter = ($this->Stelle->Bezeichnung == 'Karterung' ? " AND k.user_id = " . $this->user->id : "");
@@ -12,7 +13,7 @@
 				UPDATE
 					mvbio." . ($this->formvars['objektart'] == 'Verlustobjekte' ? 'verlustobjekte' : 'kartierobjekte') . " k
 				SET
-					lock = true,
+					lock = " . $lock . ",
 					bearbeitungsstufe = " . $this->formvars['stufe_neu'] . "
 				FROM
 					mvbio.code_bearbeitungsstufen b

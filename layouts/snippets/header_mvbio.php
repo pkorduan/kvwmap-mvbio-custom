@@ -278,15 +278,50 @@ else { ?>
 		</div>
 	</div>
 
-	<div title="Hinweise" style="float: right; display: block;">
-		<a href="#" onclick="message('<b>Achtung Wartungsarbeiten!</b><br><br>Die Anwendung wird so umgebaut, dass die Layeroptionen zur Einstellung von Kampagne, Kartiergebiet, Kartierebene und Bogenart im Kopf der Anwendung zu sehen ist! Die Anwendung kann während des Umbaus weiter wie gewohnt genutzt werden.');">
+	<div title="Benachrichtigungen" style="float: right; display: block;">
+		<script>
+			function delete_user2notification(notification_id) {
+				let formData = new FormData();
+				formData.append('go', 'delete_user2notification');
+				formData.append('notification_id', notification_id);
+				formData.append('csrf_token', '<? echo $_SESSION['csrf_token']; ?>')
+				let response = fetch('index.php', {
+				  method: 'POST',
+				  body: formData
+				})
+				.then(response => response.text())
+				.then(text => {
+					try {
+						const data = JSON.parse(text);
+						if (data.success) {
+							$('#notification_box_' + notification_id).remove();
+							let num_notifications = $('#num_notification_div').html() - 1;
+							if (num_notifications == 0) {
+								$('#num_notification_div').hide();
+							}
+							else {
+								$('#num_notification_div').html(num_notifications);
+							}
+						}
+						else {
+							message([{ 'type': 'error', 'msg' : 'Fehler beim Löschen Benachrichtigung für den Nutzer: ' + data.err_msg + ' ' + text}]);
+						}
+					} catch(err) {
+						message([{ 'type': 'error', 'msg' : err.name + ': ' + err.message + ' in Zeile: ' + err.lineNumber + ' Response: ' + text}]);
+					}
+				});
+			}
+		</script><?
+		include_once(CLASSPATH . 'Notification.php');
+		$result = Notification::find_for_user($this); ?>
+		<a href="#" onclick="if ($('#user_notifications').is(':visible') && $('.notification-box').filter(':visible').length > 0) { $('#user_notifications').hide('swing'); } else {
+			<? if (count($result['notifications']) == 0) { echo 'message([{ type: \'notice\', msg: \'Keine neuen Benachrichtigungen vorhanden.\'}]);'; } ?> $('.notification-box').show(); $('#user_notifications').show('swing'); }">
 			<i class="fa fa-bell" aria-hidden="true" style="
 				font-size: 150%;
 				padding: 5px 0px 4px 0;
-			"
-			></i>
-			<div
-				style="
+			"></i><?
+			if ($result['success'] AND count($result['notifications']) > 0) { ?>
+				<div id="num_notification_div" style="
 					margin: -27 0 0 14;
 					width: 12;
 					height: 12;
@@ -298,10 +333,26 @@ else { ?>
 					color: white;
 					padding: 0px 2px 3px 2px;
 					position: relative;
-					text-align: center;
-					"
-			>1</div>
+					text-align: center;"
+				><?
+					echo count($result['notifications']); ?>
+				</div><?
+			} ?>
 		</a>
+		<div id="user_notifications" style="display: none; position: absolute;right: 30px; z-index: 9999;padding: 5px;top: 30px;"><?
+			if ($result['success']) {
+				foreach($result['notifications'] AS $notification) { ?>
+					<div id="notification_box_<? echo $notification['id']; ?>" class="notification-box">
+						<div style="float: left"><a href="#" class="notification-hide-icon"><i class="fa fa-times" aria-hidden="true" style="font-size: 100%" onclick="if ($('#notification_delete_checkbox_<? echo $notification['id']; ?>').is(':checked')) { delete_user2notification(<? echo $notification['id']; ?>); } else { $(this).parent().parent().parent().hide('swing'); }"></i></a></div>
+						<div style="float: left; margin-left: 5px; max-width: 200px"><?
+							echo $notification['notification']; ?>
+						</div>
+						<div style="clear: both"></div>
+						<div style="margin-top: 2px; width: 100%; text-align: center;"><input id="notification_delete_checkbox_<? echo $notification['id']; ?>" type="checkbox"/> nicht mehr anzeigen</div>
+					</div><?
+				}
+			} ?>
+		</div>
 	</div>
 
 	<div title="Kartenausschnitt Drucken">
@@ -313,8 +364,8 @@ else { ?>
 	</div>
 
 	<div title="Ortssuche">
-		<i class="fa fa-search header-button" aria-hidden="true" style="font-size: 150%;" onclick="$('#search_div, .fa-search, .fa-times').toggle(); $('#geo_name_search_result_div').show()"></i>
-		<i class="fa fa-times header-button" aria-hidden="true" style="font-size: 150%; display: none;" onclick="$('#search_div, .fa-search, .fa-times').toggle(); $('#geo_name_search_result_div').hide()"></i>
+		<i id="search_icon" class="fa fa-search header-button" aria-hidden="true" style="font-size: 150%;" onclick="$('#search_div, #search_icon, #close_icon').toggle(); $('#geo_name_search_result_div').show()"></i>
+		<i id="close_icon" class="fa fa-times header-button" aria-hidden="true" style="font-size: 150%; display: none;" onclick="$('#search_div, #search_icon, #close_icon').toggle(); $('#geo_name_search_result_div').hide()"></i>
 	</div>
 
 	<div style="padding: 4px; float: right; width: 30%;"><?

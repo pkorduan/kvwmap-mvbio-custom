@@ -92,7 +92,7 @@
 	}
 
 	function editFormatter(value, row) {
-		var output = (row.abgeschlossen == 't' ? '' : '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=153&value_kampagne_id=' + value + '&operator_kampagne_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>"><i class="btn-link fa fa-lg fa-pencil"></i></a>');
+		var output = (row.abgeschlossen == 't' ? '' : '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=153&value_id=' + value + '&operator_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>"><i class="btn-link fa fa-lg fa-pencil"></i></a>');
 		return output;
 	}
 
@@ -123,7 +123,7 @@
 	<thead>
 		<tr>
 			<th
-				data-field="kampagne_id"
+				data-field="id"
 				data-sortable="true"
 				data-visible="true"
 				data-switchable="true"
@@ -153,12 +153,6 @@
 				data-switchable="true"
 			>Datenschichten</th>
 			<th
-				data-field="umfang"
-				data-sortable="true"
-				data-visible="true"
-				data-switchable="true"
-			>Umfang</th>
-			<th
 				data-field="abgeschlossen"
 				data-visible="true"
 				data-sortable="true"
@@ -166,13 +160,13 @@
 				data-switchable="false"
 			>abgeschlossen</th>
 			<th
-				data-field="kampagne_id"
+				data-field="id"
 				data-visible="true"
 				data-formatter="editFormatter"
 				data-switchable="false"
 			>Bearbeiten</th>
 			<th
-				data-field="kampagne_id"
+				data-field="id"
 				data-visible="true"
 				data-formatter="kartiergebieteFormatter"
 				data-switchable="false"

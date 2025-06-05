@@ -51,6 +51,11 @@
 		border-bottom: 2px solid #333333;
 		border-left: 2px solid #CCCCCC;
 	}
+
+	.gle_attribute_value {
+		height: auto !important
+	}
+
 </style>
 
 <script>

@@ -24,9 +24,9 @@
 			AND k.column_name NOT IN (
 				'id',
 				'kartierobjekt_id',
+				'updated_at',
 				'kampagne',
 				'kartiergebiet_name',
-				'userid',
 				'unb',
 				'hc',
 				'hcp',
@@ -54,12 +54,11 @@
 		$select_columns['created_at'] = "'" . date('Y-m-d H:i:s') . "'";
 		$select_columns['user_id'] = $this->user->id;
 		$select_columns['created_from'] = quote($this->user->Vorname . ' ' . $this->user->Name);
-		$select_columns['bearbeitungsstufe'] = 1;
 		$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
 		$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
 		$select_columns['e_datum'] = 'NULL';
 		$select_columns['l_datum'] = 'NULL';
-		$select_columns['bogenart_id'] = 3;
+		// $select_columns['bogenart_id'] = 3;
 		$insert_columns['bogen_id'] = 'bogen_id';
 		$select_columns['bogen_id'] = $this->formvars['bogen_id'];
 		$select_columns['foto'] = 0;

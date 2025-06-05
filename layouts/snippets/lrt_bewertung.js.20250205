@@ -7,10 +7,6 @@ function test() {
 	return foo;
 }
 
-function isFloat(n) {
-	// return Number(n) === n && n % 1 !== 0;
-	return Number(n) === n;
-}
 
 function Frame(content, title, className) {
 	this.content = content;
@@ -164,14 +160,12 @@ function getColor(s) {
 
 
 function getGesamtBewertung(bws) {
-
 	var i, aBw = 0, bBw = 0, cBw = 0;
 	for (i = 0; i < 3; i++) {
 		if (bws[i] === 'A') aBw++;
 		if (bws[i] === 'B') bBw++;
 		if (bws[i] === 'C') cBw++;
 	}
-	console.info("getGesamtBewertung A=" + aBw + "  B=" + bBw + "  C=" + cBw)
 	if ((aBw + bBw + cBw) === 3) {
 		if (cBw > 1) {
 			return "C";
@@ -490,7 +484,7 @@ function BewertungFliessgewaesser_2_2_a() {
 				}
 			}
 		}
-		console.error("T22A=" + T22A + "  =>", result);
+		console.error("T22A="+T22A+"  =>",result);
 		this.result = result;
 	}
 }
@@ -522,7 +516,7 @@ function BewertungFliessgewaesser_2_2_b() {
 				}
 			}
 		}
-		console.error("T22B=" + T22B + "  =>", result);
+		console.error("T22B="+T22B+"  =>",result);
 		this.result = result;
 	}
 }
@@ -554,7 +548,7 @@ function BewertungFliessgewaesser_2_2_c() {
 				}
 			}
 		}
-		console.error("T22C=" + T22C + "  =>", result);
+		console.error("T22C="+T22C+"  =>",result);
 		this.result = result;
 	}
 }
@@ -1961,7 +1955,7 @@ function BewertungOffenland_1_3_1() {
 			if (!isNaN(t131_1_2) && t131_1_2 > 0) {
 				result = { b: 'A' };
 			} else {
-				result = { b: 'B' };
+				result = { b: 'C' };
 			}
 		}
 		this.result = result;
@@ -2824,7 +2818,7 @@ function BewertungMoore_1_1_1() {
 
 		/*
 		7120 HC und NC = “MAT, MAG, MDH, MTR, MTO, MSS, MST, MSW, MSP“
-		7140 HC und NC = “VRX, MAT, MAG, MDH, MTR, MTO, MSS, MST, MSW, MSP, MZB, MZS, MPB“
+		7140 HC und NC = “MAT, MAG, MDH, MTR, MTO, MSS, MST, MSW, MSP, MZB, MZS, MPB“
 		7150 HC und NC = “MSS, TFB“
 		7210 HC und NC = “VRC“
 		7230 HC und NC = “VRZ, MZK, MZC, MPK“
@@ -2832,7 +2826,7 @@ function BewertungMoore_1_1_1() {
 		if (lrtCode === 7120) {
 			aCodes = ["MAT", "MAG", "MDH", "MTR", "MTO", "MSS", "MST", "MSW", "MSP"];
 		} else if (lrtCode === 7140) {
-			aCodes = ["VRX", "MAT", "MAG", "MDH", "MTR", "MTO", "MSS", "MST", "MSW", "MSP", "MZB", "MZS", "MPB"];
+			aCodes = ["MAT", "MAG", "MDH", "MTR", "MTO", "MSS", "MST", "MSW", "MSP", "MZB", "MZS", "MPB"];
 		} else if (lrtCode === 7150) {
 			aCodes = ["MSS", "TFB"];
 		} else if (lrtCode === 7210) {
@@ -4030,7 +4024,7 @@ function BewertungKueste_1_5_2() {
 		var lrtCode = b.lrtCode;
 		var T152 = b.getValue("T152");
 
-		var anz = b.getAnzahlNebenCodes();
+		var anz = b.getAnzahlNebenCodes() ;
 		//var anz = parseInt(b.getValue("anzahl_nc"));
 		var hc = b.getValue("hc");
 		console.info('anz: ' + anz + ' hc: ' + hc + ' t152: ' + T152);
@@ -4773,687 +4767,6 @@ function BewertungKueste_3_2_11() {
 		this.result = result;
 	}
 }
-
-// WALD
-
-function bewertungWald_1_1_V1(b) {
-	var result = -1;
-	var result01 = -1;
-	var result02 = -1;
-	var T111_1 = b.getValue("T111");
-	var T112_1 = b.getValue("T112");
-	if (Number.isInteger(T111_1) && T111_1 >= 0 && Number.isInteger(T112_1) && T112_1 >= 0) {
-		if (T111_1 < 7) {
-			result01 = 1;
-		} else if (T111_1 < 8) {
-			result01 = 2;
-		} else {
-			result01 = 3;
-		}
-		if (T112_1 < 7) {
-			result02 = 1;
-		} else if (T112_1 < 8) {
-			result02 = 2;
-		} else {
-			result02 = 3;
-		}
-		result = Math.max(result01, result02);
-		if (result === 1) {
-			result = { b: 'A' };
-		} else if (result === 2) {
-			result = { b: 'B' };
-		} else {
-			result = { b: 'C' };
-		}
-	}
-	return result;
-}
-function bewertungWald_1_1_V2(b) {
-	var result = -1;
-	var T111 = b.getValue("T111");
-	var T115 = b.getValue("T115");
-
-	if (Number.isInteger(T111) && T111 >= 0 && Number.isInteger(T115) && T115 >= 0) {
-		if (T115 === 1 && T111 < 8) {
-			result = { b: 'A' };
-		} else if (T115 <= 2 && T111 <= 8) {
-			result = { b: 'B' };
-		} else {
-			result = { b: 'C' };
-		}
-	}
-	return result;
-}
-/*
->=15% ja	>=10% ja	<10% nein
-*/
-function bewertungWald_1_1_V3(b) {
-	var result = -1;
-	var T111 = b.getValue("T111");
-	var T114 = b.getValue("T114");
-	console.error("T111=" + T111, "T114=" + T114);
-	if (Number.isInteger(T111) && T111 >= 0 && Number.isInteger(T114) && T114 >= 0) {
-		if (T114 === 1 && T111 <= 8) {
-			result = { b: 'A' };
-		} else if (T114 === 1 && T111 <= 9) {
-			result = { b: 'B' };
-		} else {
-			result = { b: 'C' };
-		}
-	}
-	return result;
-}
-function bewertungWald_1_1_V4(b) {
-	var result = -1;
-	var result = -1;
-	var sum = 0;
-
-	function isPhase(v) {
-		var result = -1;
-		if (Number.isInteger(v) && v >= 0) {
-			result = (v < 10) ? 1 : 0;
-		}
-		return result;
-	}
-
-	var v1 = isPhase(b.getValue("T113_1"));
-	var v2 = isPhase(b.getValue("T113_2"));
-	var v3 = isPhase(b.getValue("T113_3"));
-	var v4 = isPhase(b.getValue("T113_4"));
-	var v5 = isPhase(b.getValue("T113_5"));
-	console.info("vvvv", v1, v2, v3, v4, v5);
-
-	if (v1 >= 0 && v2 >= 0 && v3 >= 0 && v4 >= 0 && v5 >= 0) {
-		sum = v1 + v2 + v3 + v4 + v5;
-		if (sum >= 3) {
-			result = { b: 'A' };
-		} else if (sum >= 2) {
-			result = { b: 'B' };
-		} else {
-			result = { b: 'C' };
-		}
-	}
-	return result;
-}
-function BewertungWald_1_1() {
-
-	Bewertung.call(this);
-
-	this.nr = "1.1.";
-	this.txt = "Reifephase";
-	this.lrtCodes = [9110, 9130, 9150, 9180, "91E0", 9160, 9190, "91G0"];
-
-	this.bewerte = function (b) {
-		console.info("BewertungWald_1_1.bewerte");
-		var result = -1;
-		var lrtCode = b.lrtCode;
-
-		var lrtCodesVar01 = [9110, 9130, 9150];
-		var lrtCodesVar02 = [9180];
-		var lrtCodesVar03 = ["91E0"];
-		var lrtCodesVar04 = [9160, 9190, "91G0"];
-
-		if (lrtCodesVar01.indexOf(lrtCode) >= 0) {
-			result = bewertungWald_1_1_V1(b);
-		} else if (lrtCodesVar02.indexOf(lrtCode) >= 0) {
-			result = bewertungWald_1_1_V2(b);
-		} else if (lrtCodesVar03.indexOf(lrtCode) >= 0) {
-			result = bewertungWald_1_1_V3(b);
-		} else if (lrtCodesVar04.indexOf(lrtCode) >= 0) {
-			result = bewertungWald_1_1_V4(b);
-		}
-
-		this.result = result;
-	}
-
-}
-function aggrBewertung1_2(bwT211, bwT216) {
-	const s = bwT211 + bwT216;
-	switch (s) {
-		case "AA":
-			return "A"
-		case "AB":
-			return "A"
-		case "AC":
-			return "B"
-		case "BA":
-			return "B"
-		case "BB":
-			return "B"
-		case "BC":
-			return "B"
-		case "CA":
-			return "B"
-		case "CB":
-			return "C"
-		case "CC":
-			return "C"
-		default:
-			break;
-	}
-}
-
-function BewertungWald_1_2() {
-
-	Bewertung.call(this);
-
-	this.nr = "1.2";
-	this.txt = "Altbäume+Biotopbäume+Totholz oder Altholzinseln";
-	this.lrtCodes = [9110, 9130, 9150, 9160, 9180, 9190, "91E0", "91G0", "91T0", "91U0"];
-
-	this.prepareHTML = function (b) {
-		var targetId;
-		targetId = getTextfieldId(b.layerId, b.datensatzNr, "t121_2_1");
-		document.getElementById(targetId).disabled = true;
-
-		targetId = getTextfieldId(b.layerId, b.datensatzNr, "t121_2_2");
-		document.getElementById(targetId).disabled = true;
-	}
-
-	this.berechne = function (b) {
-		console.info("berechne " + this.nr);
-		const flaeche = b.getFlaecheInHa(b.layerId, b.datensatzNr);
-		console.info("flaeche", flaeche);
-		var T121_1_1 = parseInt(b.getValue("T121_1_1"));
-		var T121_1_2 = parseInt(b.getValue("T121_1_2"));
-		var T121_1_3 = parseInt(b.getValue("T121_1_3"));
-
-		var sum01 = "";
-		var targetId = getTextfieldId(b.layerId, b.datensatzNr, "t121_2_1");
-
-		if (Number.isInteger(T121_1_1) && Number.isInteger(T121_1_2) && T121_1_1 >= 0 && T121_1_2 >= 0 && isFloat(flaeche)) {
-			sum01 = T121_1_1 + T121_1_2;
-			document.getElementById(targetId).value = sum01 / flaeche;
-		} else {
-			document.getElementById(targetId).value = "";
-		}
-		var sum02 = "";
-		targetId = getTextfieldId(b.layerId, b.datensatzNr, "t121_2_2");
-		if (Number.isInteger(T121_1_3) && T121_1_3 >= 0 && isFloat(flaeche)) {
-			sum02 = T121_1_3;
-			document.getElementById(targetId).value = sum02 / flaeche;
-		} else {
-			document.getElementById(targetId).value = "";
-		}
-
-
-	};
-
-
-	this.bewerte = function (b) {
-		console.info("BewertungWald_1_2.bewerte");
-		// Summe 1.2.1 oder 1.2.2
-		var result = -1;
-
-
-		var T121_2_1 = parseFloat(b.getValue("T121_2_1"));
-		var T121_2_2 = parseFloat(b.getValue("T121_2_2"));
-
-		var T121_3 = parseInt(b.getValue("T121_3"));
-		console.info("Sum01", T121_2_1);
-		console.info("Sum02", T121_2_2);
-		// 1: >=2%
-		// 2: >=1%
-		// 3: < 1%
-		console.info("T121_3", T121_3, Number.isInteger(T121_3));
-		if (isFloat(T121_2_1) && isFloat(T121_2_2) && Number.isInteger(T121_3) && T121_3 >= 0) {
-			if (T121_2_1 >= 6 || T121_2_2 >= 6 || T121_3 === 1) {
-				result = { b: 'A' };
-			} else if (T121_2_1 >= 3 || T121_2_2 >= 3 || T121_3 <= 2) {
-				result = { b: 'B' };
-			} else {
-				result = { b: 'C' };
-			}
-		}
-
-
-		this.result = result;
-	}
-
-}
-
-function BewertungWald_1_3() {
-
-	Bewertung.call(this);
-
-	this.nr = "1.3.";
-	this.txt = "Freiflächenanteil";
-	this.lrtCodes = ["91T0", "91U0"];
-
-	this.bewerte = function (b) {
-		console.info("BewertungWald_1_3.bewerte");
-		var result = -1;
-		var T131 = parseInt(b.getValue("T131"));
-		console.info("T131_1", T131);
-		// >=20%	>=10%	<10%
-		if (Number.isInteger(T131) && T131 >= 0) {
-			if (T131 === 1) {
-				result = { b: 'A' };
-			} else if (T131 === 2) {
-				result = { b: 'B' };
-			} else {
-				result = { b: 'C' };
-			}
-		}
-		this.result = result;
-	}
-
-}
-
-function BewertungWald_1_4() {
-
-	Bewertung.call(this);
-
-	this.nr = "1.4.";
-	this.txt = "Kronenschluß";
-	this.lrtCodes = ["91T0", "91U0"];
-
-	this.bewerte = function (b) {
-		console.info("BewertungWald_1_3.bewerte");
-		var result = -1;
-		var T141 = parseInt(b.getValue("T141"));
-		console.info("T141", T141);
-		// <=30%	<=50%	>50%
-		if (Number.isInteger(T141) && T141 >= 0) {
-			if (T141 === 1) {
-				result = { b: 'A' };
-			} else if (T141 === 2) {
-				result = { b: 'B' };
-			} else {
-				result = { b: 'C' };
-			}
-		}
-		this.result = result;
-	}
-
-}
-
-
-
-function BewertungWald_1_5() {
-
-	Bewertung.call(this);
-
-	this.nr = "1.5";
-	this.txt = "Vorkommen verschiedener Sukzessionsstadien";
-	this.lrtCodes = [2180];
-
-	this.prepareHTML = function (b) {
-		b.setCalculated("t151_0");
-	}
-
-
-	this.berechne = function (b) {
-
-		var T151_1 = b.getValue("T151_1");
-		var targetId;
-		targetId = getTextfieldId(b.layerId, b.datensatzNr, "t151_0");
-		// var el = document.getElementById(targetId);
-		b.setTextValue("t151_0", T151_1.length);
-
-
-	}
-
-	this.bewerte = function (b) {
-		var result = -1;
-		var T151_1 = parseInt(b.getValue("T151_0"));
-		var T151_2 = parseInt(b.getValue("T151_2"));
-		var T151_3 = parseInt(b.getValue("T151_3"));
-		console.info("BewertungWald_1_5", T151_1, T151_2, T151_3);
-		/*
-		>=3    >=2	    1
-		>10m	<=10m	nicht vorhanden
-		<=10%	<=30%	>30%
-		*/
-		if (Number.isInteger(T151_1) && Number.isInteger(T151_2) && T151_2 >= 0 && Number.isInteger(T151_3) && T151_3 >= 0) {
-			if (T151_1 >= 3 && T151_2 === 1 && T151_3 === 1) {
-				result = { b: 'A' };
-			} else if (T151_1 >= 2 && T151_2 <= 2 && T151_3 <= 2) {
-				result = { b: 'B' };
-			} else {
-				result = { b: 'C' };
-			}
-		}
-		this.result = result;
-	}
-}
-
-function BewertungWald_2_1() {
-
-	Bewertung.call(this);
-
-	this.nr = "2.1";
-	this.txt = "Lebensraumtypisches Arteninventar - Pflanzenarten";
-	this.lrtCodes = [9110, 9130, 9160, 9190, "91G0", "91U0", 2180, 9180, "91E0", 9150, "91D0", "91T0"];
-
-	this.bewerte = function (b) {
-		var result = -1;
-		var lrtCode = b.lrtCode;
-		const lrtCodesVar01 = [9110, 9130, 9160, 9190, "91G0", "91U0", 2180];
-		const lrtCodesVar02 = [9180, "91E0"];
-
-		var T211 = parseInt(b.getValue("T211"));
-		var T216 = parseInt(b.getValue("T216"));
-
-		if (lrtCodesVar01.indexOf(lrtCode) >= 0) {
-			console.info("BewertungWald_2_1 ", T211, T216);
-			if (Number.isInteger(T211) && T211 >= 0 && Number.isInteger(T216) && T216 >= 0) {
-				if (T211 <= 2 && T216 === 1) {
-					result = { b: 'A' };
-				} else if (T211 <= 3 && T216 <= 2) {
-					result = { b: 'B' };
-				} else {
-					result = { b: 'C' };
-				}
-			}
-		} else if (lrtCodesVar02.indexOf(lrtCode) >= 0) {
-			if (Number.isInteger(T211) && T211 >= 0 && Number.isInteger(T216) && T216 >= 0) {
-				if (T211 <= 1 && T216 === 1) {
-					result = { b: 'A' };
-				} else if (T211 <= 2 && T216 <= 2) {
-					result = { b: 'B' };
-				} else {
-					result = { b: 'C' };
-				}
-			}
-			console.info("BewertungWald_2_1 ", T211, T216);
-		} else if (lrtCode === 9150) {
-			var T212 = parseInt(b.getValue("T212"));
-			if (Number.isInteger(T211) && T211 > 0 && Number.isInteger(T212) && T212 > 0 && Number.isInteger(T216) && T216 > 0) {
-				if (T211 <= 2 && T216 <= 1 && T212 <= 1) {
-					result = { b: 'A' };
-				} else if (T211 <= 3 && T216 <= 2 && T212 <= 2) {
-					result = { b: 'B' };
-				} else {
-					result = { b: 'C' };
-				}
-			}
-			console.info("BewertungWald_2_1 ", T211, T216, T212);
-		} else if (lrtCode === "91D0") {
-			var T213 = parseInt(b.getValue("T213"));
-			if (Number.isInteger(T211) && T211 > 0 && Number.isInteger(T213) && T213 > 0 && Number.isInteger(T216) && T216 > 0) {
-				if (T211 <= 1 && T216 <= 1 && T213 <= 1) {
-					result = { b: 'A' };
-				} else if (T211 <= 2 && T216 <= 2 && T213 <= 2) {
-					result = { b: 'B' };
-				} else {
-					result = { b: 'C' };
-				}
-			}
-			console.info("BewertungWald_2_1 ", T211, T216, T213);
-		} else if (lrtCode === "91T0") {
-			var T215 = parseInt(b.getValue("T215"));
-			if (Number.isInteger(T211) && T211 > 0 && Number.isInteger(T215) && T215 > 0 && Number.isInteger(T216) && T216 > 0) {
-				if (T211 <= 2 && T216 <= 1 && T215 <= 1) {
-					result = { b: 'A' };
-				} else if (T211 <= 3 && T216 <= 2 && T215 <= 2) {
-					result = { b: 'B' };
-				} else {
-					result = { b: 'C' };
-				}
-			}
-			console.info("BewertungWald_2_1 ", T211, T216, T215);
-		}
-
-		this.result = result;
-	}
-
-}
-
-function BewertungWald_2_2() {
-
-	Bewertung.call(this);
-
-	this.nr = "2.2";
-	this.txt = "Lebensraumtypisches Arteninventar - Pflanzen- und Tierarten";
-	this.lrtCodes = [9110, 9130, 9150, 9160, 9180, 9190, "91D0", "91E0", "91G0", "91T0", "91U0", 2180];
-
-
-	this.getKorrekturWert = function () {
-		return this.korrekturWert;
-	}
-	this.berechneKorrekturWert = function (b) {
-
-		var T22_1 = b.getValue("T221");
-		var T22_2 = b.getTextValue("T222");
-		console.info("berechneKorrekturWert ", T22_1, T22_2);
-		var korrekturWert;
-		if (T22_1 === true) {
-			if (T22_2 && T22_2.length > 3) {
-				korrekturWert = 1;
-			}
-			else {
-				korrekturWert = { err: 'Es muss mindestens eine Tierart angegeben werden.' };
-			}
-		}
-		else {
-			korrekturWert = 0;
-		}
-		this.korrekturWert = korrekturWert;
-	}
-
-}
-
-function BewertungWald_3_1() {
-
-	Bewertung.call(this);
-
-	this.nr = "3.1";
-	this.txt = "Beeinträchtigungen - Veränderung des Standorts";
-	this.lrtCodes = [2180, 2180, 9160, 9190, "91D0", "91E0"];
-
-
-	this.bewerte = function (b) {
-		var result = -1;
-		var lrtCode = b.lrtCode;
-
-		if (lrtCode === 2180) {
-			var T311 = parseInt(b.getValue("T311"));
-			var T312 = parseInt(b.getValue("T312"));
-			if (Number.isInteger(T311) && T311 > 0 && Number.isInteger(T312) && T312 > 0) {
-				if (T311 === 1 && T312 === 1) {
-					result = { b: 'A' };
-				} else if (T311 <= 2 && T312 <= 2) {
-					result = { b: 'B' };
-				} else {
-					result = { b: 'C' };
-				}
-			}
-		} else if (lrtCode === "91D0" || lrtCode === "91E0") {
-			var T313 = parseInt(b.getValue("T313"));
-			if (Number.isInteger(T313) && T313 > 0) {
-				if (T313 === 1) {
-					result = { b: 'A' };
-				} else if (T313 <= 2) {
-					result = { b: 'B' };
-				} else {
-					result = { b: 'C' };
-				}
-			}
-		}
-		this.result = result;
-	}
-
-}
-
-function BewertungWald_3_2() {
-
-	Bewertung.call(this);
-
-	this.nr = "3.2";
-	this.txt = "Beeinträchtigungen - Gewässermorphologie";
-	this.lrtCodes = ["91E0"];
-
-
-	this.bewerte = function (b) {
-		var result = -1;
-		var lrtCode = b.lrtCode;
-
-		if (lrtCode === "91E0") {
-			var T32 = parseInt(b.getValue("T321"));
-			console.info("BewertungWald_3_2", T32);
-			if (Number.isInteger(T32) && T32 > 0) {
-				if (T32 === 1) {
-					result = { b: 'A' };
-				} else if (T32 <= 2) {
-					result = { b: 'B' };
-				} else {
-					result = { b: 'C' };
-				}
-			}
-		}
-		this.result = result;
-	}
-
-}
-
-
-function BewertungWald_3_3() {
-
-	Bewertung.call(this);
-
-	this.nr = "3.3";
-	this.txt = "Beeinträchtigungen - Fahrschäden";
-	this.lrtCodes = [9110, 9130, 9150, 9160, 9180, 9190, "91D0", "91E0", "91G0", "91T0", "91U0", 2180];
-
-
-	this.bewerte = function (b) {
-		var result = -1;
-		var lrtCode = b.lrtCode;
-
-
-		var T331 = parseInt(b.getValue("T331_1"));
-		console.info("BewertungWald_3_3", T331);
-		if (Number.isInteger(T331) && T331 > 0) {
-			if (T331 === 1) {
-				result = { b: 'A' };
-			} else if (T331 <= 2) {
-				result = { b: 'B' };
-			} else {
-				result = { b: 'C' };
-			}
-		}
-
-		this.result = result;
-	}
-
-}
-
-function BewertungWald_3_4() {
-
-	Bewertung.call(this);
-
-	this.nr = "3.4";
-	this.txt = "Beeinträchtigungen - Bodenbearbeitung";
-	this.lrtCodes = [9110, 9130, 9150, 9160, 9180, 9190, "91D0", "91E0", "91G0", "91T0", "91U0", 2180];
-
-
-	this.bewerte = function (b) {
-		var result = -1;
-
-		var T341 = parseInt(b.getValue("T341"));
-		console.info("BewertungWald_3_4", T341);
-		if (Number.isInteger(T341) && T341 > 0) {
-			if (T341 === 1) {
-				result = { b: 'A' };
-			} else if (T341 <= 2) {
-				result = { b: 'B' };
-			} else {
-				result = { b: 'C' };
-			}
-		}
-
-		this.result = result;
-	}
-
-}
-
-function BewertungWald_3_5() {
-
-	Bewertung.call(this);
-
-	this.nr = "3.5";
-	this.txt = "Beeinträchtigungen - Schäden an Waldvegetation";
-	this.lrtCodes = [9110, 9130, 9150, 9160, 9180, 9190, "91D0", "91E0", "91G0", "91T0", "91U0", 2180];
-
-
-	this.bewerte = function (b) {
-		var result = -1;
-
-		var T351 = parseInt(b.getValue("T351"));
-		console.info("BewertungWald_3_5", T351);
-		if (Number.isInteger(T351) && T351 > 0) {
-			if (T351 === 1) {
-				result = { b: 'A' };
-			} else if (T351 <= 2) {
-				result = { b: 'B' };
-			} else {
-				result = { b: 'C' };
-			}
-		}
-
-		this.result = result;
-	}
-}
-
-function BewertungWald_3_6() {
-
-	Bewertung.call(this);
-
-	this.nr = "3.6";
-	this.txt = "Beeinträchtigungen - Aufforstung von Freiflächenn";
-	this.lrtCodes = ["91T0", "91U0"];
-
-
-	this.bewerte = function (b) {
-		var result = -1;
-
-		var T361 = parseInt(b.getValue("T361_1"));
-		var T362 = parseInt(b.getValue("T361_2"));
-		console.info("BewertungWald_3_6", T361, T362);
-		if (Number.isInteger(T361) && T361 > 0 && Number.isInteger(T362) && T362 > 0) {
-			if (T361 === 1 && T362 === 1) {
-				result = { b: 'A' };
-			} else if (T361 <= 2 && T362 <= 2) {
-				result = { b: 'B' };
-			} else {
-				result = { b: 'C' };
-			}
-		}
-
-		this.result = result;
-	}
-}
-
-function BewertungWald_3_7() {
-
-	Bewertung.call(this);
-
-	this.nr = "3.7";
-	this.txt = "Beeinträchtigungen - Weitere (gutachterlich)";
-	this.lrtCodes = [9110, 9130, 9150, 9160, 9180, 9190, "91D0", "91E0", "91G0", "91T0", "91U0", 2180];
-
-
-	this.bewerte = function (b) {
-		var result = -1;
-
-		var T371 = parseInt(b.getValue("T371_2"));
-		console.info("BewertungWald_3_7", T371);
-		if (Number.isInteger(T371) && T371 > 0) {
-			if (T371 === 1) {
-				result = { b: 'A' };
-			} else if (T371 <= 2) {
-				result = { b: 'B' };
-			} else {
-				result = { b: 'C' };
-			}
-		}
-
-		this.result = result;
-	}
-
-}
-
 var bewertungenKueste = [
 	new BewertungKueste_1_1_1(),
 	new BewertungKueste_1_1_2(),
@@ -5565,23 +4878,6 @@ var bewertungenMoore = [
 	new BewertungMoore_3_2_8()
 ];
 
-var bewertungenWald = [
-	new BewertungWald_1_1(),
-	new BewertungWald_1_2(),
-	new BewertungWald_1_3(),
-	new BewertungWald_1_4(),
-	new BewertungWald_1_5(),
-	new BewertungWald_2_1(),
-	new BewertungWald_2_2(),
-	new BewertungWald_3_1(),
-	new BewertungWald_3_2(),
-	new BewertungWald_3_3(),
-	new BewertungWald_3_4(),
-	new BewertungWald_3_5(),
-	new BewertungWald_3_6(),
-	new BewertungWald_3_7(),
-];
-
 function NebenCodeRecord(code, name, percentage) {
 	this.code = code;
 	this.name = name;
@@ -5593,7 +4889,6 @@ function NebenCodeRecord(code, name, percentage) {
 }
 
 function LrtBewertung(dsBewertung, bewertungen) {
-
 
 	this.dsBewertung = dsBewertung;
 
@@ -5658,9 +4953,8 @@ function Bewertung() {
 		return this.result;
 	}
 	this.isRequired = function (b) {
-		const isRequired = this.lrtCodes.indexOf(b.lrtCode) >= 0;
-		console.info("isRequired " + this.nr + "required=" + isRequired, isRequired, b, b.lrtCode, this.lrtCodes.indexOf(b.lrtCode));
-		return isRequired;
+		;
+		return this.lrtCodes.indexOf(b.lrtCode) >= 0;
 	}
 }
 
@@ -5689,12 +4983,6 @@ function GesamtBewertung(dsBewertung) {
 	this.inputTargetUserB.readOnly = true;
 	this.inputTargetUserC.readOnly = true;
 
-	// Ausblenden der Zeile Habitatstrukturen, da bei Lrt 91D0 nicht vorhanden
-	if (dsBewertung.lrtCode === "91D0") {
-		const el = document.getElementById(dsBewertung.layerId + "_sys_habit_0_" + dsBewertung.datensatzNr);
-		el.parentElement.parentElement.style.display = 'none';
-	}
-
 
 	this.inputBemerkung = document.getElementById(dsBewertung.layerId + "_bemerkung_" + dsBewertung.datensatzNr);
 
@@ -5708,30 +4996,10 @@ function GesamtBewertung(dsBewertung) {
 
 	this.bewerte = function (b) {
 		var i, result, resultSys, resultBea, grResultSystem = [], grResultBearbeiter = [];
-
-		var bewTxt = this.gruppenBewertungen[0].getResult().b;
-		for (i = 1; i < this.gruppenBewertungen.length; i++) {
-			bewTxt += ", " + this.gruppenBewertungen[i].getResult().b;
-		}
-
-		console.info("Gesambewertung " + b.lrtCode + "  AnzGruppenBewertungen=" + this.gruppenBewertungen.length + "  bewertungen=" + bewTxt);
-
-
-		// Weil keine Habitatstruktur wird bei LRT 91D0 Arteninventar doppelt einbezogen
-		if (dsBewertung.lrtCode === "91D0") {
-			console.info("fddffdfdfd");
-			grResultSystem.push(this.gruppenBewertungen[0].getResult().b);
-			grResultBearbeiter.push(this.gruppenBewertungen[0].getUserResult().b);
-		}
-
-
 		for (i = 0; i < this.gruppenBewertungen.length; i++) {
 			grResultSystem.push(this.gruppenBewertungen[i].getResult().b);
 			grResultBearbeiter.push(this.gruppenBewertungen[i].getUserResult().b);
 		}
-
-
-
 		resultSys = getGesamtBewertung(grResultSystem);
 		if (resultSys) {
 			this.result = { b: resultSys };
@@ -5817,94 +5085,28 @@ function Gruppenbewertung(dsBewertung, grpNr) {
 	this.inputTargetA.parentNode.style.textAlign = 'center';
 	this.inputTargetUserA.parentNode.style.textAlign = 'center';
 
-	this.bewerteWald = function (b) {
-
-		var result;
-
-		const arrBewertungen = [];
-		var s = "";
-		for (i = 0; i < this.bewertungen.length; i++) {
-			if (this.bewertungen[i].bewerte) {
-				const b = this.bewertungen[i].getResult().b;
-				s += b || "?";
-			} else {
-				s += "K";
-			}
-		}
-		console.info("Gruppenbewertung.bewerteWald nr=" + this.nr + " AnzTeilBewertungen=" + this.bewertungen.length, s, this);
-
-		for (i = 0; i < this.bewertungen.length; i++) {
-			if (this.bewertungen[i].bewerte) {
-				var b = this.bewertungen[i].getResult().b;
-				if (!b) {
-					return;
-				}
-				arrBewertungen.push(this.bewertungen[i].getResult().b);
-			}
-		}
-
-
-		if (this.nr === 1) {
-			if (this.bewertungen.length === 3) {
-				result = getGesamtBewertung(arrBewertungen);
-			} else if (this.bewertungen.length === 2) {
-				var v1 = arrBewertungen[0];
-				var v2 = arrBewertungen[1];
-				result = aggrBewertung1_2(v1, v2);
-			} else if (this.bewertungen.length === 1) {
-				return arrBewertungen[0];
-			} else {
-				console.error("nicht erwartet");
-			}
-		} else if (this.nr === 2) {
-			if (arrBewertungen.length === 1) {
-				return arrBewertungen[0];
-			}
-			result = getGesamtBewertung(arrBewertungen);
-
-		} else if (this.nr === 3) {
-			var cResult = "A";
-			for (i = 0; i < arrBewertungen.length; i++) {
-				let bw = arrBewertungen[i];
-				if (bw === "C") {
-					cResult = "C";
-					break;
-				}
-				if (bw === "B" && cResult === "A") {
-					cResult = "B";
-				}
-			}
-			result = cResult;
-		}
-		return result;
-
-	}
 	this.bewerte = function (b) {
+		// console.info("Gruppenbewertung.bewerte", b);
 		var result;
 		var korrekturen = 0;
-		if (b.isWald()) {
-			result = this.bewerteWald(b);
-			console.info("hggvjgj", result)
-		} else {
-			for (var i = 0; i < this.bewertungen.length; i++) {
-				if (this.bewertungen[i].bewerte) {
-					subResult = this.bewertungen[i].getResult();
-					// console.info(this.bewertungen[i].nr+"  "+subResult);
-					if (!subResult.skiped) {
-						if (subResult.b) {
-							if (result) {
-								if (subResult.b > result) {
-									result = subResult.b;
-								}
-							}
-							else {
+		for (var i = 0; i < this.bewertungen.length; i++) {
+			if (this.bewertungen[i].bewerte) {
+				subResult = this.bewertungen[i].getResult();
+				// console.info(this.bewertungen[i].nr+"  "+subResult);
+				if (!subResult.skiped) {
+					if (subResult.b) {
+						if (result) {
+							if (subResult.b > result) {
 								result = subResult.b;
 							}
 						}
 						else {
-							result = null;
-							break;
+							result = subResult.b;
 						}
+					}
+					else {
+						result = null;
+						break;
 					}
 				}
 			}
@@ -6048,8 +5250,6 @@ function DatensatzBewertung(layerId, datensatzNr) {
 			this.bewertung = new LrtBewertung(this, bewertungenMoore);
 		} else if (this.layerId === 160) {
 			this.bewertung = new LrtBewertung(this, bewertungenOffenland);
-		} else if (this.layerId === 431) {
-			this.bewertung = new LrtBewertung(this, bewertungenWald, true);
 		} else {
 			// unknown not the right Layer
 			console.info("skip " + this.layerId);
@@ -6286,7 +5486,6 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	}
 
 	this.hide = function (className) {
-		console.error("hide", className);
 		let elems = document.getElementsByClassName(className);
 		if (elems) {
 			for (let i = 0; i < elems.length; i++) {
@@ -6322,10 +5521,6 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	}
 
 	this.createExtraColumns = function () {
-		console.error("createExtraColumns", this);
-		if (layerId == 431) {
-			// return
-		}
 		var i = 0;
 		var matches = document.body.querySelectorAll('table.tgle');
 		var dsBase = matches[this.datensatzNr];
@@ -6335,11 +5530,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 			if (s.lastIndexOf('.') > 0) {
 				s = s.substring(0, s.indexOf(' '));
 				var bewertung = this.getBewertung(s);
-				var isRequired = (bewertung && bewertung.isRequired(this));
-				if (this.isWald()) {
-					isRequired = true;
-				}
-				if (isRequired) {
+				if (bewertung && bewertung.isRequired(this)) {
 					var table01 = getParent(matches[i], "TABLE");
 					var table02 = getNextSiblingWithTag(table01, "TABLE");
 					// table02.style.tableLayout="fixed";
@@ -6363,28 +5554,24 @@ function DatensatzBewertung(layerId, datensatzNr) {
 
 						cell.style.backgroundColor = "gray";
 						cell.style.textAlign = "center";
+						cell.innerText = bewertung.nr;
 
-						if (bewertung) {
-							cell.innerText = bewertung.nr;
-
-							// bewertung.cell=cell;
-							/*
-							innerDiv.style.backgroundColor="gray";
-							innerDiv.style.textAlign="center";
-							innerDiv.rowSpan=table02.rows.length;
-							innerDiv.innerText=bewertung.nr;
-							bewertung.cell=innerDiv;
-							*/
-							bewertung.cell = cell;
-						}
+						// bewertung.cell=cell;
+						/*
+						innerDiv.style.backgroundColor="gray";
+						innerDiv.style.textAlign="center";
+						innerDiv.rowSpan=table02.rows.length;
+						innerDiv.innerText=bewertung.nr;
+						bewertung.cell=innerDiv;
+						*/
+						bewertung.cell = cell;
 					}
 					else {
 						console.error("Fehler bei \"" + s + "\"");
 					}
 				}
 				else {
-
-					if (s.length > 2 && layerId !== 1431) {
+					if (s.length > 2) {
 						let table01 = getParent(matches[i], "TABLE");
 						table01.parentNode.parentNode.style.display = "none";
 					}
@@ -6535,18 +5722,15 @@ function DatensatzBewertung(layerId, datensatzNr) {
 		}
 		var id = inputElement.id;
 
-
 		var idx = id.indexOf("_");
 		var variableName = id.substring(idx + 1);
 		idx = variableName.lastIndexOf("_");
 		variableName = variableName.substring(0, idx);
 		if (inputElement.type != "text" && inputElement.type != "textarea" && inputElement.type != "hidden" && inputElement.tagName.toLowerCase() != "select") {
 			idx = variableName.lastIndexOf("_");
-			if (idx > 0) {
-				variableName = variableName.substring(0, idx);
-			}
+			variableName = variableName.substring(0, idx);
 		}
-		console.info(inputElement.id + "  " + inputElement.type + "  " + inputElement.tagName + "  " + variableName);
+		// console.info(inputElement.id+"  "+inputElement.type+"  "+inputElement.tagName+"  "+variableName);
 		if (variableName !== 'filter') {
 			if (!this.map[variableName]) {
 				this.map[variableName] = [];
@@ -6814,12 +5998,8 @@ function DatensatzBewertung(layerId, datensatzNr) {
 		var s = this.layerId + "_lrt_code_" + this.datensatzNr;
 		var el = document.getElementById(s);
 		if (el) {
-
 			var value = document.getElementById(s).value;
-			console.log('_getLRTCode', typeof value, value);
-			var iValue = parseInt(value);
-			// ursprünglich waren die Werte nur Integer jetzt auch Text, desh. integer oder string
-			return (value == ("" + iValue)) ? iValue : value;
+			return parseInt(value);
 		}
 	}
 
@@ -6846,10 +6026,8 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	this.getFlaecheInHa = function (layerId, datensatzNr) {
 		var el = document.getElementById(this.layerId + "_flaeche_" + this.datensatzNr);
 		if (el && el.value) {
-
-			const v = el.value.replace(",", ".");
-			console.log('flaeche: %s', el.value, v, parseFloat(v));
-			return parseFloat(v);
+			console.log('flaeche: %s', el.value);
+			return parseFloat(el.value);
 		}
 		else {
 			throw new Error("Kein Wert für die Fläche.");
@@ -6863,11 +6041,6 @@ function DatensatzBewertung(layerId, datensatzNr) {
 	this.isFluss = function () {
 		return ["FFN", "FFB", "FFA"].indexOf(this.getValue("hc")) >= 0;
 	}
-
-	this.isWald = function () {
-		return this.layerId === 431;
-	}
-
 
 	this.validate = function (evt) {
 		if (this.bewertung) {

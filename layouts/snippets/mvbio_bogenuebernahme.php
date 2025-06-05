@@ -9,7 +9,6 @@
 	# Bedingung für Abbruch wurde per E-Mail angefragt bei Dirk und Stefan Goen 2021-10-14.
 
 
-
 	# Übernahme der Daten des Boges mit der ID $bogen_id in ein neues Kartierobjekt
 	# Wenn es ein Bewertungsbogen ist, wird sowohl eine Kartierung und eine Bewertung angelegt
 	# Es werden alle Felder übernommen, die passen, außer bei Bewertungen. Dabei werden
@@ -30,14 +29,16 @@
 			k.table_schema = 'mvbio' AND k.table_name = 'kartierobjekte' AND
 			k.column_name NOT IN (
 				'id',
+				'updated_at',
 				'kartierobjekt_id',
 				'kampagne',
 				'kartiergebiet_name',
-				'userid',
-				'unb'
+				'unb',
+				'lrt_objekt_id'
 			)
 	";
-	#echo '<br>SQL zum Abfragen der Spaltennamen, die übernommen werden sollen.' . $sql;
+	// echo '<br>SQL zum Abfragen der Spaltennamen, die übernommen werden sollen.' . $sql;
+
 	$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 	if ($ret['success']) {
 		$insert_columns = $select_columns = array();
@@ -63,7 +64,6 @@
 			$select_columns['user_id'] = $this->user->id;
 			$select_columns['created_from'] = "'" . $this->user->Vorname . ' ' . $this->user->Name . "'";
 			$select_columns['created_at'] = "'" . date('Y-m-d H:i:s') . "'";
-			$select_columns['bearbeitungsstufe'] = 1;
 			$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
 			$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
 			# Keine Übernahme des Datums, Anpassung S. Goen, alte Zeile:
@@ -71,13 +71,7 @@
 			$select_columns['e_datum'] = 'NULL';
 			$select_columns['l_datum'] = 'NULL';
 			$select_columns['foto'] = 0;
-			$alt_datp20 = implode('-', array_reverse(explode('.', $altbogen['l_datum'] ?: ($altbogen['e_datum'] == '01.01.1970' ? 'NULL' : $altbogen['e_datum']) ?: 'NULL')));
-			if ($alt_datp20 != 'NULL') {
-				$alt_datp20 = "'" . $alt_datp20 . "'";
-			}
-#			$select_columns['alt_datp20'] = $alt_datp20;
 			$select_columns['kartierer'] = "'" . $this->user->Vorname . ' ' . $this->user->Name . "'";
-
 
 			if (rolle::$layer_params['kartierebenenfilter'] != '') {
 				$select_columns['kartierebene_id'] = rolle::$layer_params['kartierebenenfilter'];
@@ -103,7 +97,9 @@
 					id = ' . $this->formvars['bogen_id'] . '
 				RETURNING id
 			';
-			#echo '<br>SQL zum Eintragen des Kartierobjektes' . $sql;
+			if ($this->user->id == 1) {
+				echo '<br>SQL zum Eintragen des Kartierobjektes' . $sql;
+			}
 			$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 			if ($ret['success']) {
 				$rs = pg_fetch_assoc($ret[1]);
@@ -117,7 +113,7 @@
 						" . $new_kartierobjekt_id . ", pv.species_nr, pv.valid_nr, pv.dzv, pv.fsk, pv.rl, pv.cf, pv.tax, pv.bav
 					FROM
 						archiv.erfassungsboegen eb JOIN
-						archiv.pflanzenvorkommen pv ON eb.kartierobjekt_id = pv.kartierobjekt_id
+						archiv.pflanzenvorkommen pv ON eb.bogen_id = pv.bogen_id
 					WHERE
 						eb.id = " . $this->formvars['bogen_id'] . "
 				";
@@ -134,7 +130,7 @@
 						FROM
 							archiv.biotoptypen_nebencodes nc
 						WHERE
-							nc.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
+							nc.bogen_id = " . $this->formvars['bogen_id'] . "
 					";
 					#echo '<br>SQL zum Eintragen der Nebencodes: ' . $sql;
 					$ret = $this->pgdatabase->execSQL($sql, 4, 0);
@@ -148,7 +144,7 @@
 							FROM
 								archiv.habitatvorkommen hv
 							WHERE
-								hv.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
+								hv.bogen_id = " . $this->formvars['bogen_id'] . "
 						";
 						#echo '<br>SQL zum Eintragen der Habitatvorkommen: ' . $sql;
 						$ret = $this->pgdatabase->execSQL($sql, 4, 0);
@@ -162,7 +158,7 @@
 								FROM
 									archiv.empfehlungen_massnahmen em
 								WHERE
-									em.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
+									em.bogen_id = " . $this->formvars['bogen_id'] . "
 							";
 							#echo '<br>SQL zum Eintragen des Empfehlungen und Massnahmen: ' . $sql;
 							$ret = $this->pgdatabase->execSQL($sql, 4, 0);
@@ -176,7 +172,7 @@
 									FROM
 										archiv.beeintraechtigungen_gefaehrdungen bg
 									WHERE
-										bg.kartierobjekt_id = " . $this->formvars['bogen_id'] . "
+										bg.bogen_id = " . $this->formvars['bogen_id'] . "
 								";
 								#echo '<br>SQL zum Eintragen des Beeintraechtigungen und Gefaehrdungen: ' . $sql;
 								$ret = $this->pgdatabase->execSQL($sql, 4, 0);
@@ -221,7 +217,6 @@
 														'kampagne',
 														'kartiergebiet_id',
 														'kartiergebiet_name',
-														'userid',
 														'sys_habit',
 														'sys_leben',
 														'sys_beein',
@@ -326,38 +321,4 @@
 		$this->GenerischeSuche_Suchen();
 		exit();
 	}
-/*
--- Angaben zur Erstkartierung von Kurzbögen und Kampagne 1 übernehmen an Hand einer Zuordnungstabelle
-UPDATE
-	mvbio.kartierobjekte ko
-SET
-	alt_giscod = b.alt_giscod,
-	alt_lfd_nr = b.alt_lfd_nr,
-	alt_bearb = b.alt_bearb,
-	alt_datp20 = b.alt_datp20
-FROM
-	mvbio.zuordnungstabelle z JOIN
-	archiv.grundboegen b ON z.alt_giscode = b.alt_giscode
-WHERE
-	z.label = ko.label AND
-	b.kampagne_id = 1
-
--- Und das ganze noch mal für Grundbögen
-
-UPDATE
-	mvbio.kartierobjekte ko
-SET
-	alt_giscod = b.alt_giscod,
-	alt_lfd_nr = b.alt_lfd_nr,
-	see_nr = b.see_nr,
-	alt_bearb = b.alt_bearb,
-	alt_datp20 = b.alt_datp20,
-	alt_datffh = b.alt_datffh
-FROM
-	mvbio.msommer m JOIN
-	archiv.grundboegen b ON m.alt_giscode = b.alt_giscode
-WHERE
-	m.label = ko.label AND
-	b.kampagne_id = 1
-*/
 ?>

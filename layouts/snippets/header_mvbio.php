@@ -371,6 +371,12 @@ else { ?>
 	<div style="padding: 4px; float: right; width: 30%;"><?
 		include(SNIPPETS . 'geo_name_search.php'); ?>
 	</div>
+
+	<div><? 
+		if (array_key_exists('prev_login_name', $_SESSION)) {
+			echo '<a href="index.php?go=als_voriger_Nutzer_anmelden" class="fett" style="white-space: nowrap;">zurück zum vorigen Nutzer wechseln</a>';
+		} ?>
+	</div>
 </div>
 
 <div id="sperr_div" class="sperr-div" onclick="

@@ -18,7 +18,6 @@
 				table_schema = 'mvbio' AND
 				table_name = 'kartierobjekte' AND
 				column_name NOT IN (
-					'alt_giscod',
 					'erhaltung',
 					'eu_nr', -- wird im trigger tr_60_update_eu_nr gesetzt
 					'flaeche_geom_20201113',
@@ -27,17 +26,14 @@
 					'gemeinde_id', -- wird im trigger tr_62_update_gemeinde_id gesetzt
 					'geom',
 					'geom_topo',
-					'geprueft',
 					'id', -- wird automatisch über serial gesetzt
 					'kommentar_zum_korrekturhinweis',
 					'kommentar_zum_pruefhinweis',
 					'koordinator_korrekturhinweis',
 					'koordinator_rueckweisung',
-					'korrektur',
 					'korrektur_nr',
 					'label', -- wird im trigger tr_20_lfd_nr_label gesetzt
 					'lfd_nr_kr', -- wird im trigger tr_20_lfd_nr_label gesetzt
-					'lock',
 					'lrt'
 					'pdf_document',
 					'pruefdatum',

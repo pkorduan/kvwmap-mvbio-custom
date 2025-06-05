@@ -93,7 +93,7 @@
 	function kartiergebieteDetailsFormatter(value, row) {
 		var output;
 
-				output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=122&value_kampagne_id=' + value + '&operator_kampagne_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>">ansehen</a>';
+				output = '<a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=122&value_id=' + value + '&operator_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>">ansehen</a>';
 		return output;
 	}
 </script>
@@ -123,7 +123,7 @@
 	<thead>
 		<tr>
 			<th
-				data-field="kampagne_id"
+				data-field="id"
 				data-sortable="true"
 				data-visible="true"
 				data-switchable="true"
@@ -147,25 +147,19 @@
 				data-switchable="true"
 			>Erfassungszeitraum</th>
 			<th
-				data-field="umfang"
-				data-sortable="true"
-				data-visible="true"
-				data-switchable="true"
-			>Umfang</th>
-			<th
 				data-field="datenschichten"
 				data-sortable="true"
 				data-visible="true"
 				data-switchable="true"
 			>Datenschichten</th>
 			<th
-				data-field="kampagne_id"
+				data-field="id"
 				data-visible="true"
 				data-formatter="kartiergebieteDetailsFormatter"
 				data-switchable="false"
 			>Details</th>
 			<th
-				data-field="kampagne_id"
+				data-field="id"
 				data-visible="true"
 				data-formatter="kartiergebieteFormatter"
 				data-switchable="false"

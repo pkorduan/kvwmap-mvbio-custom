@@ -3,56 +3,56 @@ SYMBOLSET
 	SYMBOL				#1
 		NAME "Wohngebaeude"
 		TYPE PIXMAP
-		IMAGE "wohngebaeude_allgemein.png"
+		IMAGE "../../symbols/wohngebaeude_allgemein.png"
 		TRANSPARENT 0
 	END
 
 	SYMBOL				#2
 		NAME "Wirtschaftsgebaeude"
 		TYPE PIXMAP
-		IMAGE "wirtschaftsgebaeude.png"
+		IMAGE "../../symbols/wirtschaftsgebaeude.png"
 		TRANSPARENT 0
 	END
 
 	SYMBOL				#3
 		NAME "Gruenanlage"
 		TYPE PIXMAP
-		IMAGE "gruenanlage.png"
+		IMAGE "../../symbols/gruenanlage.png"
 		TRANSPARENT 1
 	END
 
 	SYMBOL				#4
 		NAME "(Klein-)Garten"
 		TYPE PIXMAP
-		IMAGE "garten.png"
+		IMAGE "../../symbols/garten.png"
 		TRANSPARENT 1
 	END
 
 	SYMBOL				#5
 		NAME "Gruenland_Bild"
 		TYPE PIXMAP
-		IMAGE "gruenland.png"
+		IMAGE "../../symbols/gruenland.png"
 		TRANSPARENT 1
 	END
 
 	SYMBOL				#6
 		NAME "Gartenland (allgemein)"
 		TYPE PIXMAP
-		IMAGE "gartenland.png"
+		IMAGE "../../symbols/gartenland.png"
 		TRANSPARENT 1
 	END
 
 	SYMBOL				#7
 		NAME "Nadelwald_Bild"
 		TYPE PIXMAP
-		IMAGE "nadelwald.png"
+		IMAGE "../../symbols/nadelwald.png"
 		TRANSPARENT 1
 	END
 
 	SYMBOL				#8
 		NAME "Mischwald_Bild"
 		TYPE PIXMAP
-		IMAGE "mischwald.png"
+		IMAGE "../../symbols/mischwald.png"
 		TRANSPARENT 1
 	END
 
@@ -98,7 +98,7 @@ SYMBOLSET
 	SYMBOL				#14
 		NAME "Denkmal_Bild"
 		TYPE PIXMAP
-		IMAGE "denkmal.png"
+		IMAGE "../../symbols/denkmal.png"
 		TRANSPARENT 255
 	END
 
@@ -155,7 +155,7 @@ SYMBOLSET
 	SYMBOL				#17
 		NAME "Altlastenbilder"
 		TYPE PIXMAP
-		IMAGE "kamera.png"
+		IMAGE "../../symbols/kamera.png"
 		TRANSPARENT 255
 	END
 
@@ -180,7 +180,7 @@ SYMBOLSET
 	SYMBOL	 #19
 		NAME "diagonal-auf"
 		TYPE PIXMAP
-		IMAGE "diagonal-auf.png"
+		IMAGE "../../symbols/diagonal-auf.png"
 		TRANSPARENT 1
 	END
 
@@ -498,42 +498,42 @@ SYMBOLSET
 	SYMBOL #47
 		NAME "marker"
 		TYPE PIXMAP
-		IMAGE "marker.png"
+		IMAGE "../../symbols/marker.png"
 		TRANSPARENT 0
 	END
 
 	SYMBOL #48
 		NAME "marker-blue"
 		TYPE PIXMAP
-		IMAGE "marker-blue7.png"
+		IMAGE "../../symbols/marker-blue7.png"
 		#TRANSPARENT 11
 	END
 
 	SYMBOL #49
 		NAME "marker-blue2"
 		TYPE PIXMAP
-		IMAGE "marker-blue4.png"
+		IMAGE "../../symbols/marker-blue4.png"
 		TRANSPARENT 13
 	END
 
 	SYMBOL #50
 		NAME "marker-gold"
 		TYPE PIXMAP
-		IMAGE "marker-blue.png"
+		IMAGE "../../symbols/marker-blue.png"
 		TRANSPARENT 0
 	END
 
 	SYMBOL #51
 		NAME "marker-green"
 		TYPE PIXMAP
-		IMAGE "marker-green.png"
+		IMAGE "../../symbols/marker-green.png"
 		TRANSPARENT 0
 	END
 
 	SYMBOL #52
 		NAME "townhall"
 		TYPE PIXMAP
-		IMAGE "town_hall.png"
+		IMAGE "../../symbols/town_hall.png"
 		TRANSPARENT 0
 	END
 
@@ -549,7 +549,7 @@ SYMBOLSET
 	SYMBOL #54
 		NAME "kreuz_gefaellt"
 		TYPE PIXMAP
-		IMAGE "kreuz_gefaellt.png"
+		IMAGE "../../symbols/kreuz_gefaellt.png"
 		TRANSPARENT 1
 	END
 
@@ -586,7 +586,7 @@ SYMBOLSET
 	SYMBOL #57
 		NAME "hecke"
 		TYPE PIXMAP
-		IMAGE "hecke.png"
+		IMAGE "../../symbols/hecke.png"
 		TRANSPARENT 1
 	END
 

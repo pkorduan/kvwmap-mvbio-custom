@@ -7,13 +7,14 @@
 		  archiv.erfassungsboegen eb
 		  JOIN archiv.kampagnen kk ON eb.kampagne_id = kk.id
 		  JOIN mvbio.bogenarten ba ON eb.bogenart_id = ba.id
-		  LEFT JOIN archiv.bewertungsboegen bb ON eb.id = bb.id
+		  LEFT JOIN archiv.grundboegen gb ON eb.id = gb.id
+			LEFT JOIN mvbio.lrt_gruppen lrg ON lrg.id = gb.lrt_gr::integer
 		  LEFT JOIN mvbio.layer l ON l.name = 'Archiv '
 		  || kk.layer_kuerzel
 		  || ' '
 		  || CASE
 		    WHEN eb.bogenart_id = 4
-			  THEN bb.lrt_gr_tex
+			  THEN lrg.bezeichnung
 			  ELSE ba.layer_name_part
 		  END
 		WHERE

@@ -1,7 +1,8 @@
 <?php
 include_once(CLASSPATH . 'PgObject.php');
 $kampagne = new PgObject($this, 'mvbio', 'kampagnen');
-if ($this->go == 'Stelle_waehlen' OR in_array($this->user->id, array(1, 47))) {
+$only_for_admins = in_array($this->user->id, array(1, 8, 47, 237));
+if ($this->go == 'Stelle_waehlen' OR $only_for_admins) {
 	$kartiergebiet = new PgObject($this, 'mvbio', 'kartiergebiete');
 	$kartierebene = new PgObject($this, 'mvbio', 'kartierebenen2kampagne');
 	$bogenart = new PgObject($this, 'mvbio', 'bogenarten2kartierebenen');
@@ -190,7 +191,7 @@ else { ?>
 	height: 100%;
 	background: linear-gradient(<? echo BG_GLEATTRIBUTE; ?> 0%, <? echo BG_DEFAULT ?> 100%);
 "><?
-	$title_width = (in_array($this->user->id, array(1, 47)) ? '203px' : '54%'); ?>
+	$title_width = ($only_for_admins ? '203px' : '54%'); ?>
 	<div style="padding: 6px; float: left; width: <? echo $title_width; ?>; text-align: left;"><?
 		$params = $this->user->rolle->get_layer_params($this->Stelle->selectable_layer_params, $this->pgdatabase);
 		$title = array();
@@ -234,7 +235,7 @@ else { ?>
 			echo $this->Stelle->Bezeichnung . (rolle::$layer_params['umgebung'] == 'Test' ? ' <span style="color: red">Testumgebung</span>' : '') . ' ' . implode(', ', $title); ?>
 		</span>
 	</div><?
-	if (in_array($this->user->id, array(1, 47))) { ?>
+	if ($only_for_admins) { ?>
 		<div style="float: left; margin-top: 6px;"><?
 			include(WWWROOT . APPLVERSION . CUSTOM_PATH . 'layouts/snippets/params_mvbio.php'); ?>
 		</div><?
@@ -268,7 +269,7 @@ else { ?>
 			<div class="options-devider"></div>
 			<div
 				class="user-option"
-				onclick="window.location.href='index.php?go=Stelle_waehlen&show_layer_parameter=<? echo (in_array($this->user->id, array(1, 47)) ? '0' : '1');?>&hide_stellenwahl=1&csrf_token=<? echo $_SESSION['csrf_token']; ?>'"
+				onclick="window.location.href='index.php?go=Stelle_waehlen&show_layer_parameter=<? echo ($only_for_admins ? '0' : '1');?>&hide_stellenwahl=1&csrf_token=<? echo $_SESSION['csrf_token']; ?>'"
 			><i class="fa fa-ellipsis-v options-button"></i>Einstellungen</div>
 		<div class="options-devider"></div>
 		<div

@@ -1,10 +1,13 @@
+function sort_archivkartiergebiete(e, kampagne_id = null) {
+  window.location.href = `index.php?go=show_snippet&snippet=mvbio_archivierung&action=show_kartiergebiete&kampagne_id=${kampagne_id}&order=${e.dataset.order}&direction=${e.dataset.direction}&csrf_token=${csrf_token}`;
+}
+
 async function create_archivkartiergebiet(e) {
   const kgId = e.dataset.kg_id;
   const kgBezeichnung = e.dataset.kg_bezeichnung;
   const kgLosnummer = e.dataset.kg_losnummer;
   const kgBemerkungen = e.dataset.kg_bemerkungen;
   const akId = e.dataset.ak_id;
-  console.log('Creating archive kartiergebiet von mvbio_kartiergebiet_id: %s in archivekampagne_id: %s', kgId, akId);
 
   // ToDo: Request custom bezeichnung, losnummer and bemerkung of archivkartiergebiet in one single form
   const akg_bezeichnung = prompt("Bezeichnung des Kartiergebietes im Archiv", kgBezeichnung);
@@ -33,9 +36,10 @@ async function create_archivkartiergebiet(e) {
       throw new Error(`Response status: ${response.status}`);
     }
     const json = await response.json();
-    console.log(json);
+    // console.log(json);
     if (json.success) {
       const akg = json.data;
+      console.log('Archivkartiergebiet created: ', akg);
       // Add new created archivkartiergebiet to all archiv select lists 
       document.querySelectorAll(`.archivkartiergebiete-select[data-ak_id="${akId}"]`).forEach(function(selectField) {
         const option = document.createElement('option');
@@ -97,13 +101,22 @@ async function undo_archivkartiergebiet(e) {
       throw new Error(`Response status: ${response.status}`);
     }
     const json = await response.json();
-    // console.log(json);
+    console.log(json);
     if (json.success) {
       document.getElementById(`undo_archivkartiergebiet_div_${kgId}_${akId}`).style.display = 'none';
       document.getElementById(`selected_archivkartiergebiet_div_${kgId}_${akId}`).style.display = 'none';
       document.getElementById(`archivkartiergebiete_${kgId}_${akId}`).value = '';
+      if (json.deleted_archivkartiergebiet_id) {
+        document.querySelectorAll(`.archivkartiergebiete-select[data-ak_id="${akId}"]`).forEach(function(selectField) {
+          const option = selectField.querySelector(`option[value="${json.deleted_archivkartiergebiet_id}"]`);
+          if (option) {
+            option.remove();
+          }
+        });
+      }
       document.getElementById(`select_archivkartiergebiet_div_${kgId}_${akId}`).style.display = 'inline-block';
       document.getElementById(`create_archivkartiergebiet_div_${kgId}_${akId}`).style.display = 'inline-block';
+
       message([{'type': 'notice', 'msg': json.msg}]);
     } else {
       message([{'type': 'error', 'msg': json.msg}]);

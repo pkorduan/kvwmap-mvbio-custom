@@ -25,8 +25,6 @@
 				'id',
 				'kartierobjekt_id',
 				'updated_at',
-				'kampagne',
-				'kartiergebiet_name',
 				'unb',
 				'hc',
 				'hcp',

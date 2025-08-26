@@ -441,6 +441,7 @@ function BewertungFliessgewaesser_2_2() {
 	this.lrtCodes = [3260, 3270];
 
 	this.getKorrekturWert = function () {
+		console.info("BewertungFliessgewaesser_2_2.getKorrekturWert: " + this.korrekturWert);
 		return this.korrekturWert;
 	}
 
@@ -460,6 +461,7 @@ function BewertungFliessgewaesser_2_2() {
 			korrekturWert = 0;
 		}
 		this.korrekturWert = korrekturWert;
+		console.info("BewertungFliessgewaesser_2_2.berechneKorrekturWert: " + this.korrekturWert);
 	}
 }
 
@@ -1303,7 +1305,7 @@ function BewertungStillgewaesser_2_1_2() {
 		if (lrtCode === 3140) {
 			if (
 				(UC1 === "USG" && T212_2 >= 10) ||
-				(["USW", "USS", "USL", "USB", "USK"].indexOf(UC1) >= 0 && T212_2 >= 4) ||
+				(["USW", "USS", "USL", "USB", "USK", "USC"].indexOf(UC1) >= 0 && T212_2 >= 4) ||
 				(UC1 === "UST" && T212_2 >= 3) ||
 				(UC1 === "USP" && T212_2 >= 2)
 			) {
@@ -1311,7 +1313,7 @@ function BewertungStillgewaesser_2_1_2() {
 			}
 			else if (
 				(UC1 === "USG" && T212_2 >= 5) ||
-				(["USW", "USS", "USL", "USB", "USK"].indexOf(UC1) >= 0 && T212_2 >= 3) ||
+				(["USW", "USS", "USL", "USB", "USK", "USC"].indexOf(UC1) >= 0 && T212_2 >= 3) ||
 				(UC1 === "UST" && T212_2 === 2) ||
 				(UC1 === "USP" && T212_2 === 1)
 			) {
@@ -1319,7 +1321,7 @@ function BewertungStillgewaesser_2_1_2() {
 			}
 			else if (
 				(UC1 === "USG" && T212_2 < 5) ||
-				(["USW", "USS", "USL", "USB", "USK"].indexOf(UC1) >= 0 && T212_2 < 3) ||
+				(["USW", "USS", "USL", "USB", "USK", "USC"].indexOf(UC1) >= 0 && T212_2 < 3) ||
 				(UC1 === "UST" && T212_2 < 2) ||
 				(UC1 === "USP" && T212_2 < 1)
 			) {
@@ -1389,6 +1391,84 @@ function BewertungStillgewaesser_2_2_a() {
 	}
 }
 
+function BewertungStillgewaesser_3_1_1() {
+
+	Bewertung.call(this);
+
+	this.nr = "3.1.1";
+
+	this.varA = new BewertungStillgewaesser_3_1_1_a();
+	this.varB = new BewertungStillgewaesser_3_1_1_b();
+
+	this.prepareHTML = function (b) {
+		this.isSeeGr50ha = b.seeGr50ha();
+		if (this.isSeeGr50ha) {
+			console.info("BewertungStillgewaesser_3_1_1.prepareHTML Variante A");
+			this.showVarA(b);
+		} else {
+			console.info("BewertungStillgewaesser_3_1_1.prepareHTML Variante B");
+			this.showVarB(b);
+		}
+		const chBox = document.getElementById(b.layerId + "_see_gr_50ha_0");
+		chBox.addEventListener("change", () => {
+			if (chBox.checked) {
+				this.isSeeGr50ha = true;
+				this.showVarA(b);
+			} else {
+				this.isSeeGr50ha = false;
+				this.showVarB(b);
+			}
+		});
+	};
+
+	this.showVarA = function (b) {
+		console.info("BewertungStillgewaesser_3_1_1.showVarA");
+		b.setVisibiltyOfBlock("3.1.1 a", true);
+		b.setVisibiltyOfBlock("3.1.1 b", false);
+		this.bewerte = this.varA.bewerte;
+		this.berechneKorrekturWert = null;
+		this.getKorrekturWert = null;
+	};
+	this.showVarB = function (b) {
+		console.info("BewertungStillgewaesser_3_1_1.showVarB");
+		b.setVisibiltyOfBlock("3.1.1 b", true);
+		b.setVisibiltyOfBlock("3.1.1 a", false);
+		this.bewerte = null;
+		this.berechneKorrekturWert = this.varB.berechneKorrekturWert;
+		this.getKorrekturWert = this.varB.getKorrekturWert;
+	};
+
+	/*
+	this.bewerte = function (b) {
+		if (b.seeGr50ha()) {
+			this.varA.bewerte(b);
+		}
+	}
+
+	this.berechneKorrekturWert = function (b) {
+		if (!b.seeGr50ha()) {
+			this.varB.berechneKorrekturWert(b);
+		}
+	}
+
+	this.getKorrekturWert = function (b) {
+		if (this.isSeeGr50ha) {
+			return this.varB.korrekturWert;
+		} else {
+			return 0;
+		}
+	}
+	*/
+
+	this.isRequired = function (b) {
+		const isRequired = this.varA.isRequired(b) || this.varB.isRequired(b);
+		console.info("!!!!!!!!!isReq = " + isRequired);
+		console.info("isRequired " + this.nr + "required=" + isRequired);
+		return isRequired;
+	}
+
+}
+
 function BewertungStillgewaesser_3_1_1_a() {
 	Bewertung.call(this);
 
@@ -1420,7 +1500,7 @@ function BewertungStillgewaesser_3_1_1_a() {
 	}
 }
 
-function BewertungStillgewaesser_3_1_2b() {
+function BewertungStillgewaesser_3_1_1_b() {
 
 	Bewertung.call(this);
 
@@ -2098,8 +2178,8 @@ function BewertungOffenland_2_1_1() {
 					result = { b: 'A' };
 				} else if (T211_1_1 >= 3 && T211_1_2 >= 2) {
 					result = { b: 'B' };
-				} else if (T211_1_2 >= 1) {
-					result = { b: 'C' };
+				} else if (T211_1_1 >= 1 && T211_1_2 >= 0) {
+					result = { b: 'C' }; //Abweichung zur BWA ( >=1 bes. char. Art)
 				}
 			}
 		} else if (lrtCode === 4030) {
@@ -2142,8 +2222,8 @@ function BewertungOffenland_2_1_1() {
 					result = { b: 'A' };
 				} else if (T211_1_1 >= 5 && T211_1_2 >= 2) {
 					result = { b: 'B' };
-				} else if (T211_1_2 >= 1) {
-					result = { b: 'C' };
+				} else if (T211_1_1 >= 1 && T211_1_2 >= 0) {
+					result = { b: 'C' }; //Abweichung zur BWA ( >=1 bes. char. Art)
 				}
 			}
 		} else if (lrtCode === 6230) {
@@ -5515,8 +5595,9 @@ var bewertungenStillgewaesser = [
 	new BewertungStillgewaesser_2_1_2(),
 	new BewertungStillgewaesser_2_2(),
 	new BewertungStillgewaesser_2_2_a(),
-	new BewertungStillgewaesser_3_1_1_a(),
-	new BewertungStillgewaesser_3_1_2b(),
+	new BewertungStillgewaesser_3_1_1(),
+	// new BewertungStillgewaesser_3_1_1_a(),
+	// new BewertungStillgewaesser_3_1_2b(),
 	new BewertungStillgewaesser_3_1_2(),
 	new BewertungStillgewaesser_3_1_3(),
 	new BewertungStillgewaesser_3_1_5(),
@@ -5659,7 +5740,7 @@ function Bewertung() {
 	}
 	this.isRequired = function (b) {
 		const isRequired = this.lrtCodes.indexOf(b.lrtCode) >= 0;
-		console.info("isRequired " + this.nr + "required=" + isRequired, isRequired, b, b.lrtCode, this.lrtCodes.indexOf(b.lrtCode));
+		console.error("isRequired " + this.nr + "required=" + isRequired, isRequired, b, b.lrtCode, this.lrtCodes.indexOf(b.lrtCode));
 		return isRequired;
 	}
 }
@@ -5797,6 +5878,7 @@ function Gruppenbewertung(dsBewertung, grpNr) {
 	Bewertung.call(this);
 
 	this.nr = grpNr;
+	this.teilBewertungen = [];
 	this.bewertungen = [];
 	this.korrekturen = [];
 
@@ -5886,6 +5968,16 @@ function Gruppenbewertung(dsBewertung, grpNr) {
 			result = this.bewerteWald(b);
 			console.info("hggvjgj", result)
 		} else {
+			this.bewertungen = [];
+			this.korrekturen = [];
+			for (var i = 0; i < this.teilBewertungen.length; i++) {
+				if (this.teilBewertungen[i].bewerte) {
+					this.bewertungen.push(this.teilBewertungen[i]);
+				}
+				if (this.teilBewertungen[i].getKorrekturWert) {
+					this.korrekturen.push(this.teilBewertungen[i]);
+				}
+			}
 			for (var i = 0; i < this.bewertungen.length; i++) {
 				if (this.bewertungen[i].bewerte) {
 					subResult = this.bewertungen[i].getResult();
@@ -6002,7 +6094,10 @@ function Gruppenbewertung(dsBewertung, grpNr) {
 	}
 
 
+
+
 	this.addBewertung = function (bewertung) {
+		this.teilBewertungen.push(bewertung);
 		if (bewertung.bewerte) {
 			this.bewertungen.push(bewertung);
 		}
@@ -6040,6 +6135,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 		this.lrtCode = this._getLRTCode();
 		if (this.layerId === 144) {
 			this.bewertung = new LrtBewertung(this, bewertungenStillgewaesser);
+			this.addListener50ha();
 		} else if (this.layerId === 145) {
 			this.bewertung = new LrtBewertung(this, bewertungenFliessgewaesser);
 		} else if (this.layerId === 156) {
@@ -6321,6 +6417,24 @@ function DatensatzBewertung(layerId, datensatzNr) {
 		}
 	}
 
+	this.setVisibiltyOfBlock = function (s, visible) {
+		var i = 0;
+		var matches = document.body.querySelectorAll('table.tgle');
+		var dsBase = matches[this.datensatzNr];
+		matches = dsBase.querySelectorAll('span.fett');
+		for (i = 0; i < matches.length; i++) {
+			if (matches[i].innerText.indexOf(s) === 0) {
+				let table01 = getParent(matches[i], "TABLE");
+				if (visible) {
+					table01.parentNode.parentNode.style.display = "";
+				} else {
+					table01.parentNode.parentNode.style.display = "none";
+				}
+				return;
+			}
+		}
+	}
+
 	this.createExtraColumns = function () {
 		console.error("createExtraColumns", this);
 		if (layerId == 431) {
@@ -6414,6 +6528,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 
 	this.bewerte = function () {
 		console.info(`bewerte ${this.layerId} Datensatz=${this.datensatzNr}`, this.habitate, this.nebencodes, this.gefcodes);
+		if (arguments && arguments[0] && arguments[0].target && arguments[0].target.id && arguments[0].target.id === '144_see_gr_50ha_0') { return; }
 		var s = "", value;
 
 		if (!this.habitate) {
@@ -6448,7 +6563,7 @@ function DatensatzBewertung(layerId, datensatzNr) {
 
 			for (var i = 0; i < bewertungen.length; i++) {
 				var bewertung = bewertungen[i];
-
+				console.info(bewertung.nr);
 				try {
 					if (bewertung.bewerte) {
 						var nr = bewertung.nr;
@@ -6821,6 +6936,13 @@ function DatensatzBewertung(layerId, datensatzNr) {
 			// ursprünglich waren die Werte nur Integer jetzt auch Text, desh. integer oder string
 			return (value == ("" + iValue)) ? iValue : value;
 		}
+	}
+
+	this.addListener50ha = function () {
+		var el_gr_50ha = document.getElementById(this.layerId + "_see_gr_50ha_0");
+		el_gr_50ha.addEventListener("change", () => {
+			console.info("50ha changed " + el_gr_50ha.checked, el_gr_50ha);
+		});
 	}
 
 	this.seeGr50ha = function () {

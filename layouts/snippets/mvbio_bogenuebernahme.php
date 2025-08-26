@@ -29,6 +29,7 @@
 			k.table_schema = 'mvbio' AND k.table_name = 'kartierobjekte' AND
 			k.column_name NOT IN (
 				'id',
+				'created_from',
 				'updated_at',
 				'kartierobjekt_id',
 				'kampagne',

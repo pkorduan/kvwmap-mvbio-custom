@@ -393,7 +393,8 @@
 							data-sortable="true"
 							data-visible="<? echo ((!array_key_exists('hc', $rolle_attribute_settings) OR $rolle_attribute_settings['hc']['switched_on'] == 1) ? 'true': 'false'); ?>"
 							data-switchable="true"
-							data-filter-control="select"
+							data-filter-control="input"
+							data-filter-order-by="asc"
 						>Hauptcode</th>
 						<th
 							data-field="lrt_info_code"
@@ -411,6 +412,13 @@
 							data-width="40px"
 							data-filter-control="input"
 						>Biotopname</th>
+						<th
+							data-field="anz_habitatvorkommen"
+							data-sortable="true"
+							data-visible="<? echo ((!array_key_exists('anz_habitatvorkommen', $rolle_attribute_settings) OR $rolle_attribute_settings['anz_habitatvorkommen']['switched_on'] == 1) ? 'true': 'false'); ?>"
+							data-switchable="true"
+							data-filter-control="input"
+						>Habitate</th>
 						<th
 							data-field="koordinator_rueckweisung"
 							data-sortable="true"

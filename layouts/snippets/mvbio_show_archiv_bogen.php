@@ -27,6 +27,6 @@
 	$this->formvars['go'] = 'Layer-Suche_Suchen';
 	$this->formvars['operator_bogen_id'] = '=';
 	$this->formvars['value_bogen_id'] = $this->formvars['bogen_id'];
+	$this->formvars['only_main'] = true;
 	$this->GenerischeSuche_Suchen();
-	$this->only_main = 1;
 ?>

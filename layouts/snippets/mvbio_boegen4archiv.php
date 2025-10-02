@@ -1,6 +1,6 @@
 <? include_once(CLASSPATH . 'FormObject.php'); ?>
 <script src="<? echo CUSTOM_PATH; ?>layouts/snippets/mvbio_boegen4archiv.js"></script>
-<h2 style="margin: 10px">Archivierung von Kartier- und Verlustobjekten</h2>
+<h2 style="margin: 10px">Archivierung von <? echo $kartierebene->get('bogenarten'); ?></h2>
 <div style="
 	margin-bottom: 10px;
 	line-height: 21px;
@@ -65,9 +65,15 @@
 	<br>
 	<br>
 	<div class="assigned-div" style="display: <? echo ($num_archived_boegen == 0 ? "block" : "none"); ?>">
-		Gesamtzahl der zur Archivierung zugeordneten Bögen: <span id="num_assigned_boegen"><? echo $num_assigned_boegen; ?></span><br>
-		Archivbögen nach Übernahme gleich aktiv setzen? <input id="set_active" type="checkbox" name="set_active" style="vertical-align: text-top"> <span data-tooltip="Wenn die Option gewählt wird, werden alle existierenden Bögen im Archiv, die sich innerhalb des Archivkartiergebietes befinden auf unaktuell gesetzt und die neuen Bögen auf aktuell." style="vertical-align: -2px"></span><br>
-		Prüfer <? echo FormObject::createSelectField(
+		Gesamtzahl der zur Archivierung zugeordneten Bögen: <span id="num_assigned_boegen"><? echo $num_assigned_boegen; ?></span><?php
+		if (count(array_filter($bogenarten, function($bogenart) { return $bogenart->get('id') == 5; })) > 0) {
+			// Wenn Grünlandbögen dabei sind, set_active checkbox verstecken und nicht einstellbar machen ?>
+			<input id="set_active" type="hidden" name="set_active" value=""/><?php
+		}
+		else { ?>
+			<br>Archivbögen nach Übernahme gleich aktiv setzen? <input id="set_active" type="checkbox" name="set_active" style="vertical-align: text-top"> <span data-tooltip="Wenn die Option gewählt wird, werden alle existierenden Bögen im Archiv, die sich innerhalb des Archivkartiergebietes befinden auf unaktuell gesetzt und die neuen Bögen auf aktuell." style="vertical-align: -2px"></span><?
+		} ?>
+		<br>Prüfer <? echo FormObject::createSelectField(
 			'pruefer',
 			array_map(
 				function($user) {

@@ -99,7 +99,7 @@
 				RETURNING id
 			';
 			if ($this->user->id == 1) {
-				echo '<br>SQL zum Eintragen des Kartierobjektes' . $sql;
+				// echo '<br>SQL zum Eintragen des Kartierobjektes' . $sql;
 			}
 			$ret = $this->pgdatabase->execSQL($sql, 4, 0);
 			if ($ret['success']) {

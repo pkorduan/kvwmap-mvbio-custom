@@ -30,7 +30,7 @@
 				'hcp',
 				'uc1',
 				'uc2',
-				'beschreibg',
+				'beschreibung',
 				'vegeinheit',
 				'giscode',
 				'eu_nr'

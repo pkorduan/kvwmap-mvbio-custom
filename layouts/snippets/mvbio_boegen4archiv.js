@@ -159,42 +159,42 @@ async function undo_archiv_boegen(e) {
   }
 }
 
-async function undo_archiv_boegen_einzeln_nach_bogenart(e) {
-  const akgId = document.getElementById('archivkartiergebiet_id').value;
-  const bogenartId = e.dataset.bogenart_id;
-  const url = 'index.php?';
-  const params = {
-    go: 'show_snippet',
-    snippet: 'mvbio_archivierung',
-    action: `undo_archiv_boegen`,
-    archivkartiergebiet_id: akgId,
-    bogenart_id: bogenartId,
-    only_main : 1,
-    csrf_token: csrf_token
-  };
+// async function undo_archiv_boegen_einzeln_nach_bogenart(e) {
+//   const akgId = document.getElementById('archivkartiergebiet_id').value;
+//   const bogenartId = e.dataset.bogenart_id;
+//   const url = 'index.php?';
+//   const params = {
+//     go: 'show_snippet',
+//     snippet: 'mvbio_archivierung',
+//     action: `undo_archiv_boegen`,
+//     archivkartiergebiet_id: akgId,
+//     bogenart_id: bogenartId,
+//     only_main : 1,
+//     csrf_token: csrf_token
+//   };
 
-  console.log('url: ', url + new URLSearchParams(params).toString());
-  try {
-    document.getElementById('waitingdiv').style.display = 'inline-block';
-    const response = await fetch(url + new URLSearchParams(params).toString());
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
-    }
-    const json = await response.json();
-    // console.log(json);
-    if (json.success) {
-      // Anzeige der zu archivierenden Kurzbögen auf nicht sichtbar setzen.
-      document.getElementById(`num_assigned_boegen_${bogenartId}`).innerHTML = json.num_assigned_boegen;
-      document.getElementById(`assigned-div_${bogenartId}`).style.display = 'block';
-      document.getElementById(`archived-div_${bogenartId}`).style.display = 'none';
-      message([{ 'type': 'info', 'msg': json.msg }]);
-    } else {
-      message([{ 'type': 'error', 'msg': json.msg }]);
-      console.error(json.msg);
-    }
-    document.getElementById('waitingdiv').style.display = 'none';
-  } catch (error) {
-    message([{ 'type' : 'error', 'msg': error.message }]);
-    console.error(error.message);
-  }
-}
+//   console.log('url: ', url + new URLSearchParams(params).toString());
+//   try {
+//     document.getElementById('waitingdiv').style.display = 'inline-block';
+//     const response = await fetch(url + new URLSearchParams(params).toString());
+//     if (!response.ok) {
+//       throw new Error(`Response status: ${response.status}`);
+//     }
+//     const json = await response.json();
+//     // console.log(json);
+//     if (json.success) {
+//       // Anzeige der zu archivierenden Kurzbögen auf nicht sichtbar setzen.
+//       document.getElementById(`num_assigned_boegen_${bogenartId}`).innerHTML = json.num_assigned_boegen;
+//       document.getElementById(`assigned-div_${bogenartId}`).style.display = 'block';
+//       document.getElementById(`archived-div_${bogenartId}`).style.display = 'none';
+//       message([{ 'type': 'info', 'msg': json.msg }]);
+//     } else {
+//       message([{ 'type': 'error', 'msg': json.msg }]);
+//       console.error(json.msg);
+//     }
+//     document.getElementById('waitingdiv').style.display = 'none';
+//   } catch (error) {
+//     message([{ 'type' : 'error', 'msg': error.message }]);
+//     console.error(error.message);
+//   }
+// }

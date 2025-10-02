@@ -6130,6 +6130,12 @@ function DatensatzBewertung(layerId, datensatzNr) {
 
 	this.start = function () {
 		console.info("start layerId=" + this.layerId + " datensatzNr=" + this.datensatzNr, this);
+
+		// if (this.lrtCode === 1330) {
+		// 	alert("1330 disabled")
+		// 	return
+		// }
+
 		if (this.layerId === 109) {
 		}
 		this.lrtCode = this._getLRTCode();
@@ -6245,6 +6251,11 @@ function DatensatzBewertung(layerId, datensatzNr) {
 		}
 
 		this.printHTML();
+		if (this.lrtCode === 1330) {
+			alert("Bitte beachten Sie:\nSind die Anzahlen der Pflanzenarten (2.1.1) nicht korrekt berechnet, wählen Sie die korrekte West/Ost-Lage und speichern Sie bitte das Formular, um die Pflanzenarten neu zuberechnen." +
+				"\nBitte speichern Sie das Formular auch erstmal jedes Mal, wenn Sie die West/Ost-Lage ändern."
+			);
+		}
 
 	}
 

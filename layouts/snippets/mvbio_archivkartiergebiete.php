@@ -18,12 +18,11 @@
       <th>Losnummer<br><i class="fa fa-caret-up" aria-hidden="true" data-order="losnummer" data-direction="ASC" onclick="sort_archivkartiergebiete(this, <? echo $kk->get_id(); ?>)"></i><i class="fa fa-caret-down" aria-hidden="true" data-order="losnummer" data-direction="DESC" onclick="sort_archivkartiergebiete(this, <? echo $kk->get_id(); ?>)"></i></th>
       <th>Kartiergebiet<br><i class="fa fa-caret-up" aria-hidden="true" data-order="bezeichnung" data-direction="ASC" onclick="sort_archivkartiergebiete(this, <? echo $kk->get_id(); ?>)"></i><i class="fa fa-caret-down" aria-hidden="true" data-order="bezeichnung" data-direction="DESC" onclick="sort_archivkartiergebiete(this, <? echo $kk->get_id(); ?>)"></i></th><?php
       foreach ($kk->archivkampagnen as $archivkampagne) { ?>
-        <th><?php echo $archivkampagne->get('bezeichnung') . ' (' . $archivkampagne->get('abk') . ')'; ?></th><?php
+        <th><?php echo $archivkampagne->get('bezeichnung') . ' (' . $archivkampagne->get('abk') . ')'; ?><!--br><i class="fa fa-caret-up" aria-hidden="true" data-order="<? echo $archivkampagne->get('abk'); ?>" data-direction="ASC" onclick="sort_archivkartiergebiete(this, <? echo $archivkampagne->get_id(); ?>)"></i><i class="fa fa-caret-down" aria-hidden="true" data-order="<? echo $archivkampagne->get('abk'); ?>" data-direction="DESC" onclick="sort_archivkartiergebiete(this, <? echo $archivkampagne->get_id(); ?>)"></i//--></th><?php
       } ?>
     </tr>
   </thead>
   <tbody><?php
-
     foreach ($kk->kartiergebiete as $kg) { ?>
       <tr>
         <td><a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=302&value_kartiergebiet_id=<? echo $kg->get_id(); ?>&operator_kartiergebiet_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>" title="Kartiergebiet anzeigen"><?php echo $kg->get('id'); ?></a></td>
@@ -34,9 +33,11 @@
             <td><?
               $assigned_archivkartiergebiet = $kg->assigned_archivkartiergebiet[$archivkampagne->get_id()];
               if ($assigned_archivkartiergebiet AND $assigned_archivkartiergebiet->is_archiviert) {
+                // Kartiergebiet ist in dieser Archivkampagne bereits archiviert
                 echo '<span style="color: green; font-weight: bold">Bereits archiviert in Archivkartiergebiet ' . $assigned_archivkartiergebiet->get('bezeichnung') . ' (ID: <a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=' . KARTIERGEBIETE_TEMPLATE_LAYER_ID . '&value_kartiergebiet_id=' . $assigned_archivkartiergebiet->get_id() . '&operator_kartiergebiet_id==&csrf_token=' . $_SESSION['csrf_token'] . '">' . $assigned_archivkartiergebiet->get_id() . '</a>)</span><br>';
               }
               else {
+                // Kartiergebiet ist in dieser Archivkampagne noch nicht archiviert
                 // echo 'archivkampagne_id: ' . $archivkampagne->get_id() . '<br>';
                 // echo 'Num Kurzbögen: ' . $kg->sum_kartierobjekte->get('kurzboegen') . ' Grundbögen: ' . $kg->sum_kartierobjekte->get('grundboegen') . ' Grünlandbögen: ' . $kg->sum_kartierobjekte->get('gruenlandboegen') . '<br>';
                 $unarchived_boegen = get_unarchived_boegen($this, $kg, $archivkampagne);
@@ -89,7 +90,7 @@ function archivkartiergebietauswahl($kg, $archivkampagne) {
       },
       array_filter($archivkampagne->archivkartiergebiete, function($archivkartiergebiet) { return !$archivkartiergebiet->is_archiviert; })
     ), // options
-    $assigned_archivkartiergebiet ? $assigned_archivkartiergebiet->get_id() : null, // ,
+    $assigned_archivkartiergebiet ? $assigned_archivkartiergebiet->get_id() : null, // value
     1, // size
     'margin-top: 5px; width: 250px; margin-right: 10px;', // style
     'change_archivkartiergebiet(this)', // onchange
@@ -107,6 +108,7 @@ function archivkartiergebietauswahl($kg, $archivkampagne) {
       'ak_id' => $archivkampagne->get_id()
     ) // data attributes
   );
+
   $html .= '<span data-tooltip="Zuordnung zum Kartiergebiet in der Archivkampagne oder Kartiergebiet als neues Kartiergebiet in dieser Kampagne anlegen."></span>';
   $html .= '</div>';
 

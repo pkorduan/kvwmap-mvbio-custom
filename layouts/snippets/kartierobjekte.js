@@ -84,7 +84,7 @@ function DatensatzValidator(layerId, datensatzNr) {
 	}
 
 	this.start = function () {
-		//console.info('getValue for label');
+		console.info('getValue for label');
 		label = this.getValue("label");
 		if (!label || label.length === 0) {
 			// console.info("new record");
@@ -92,10 +92,11 @@ function DatensatzValidator(layerId, datensatzNr) {
 		}
 		else {
 			// console.info("not new record");
-			// console.info(this.layerId + "_kampagne_id_" + datensatzNr);
+			console.info(this.layerId + "_kampagne_id_" + datensatzNr);
 			this.disableDropbox(document.getElementById(this.layerId + "_kampagne_id_" + datensatzNr));
 			this.disableDropbox(document.getElementById(this.layerId + "_kartierebene_id_" + datensatzNr));
 
+			console.info(this.layerId + "_kartiergebiet_id_" + datensatzNr);
 			this.disableDropbox(document.getElementById(this.layerId + "_kartiergebiet_id_" + datensatzNr));
 			this.disableDropbox(document.getElementById(this.layerId + "_bogenart_id_" + datensatzNr));
 

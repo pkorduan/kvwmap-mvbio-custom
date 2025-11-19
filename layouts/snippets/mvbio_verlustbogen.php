@@ -54,6 +54,7 @@
 		$select_columns['created_from'] = quote($this->user->Vorname . ' ' . $this->user->Name);
 		$select_columns['kampagne_id'] = (rolle::$layer_params['kampagne_id'] == '' ? 0 : rolle::$layer_params['kampagne_id']);
 		$select_columns['kartiergebiet_id'] = (rolle::$layer_params['kartiergebietfilter'] == '' ? 0 : rolle::$layer_params['kartiergebietfilter']);
+		$select_columns['kartierebene_id'] = (rolle::$layer_params['kartierebenenfilter'] == '' ? 0 : rolle::$layer_params['kartierebenenfilter']);
 		$select_columns['e_datum'] = 'NULL';
 		$select_columns['l_datum'] = 'NULL';
 		// $select_columns['bogenart_id'] = 3;
@@ -82,7 +83,7 @@
 			
 		}
 		else {
-			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neues Verlustobjekt!<br>Hinweis: Wählen Sie immer vor der Übernahme unter Einstellungen die Kampagne und Kartiergebiet in die übernommen werden soll.');
+			$this->add_message('error', 'Fehler beim Eintragen des Datensatzes als neues Verlustobjekt!<br>Hinweis: Wählen Sie immer vor der Übernahme unter Einstellungen die Kampagne, das Kartiergebiet und die Kartierebene in die übernommen werden soll.');
 			$fehler = true;
 		}
 	}

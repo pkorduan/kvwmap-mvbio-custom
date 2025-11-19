@@ -23,80 +23,80 @@
 	$allowed_users = array(1, 8, 47, 237);
 
 	switch ($this->formvars['action']) {
-		case 'archiv_boegen_einzeln_nach_bogenart' : {
-			if (!$this->Stelle->id == 3 OR !in_array($this->user->id, $allowed_users)) {
-				throw new Exception('Sie haben keine Berechtigung, um Bögen zu archivieren!');
-			}
-			$this->sanitize(array(
-				'archivkartiergebiet_id' => 'int',
-				'set_active' => 'boolean',
-				'pruefer' => 'text'
-			));
+		// case 'archiv_boegen_einzeln_nach_bogenart' : {
+		// 	if (!$this->Stelle->id == 3 OR !in_array($this->user->id, $allowed_users)) {
+		// 		throw new Exception('Sie haben keine Berechtigung, um Bögen zu archivieren!');
+		// 	}
+		// 	$this->sanitize(array(
+		// 		'archivkartiergebiet_id' => 'int',
+		// 		'set_active' => 'boolean',
+		// 		'pruefer' => 'text'
+		// 	));
 
-			if (!(array_key_exists('archivkartiergebiet_id', $this->formvars))) {
-				throw new Exception('Archivkartiergebiet nicht angegeben!');
-			}
+		// 	if (!(array_key_exists('archivkartiergebiet_id', $this->formvars))) {
+		// 		throw new Exception('Archivkartiergebiet nicht angegeben!');
+		// 	}
 
-			if ($this->formvars['archivkartiergebiet_id'] == '') {
-				throw new Exception('Archivkartiergebiet-ID ist leer!');
-			}
+		// 	if ($this->formvars['archivkartiergebiet_id'] == '') {
+		// 		throw new Exception('Archivkartiergebiet-ID ist leer!');
+		// 	}
 
-			$obj = new PgObject($this, 'archiv', 'kartiergebiete');
-			$akg = $obj->find_by('id', $this->formvars['archivkartiergebiet_id']);
-			if ($akg->data === false) {
-				throw new Exception('Archivkartiergebiet mit id: ' . $this->formvars['archivkartiergebiet_id'] . ' nicht gefunden!');
-			}
+		// 	$obj = new PgObject($this, 'archiv', 'kartiergebiete');
+		// 	$akg = $obj->find_by('id', $this->formvars['archivkartiergebiet_id']);
+		// 	if ($akg->data === false) {
+		// 		throw new Exception('Archivkartiergebiet mit id: ' . $this->formvars['archivkartiergebiet_id'] . ' nicht gefunden!');
+		// 	}
 
-			if (!(array_key_exists('bogenart_id', $this->formvars))) {
-				throw new Exception('Bogenart-ID nicht angegeben!');
-			}
+		// 	if (!(array_key_exists('bogenart_id', $this->formvars))) {
+		// 		throw new Exception('Bogenart-ID nicht angegeben!');
+		// 	}
 
-			if ($this->formvars['bogenart_id'] == '') {
-				throw new Exception('Bogenart-ID ist leer!');
-			}
+		// 	if ($this->formvars['bogenart_id'] == '') {
+		// 		throw new Exception('Bogenart-ID ist leer!');
+		// 	}
 
-			$obj = new PgObject($this, 'mvbio', 'bogenarten');
-			$ba = $obj->find_by('id', $this->formvars['bogenart_id']);
-			if ($ba->data === false) {
-				throw new Exception('Bogenart mit id: ' . $this->formvars['bogenart_id'] . ' nicht gefunden!');
-			}
+		// 	$obj = new PgObject($this, 'mvbio', 'bogenarten');
+		// 	$ba = $obj->find_by('id', $this->formvars['bogenart_id']);
+		// 	if ($ba->data === false) {
+		// 		throw new Exception('Bogenart mit id: ' . $this->formvars['bogenart_id'] . ' nicht gefunden!');
+		// 	}
 
-			$ab = new PgObject($this, 'mvbio', $ba->get('archivtabelle') . '4archiv');
-			if ($ba->get_id() == 3) {
-				// Verlustbögen
-				$obj = new PgObject($this, 'archiv', 'kartierebenen2kampagne');
-				$ke = $obj->find_by('kampagne_id', $akg->get('kampagne_id'));
-				if ($ke->data === false) {
-					throw new Exception('Kartierebene von Kampagne id: ' . $akg->get('kampagne_id') . ' nicht gefunden!');
-				}
-				$akg->set('kartierebene_id', $ke->get('kartierebene_id'));
-				$boegen = $ab->find_where("kartiergebiet_id = " . $this->formvars['archivkartiergebiet_id'] . " AND kartierebene_id = " . $ke->get('kartierebene_id'));
-			}
-			else{
-				$boegen = $ab->find_where("kartiergebiet_id = " . $this->formvars['archivkartiergebiet_id']);
-			};
+		// 	$ab = new PgObject($this, 'mvbio', $ba->get('archivtabelle') . '4archiv');
+		// 	if ($ba->get_id() == 3) {
+		// 		// Verlustbögen
+		// 		$obj = new PgObject($this, 'archiv', 'kartierebenen2kampagne');
+		// 		$ke = $obj->find_by('kampagne_id', $akg->get('kampagne_id'));
+		// 		if ($ke->data === false) {
+		// 			throw new Exception('Kartierebene von Kampagne id: ' . $akg->get('kampagne_id') . ' nicht gefunden!');
+		// 		}
+		// 		$akg->set('kartierebene_id', $ke->get('kartierebene_id'));
+		// 		$boegen = $ab->find_where("kartiergebiet_id = " . $this->formvars['archivkartiergebiet_id'] . " AND kartierebene_id = " . $ke->get('kartierebene_id'));
+		// 	}
+		// 	else{
+		// 		$boegen = $ab->find_where("kartiergebiet_id = " . $this->formvars['archivkartiergebiet_id']);
+		// 	};
 
-			if (count($boegen) == 0) {
-				throw new Exception('Keine zugeordneten Bögen zum Archivkartiergebiet Id: ' . $this->formvars['archivkartiergebiet_id'] . ' gefunden!');
-			}
+		// 	if (count($boegen) == 0) {
+		// 		throw new Exception('Keine zugeordneten Bögen zum Archivkartiergebiet Id: ' . $this->formvars['archivkartiergebiet_id'] . ' gefunden!');
+		// 	}
 
-			if (!(array_key_exists('pruefer', $this->formvars))) {
-				throw new Exception('Prüfer nicht angegeben!');
-			}
+		// 	if (!(array_key_exists('pruefer', $this->formvars))) {
+		// 		throw new Exception('Prüfer nicht angegeben!');
+		// 	}
 
-			if ($this->formvars['pruefer'] == '') {
-				throw new Exception('Prüfer ist leer!');
-			}
+		// 	if ($this->formvars['pruefer'] == '') {
+		// 		throw new Exception('Prüfer ist leer!');
+		// 	}
 
-			if (!(array_key_exists('set_active', $this->formvars))) {
-				throw new Exception('Der Parameter set_active ist nicht angegeben!');
-			}
+		// 	if (!(array_key_exists('set_active', $this->formvars))) {
+		// 		throw new Exception('Der Parameter set_active ist nicht angegeben!');
+		// 	}
 
-			$archiv_function = 'archiv_' . $ba->get('archivtabelle');
-			$result = $archiv_function($this, $akg, $this->formvars['pruefer'], $this->formvars['set_active']);
+		// 	$archiv_function = 'archiv_' . $ba->get('archivtabelle');
+		// 	$result = $archiv_function($this, $akg, $this->formvars['pruefer'], $this->formvars['set_active']);
 
-			echo json_encode($result);
-		} break;
+		// 	echo json_encode($result);
+		// } break;
 
 		case 'archiv_boegen' : {
 			if (!$this->Stelle->id == 3 OR !in_array($this->user->id, $allowed_users)) {
@@ -140,24 +140,25 @@
 			$success = true;
 			$msg = '';
 			$ke = get_kartierebene($this, $akg->get('kampagne_id'));
+			$ak = get_archivkampagne($this, $akg->get('kampagne_id'));
+			$result = is_flaechendeckend($this, $akg);
+			$flaechendeckend = $result['flaechendeckend'];
+			$msg .= 'Archivierung flächendeckend: ' . ($flaechendeckend ? 'ja' : 'nein') . '<br>';
 			foreach ($bogenarten AS $ba) {
 				$ab = new PgObject($this, 'mvbio', $ba->get('archivtabelle') . '4archiv');
 				if ($ba->get_id() == 3) {
 					// Verlustbögen
 					$akg->set('kartierebene_id', $ke->get('id'));
-					$boegen = $ab->find_where("kartiergebiet_id = " . $this->formvars['archivkartiergebiet_id'] . " AND kartierebene_id = " . $ke->get('kartierebene_id'));
 				}
-				else {
-					$boegen = $ab->find_where("kartiergebiet_id = " . $this->formvars['archivkartiergebiet_id']);
-				};
+				$boegen = $ab->find_where("kartiergebiet_id = " . $this->formvars['archivkartiergebiet_id']);
 
 				if (count($boegen) > 0) {
-					if ($ba->get('id') == 2 AND $ke->get('abk') == 'LRT') {
-						$result = archiv_bewertungsboegen($this, $akg);
+					if ($ba->get('id') == 2 AND in_array($ke->get('abk'), array('LRT', 'BLRTK'))) {
+						$result = archiv_bewertungsboegen($this, $ak, $akg, $flaechendeckend);
 						$msg .= $result['msg'] . '<br>';
 					}
 					$archiv_function = 'archiv_' . $ba->get('archivtabelle');
-					$result = $archiv_function($this, $akg, $this->formvars['pruefer'], $this->formvars['set_active']);
+					$result = $archiv_function($this, $ak, $akg, $this->formvars['pruefer'], $this->formvars['set_active'], $flaechendeckend);
 					if (!$result['success']) {
 						$msg .= $result['msg'];
 						$success = false;
@@ -385,6 +386,7 @@
 			}
 
 			$this->sanitize(array(
+				'kampange_id' => 'int',
 				'archivkartiergebiet_id' => 'int'
 			));
 
@@ -396,6 +398,15 @@
 				throw new Exception('Archivkartiergebiet-ID ist leer!');
 			}
 
+			// kampagne_id muss angegeben sein.
+			if (!(array_key_exists('kampagne_id', $this->formvars))) {
+				throw new Exception('Kampagne nicht angegeben!');
+			}
+			if ($this->formvars['kampagne_id'] == '') {
+				throw new Exception('Kampagne-ID ist leer!');
+			}
+
+			$kampagne_id = $this->formvars['kampagne_id'];
 			$obj = new PgObject($this, 'mvbio', 'kartiergebiete2archivkartiergebiete');
 			$obj->identifiers = array(
 				array('column' => 'kartiergebiet_id', 'type' => 'integer'),
@@ -568,27 +579,25 @@
 					$result = undo_archiv_boegen($this, $ak, $akg, $ba);
 				};
 
-				if (!$result['success']) {
-					$msg .= '<br>' . $result['msg'];
-				}
-				else {
+				if ($result['success']) {
 					$num_assigned_boegen += $result['num_assigned_boegen'];
 				}
+				$msg .= '<br>' . $result['msg'];
 			}
 
 			if ($result['success']) {
-				// Fotos aus den Archivverzeichnissen löschen
+				// Dateien aus den Archivverzeichnissen löschen
 				if ($ak->get('abk') !== '' AND $akg->get('bezeichnung') !== '') {
-					$msg .= 'Lösche Fotos aus dem Archivverzeichnis:<br>';
-					array_map('unlink', glob('/var/www/data/mvbio/archivfotos/' . $ak->get('abk') . '/' . $akg->get('bezeichnung') . '/*'));
+					$msg .= '<br>Lösche Fotos aus dem Archivverzeichnis:<br>';
 					$msg .= '/var/www/data/mvbio/archivfotos/' . $ak->get('abk') . '/' . $akg->get('bezeichnung') . '/<br>';
+					array_map('unlink', glob('/var/www/data/mvbio/archivfotos/' . $ak->get('abk') . '/' . $akg->get('bezeichnung') . '/*'));
+
 					if (!empty(array_filter($bogenarten, fn($a) => $a->get_id() == 3))) {
-						$msg .= 'Lösche Verlustbogenfotos aus dem Archivverzeichnis:<br>';
+						$msg .= '<br>Lösche Verlustbogenfotos aus dem Archivverzeichnis:<br>';
 						array_map('unlink', glob('/var/www/data/mvbio/archivfotos_verlustboegen/' . $ak->get('abk') . '/' . $akg->get('bezeichnung') . '/*'));
 						$msg .= '/var/www/data/mvbio/archivfotos_verlustboegen/' . $ak->get('abk') . '/' . $akg->get('bezeichnung') . '/<br>';
 					}
 				}
-				$msg .= $result['msg'] . '<br>';
 			}
 
 			echo json_encode(array(
@@ -655,13 +664,13 @@
 		}
 	}
 
-	function archiv_bewertungsboegen($gui, $akg) {
+	function archiv_bewertungsboegen($gui, $ak, $akg, $flaechendeckend) {
 		$final_result = array('success' => true);
 		$obj = new PgObject($gui, 'mvbio', 'lrt_gruppen');
 		$lrt_gruppen = $obj->find_where('id < 6');
 		foreach($lrt_gruppen AS $lrt_gruppe) {
 			$archiv_function = 'archiv_bewertungsboegen_' . $lrt_gruppe->get('tabelle_postfix');
-			$result = $archiv_function($gui, $akg, $lrt_gruppe);
+			$result = $archiv_function($gui, $ak, $akg, $lrt_gruppe, $flaechendeckend);
 			if (!$result['success']) {
 				return $result;
 			}
@@ -671,7 +680,7 @@
 		return $final_result;
 	}
 
-	function archiv_bewertungsboegen_fliessgewaesser($gui, $akg, $lrt_gruppe) {
+	function archiv_bewertungsboegen_fliessgewaesser($gui, $ak, $akg, $lrt_gruppe, $flaechendeckend = true) {
 		$msg = '';
 		$sql = "
 			INSERT INTO archiv.lrt_objekte_" . $lrt_gruppe->get('tabelle_postfix') . " (
@@ -723,7 +732,7 @@
 		);
 	}
 
-	function archiv_bewertungsboegen_kueste($gui, $akg, $lrt_gruppe) {
+	function archiv_bewertungsboegen_kueste($gui, $ak, $akg, $lrt_gruppe, $flaechendeckend = true) {
 		$msg = '';
 		$sql = "
 			INSERT INTO archiv.lrt_objekte_" . $lrt_gruppe->get('tabelle_postfix') . " (
@@ -785,7 +794,7 @@
 		);
 	}
 
-	function archiv_bewertungsboegen_marine($gui, $akg, $lrt_gruppe) {
+	function archiv_bewertungsboegen_marine($gui, $ak, $akg, $lrt_gruppe, $flaechendeckend = true) {
 		$msg = '';
 		$sql = "
 			INSERT INTO archiv.lrt_objekte_" . $lrt_gruppe->get('tabelle_postfix') . " (
@@ -831,7 +840,7 @@
 		);
 	}
 
-	function archiv_bewertungsboegen_moore($gui, $akg, $lrt_gruppe) {
+	function archiv_bewertungsboegen_moore($gui, $ak, $akg, $lrt_gruppe, $flaechendeckend = true) {
 		$msg = '';
 		$sql = "
 			INSERT INTO archiv.lrt_objekte_" . $lrt_gruppe->get('tabelle_postfix') . " (
@@ -887,7 +896,7 @@
 		);
 	}
 
-	function archiv_bewertungsboegen_offenland($gui, $akg, $lrt_gruppe) {
+	function archiv_bewertungsboegen_offenland($gui, $ak, $akg, $lrt_gruppe, $flaechendeckend = true) {
 		$msg = '';
 		$sql = "
 			INSERT INTO archiv.lrt_objekte_" . $lrt_gruppe->get('tabelle_postfix') . " (
@@ -942,7 +951,7 @@
 		);
 	}
 
-	function archiv_bewertungsboegen_stillgewaesser($gui, $akg, $lrt_gruppe) {
+	function archiv_bewertungsboegen_stillgewaesser($gui, $ak, $akg, $lrt_gruppe, $flaechendeckend = true) {
 		$msg = '';
 		$sql = "
 			INSERT INTO archiv.lrt_objekte_" . $lrt_gruppe->get('tabelle_postfix') . " (
@@ -1000,7 +1009,7 @@
 		);
 	}
 
-	function archiv_bewertungsboegen_waelder($gui, $akg, $lrt_gruppe) {
+	function archiv_bewertungsboegen_waelder($gui, $ak, $akg, $lrt_gruppe, $flaechendeckend = true) {
 		$msg = '';
 		$sql = "
 			INSERT INTO archiv.lrt_objekte_" . $lrt_gruppe->get('tabelle_postfix') . " (
@@ -1046,10 +1055,64 @@
 		);
 	}
 
-	function archiv_gruenlandboegen($gui, $akg, $pruefer, $set_active) {
+	function archiv_gruenlandboegen($gui, $ak, $akg, $pruefer, $set_active, $flaechendeckend = true) {
+		$sql = '';
+		$msg = '';
 		$current_timestamp = date('Y-m-d H:i:s');
-		$select_aktuell = ($set_active ? "true" : "false");
-		$select_aktuell_seit = ($set_active ? "'" . $current_timestamp . "'" : "NULL");
+		if ($set_active) {
+			$select_aktuell = "true";
+			$select_aktuell_seit = "'" . $current_timestamp . "'";
+			// Setze existierende Erfassungsbögen im Archivkartiergebiet auf unaktuell und unaktuell_seit auf current_timestamp
+			// ToDo Bei flaechendeckend = false nur die Vorgänger und die zu archivierenden auf unaktuell setzen.
+			if ($flaechendeckend) {
+				$sql .= "
+					UPDATE
+						archiv.gruenlandboegen
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					WHERE
+						ST_Within(ST_PointOnSurface(geom), (SELECT geom FROM archiv.kartiergebiete WHERE id = " . $akg->get_id() . "));
+				";
+			}
+			else {
+				$sql .= "
+					UPDATE
+						archiv.gruenlandboegen gb
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					FROM
+						mvbio.gruenlandboegen4archiv gb4a
+					WHERE
+						gb4a.kartiergebiet_id = " . $akg->get_id() . " AND
+						gb.id = gb4a.vorgaenger_id;
+
+					UPDATE
+						archiv.gruenlandboegen gb
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					FROM
+						(
+							SELECT
+								unnest(zusammengefasste_ids) AS vorgaenger_bogen_id
+							FROM
+								mvbio.gruenlandboegen4archiv
+							WHERE
+								zusammengefasste_ids IS NOT NULL AND
+								kartiergebiet_id = " . $akg->get_id() . "
+						) gb4a
+					WHERE
+						gb.id = gb4a.vorgaenger_bogen_id;
+				";
+			}
+		}
+		else {
+			$select_aktuell = "false";
+			$select_aktuell_seit = "NULL";
+		}
+
 		$sql = "
 			-- gruenlandboegen
 			INSERT INTO archiv.gruenlandboegen (
@@ -1077,6 +1140,7 @@
 				aktuell,
 				aktuell_seit,
 				unaktuell_seit,
+				hat_pdf_bogen,
 				geom
 			)
 			SELECT
@@ -1104,6 +1168,7 @@
 				false AS aktuell,
 				NULL AS aktuell_seit,
 				NULL AS unaktuell_seit,
+				true AS hat_pdf_bogen,
 				geom
 			FROM
 				mvbio.gruenlandboegen4archiv
@@ -1320,26 +1385,65 @@
 	 * @params GUI $gui
 	 * @params PgObject $akg Archivkartiergebiet-Objekt
 	 */
-	function archiv_grundboegen($gui, $akg, $pruefer, $set_active) {
+	function archiv_grundboegen($gui, $ak, $akg, $pruefer, $set_active, $flaechendeckend = true) {
 		$sql = '';
+		$msg = '';
 		$current_timestamp = date('Y-m-d H:i:s');
+
 		if ($set_active) {
 			$select_aktuell = "true";
 			$select_aktuell_seit = "'" . $current_timestamp . "'";
+			$update_bvz_nr = get_update_bvz_nr_sql($akg->get_id(), 'grundboegen');
 			// Setze existierende Erfassungsbögen im Archivkartiergebiet auf unaktuell und unaktuell_seit auf current_timestamp
-			$sql .= "
-				UPDATE
-					archiv.grundboegen
-				SET
-					aktuell = false,
-					unaktuell_seit = '" . $current_timestamp . "'
-				WHERE
-					ST_Within(ST_PointOnSurface(geom), (SELECT geom FROM archiv.kartiergebiete WHERE id = " . $akg->get_id() . "));
-			";
+			// ToDo Bei flaechendeckend = false nur die Vorgänger und die zu archivierenden auf unaktuell setzen.
+			if ($flaechendeckend) {
+				$sql .= "
+					UPDATE
+						archiv.grundboegen
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					WHERE
+						ST_Within(ST_PointOnSurface(geom), (SELECT geom FROM archiv.kartiergebiete WHERE id = " . $akg->get_id() . "));
+				";
+			}
+			else {
+				$sql .= "
+					UPDATE
+						archiv.erfassungsboegen gb
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					FROM
+						mvbio.grundboegen4archiv gb4a
+					WHERE
+						gb4a.kartiergebiet_id = " . $akg->get_id() . " AND
+						gb.id = gb4a.vorgaenger_id;
+
+					UPDATE
+						archiv.erfassungsboegen gb
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					FROM
+						(
+							SELECT
+								unnest(zusammengefasste_ids) AS vorgaenger_bogen_id
+							FROM
+								mvbio.grundboegen4archiv
+							WHERE
+								zusammengefasste_ids IS NOT NULL AND
+								kartiergebiet_id = " . $akg->get_id() . "
+						) gb4a
+					WHERE
+						gb.id = gb4a.vorgaenger_bogen_id;
+				";
+			}
 		}
 		else {
 			$select_aktuell = "false";
 			$select_aktuell_seit = "NULL";
+			$update_bvz_nr = "";
 		}
 
 		$sql .= "
@@ -1356,6 +1460,7 @@
 				beschreibung,
 				substrat_1, substrat_2, substrat_3, substrat_4, substrat_5, substrat_6, substrat_7, substrat_8, substrat_9, substrat_10, trophie_1, trophie_2, trophie_3, trophie_4, trophie_5, wasser_1, wasser_2, wasser_3, wasser_4, wasser_5, wasser_6, wasser_7, wasser_8, wasser_9, relief_1, relief_2, relief_3, relief_4, relief_5, relief_6, relief_7, relief_8, relief_9, relief_10, relief_11, relief_12, exposition_1, exposition_2, exposition_3, exposition_4, exposition_5, exposition_6, exposition_7, exposition_8, nutzintens_1, nutzintens_2, nutzintens_3, nutzintens_4, nutzungsart_1, nutzungsart_2, nutzungsart_3, nutzungsart_4, nutzungsart_5, nutzungsart_6, nutzungsart_7, nutzungsart_8, nutzungsart_9, nutzungsart_10, nutzungsart_11, nutzungsart_12, nutzungsart_13, nutzungsart_14, nutzartzus, umgebung_1, umgebung_2, umgebung_3, umgebung_4, umgebung_5, umgebung_6, umgebung_7, umgebung_8, umgebung_9, umgebung_10, umgebung_11, umgebung_12, umgebung_13, umgebung_14, umgebung_15, umgebung_16, umgebung_17, umgebung_18, umgebung_19, umgebung_20, umgebung_21, umgebung_22, umgebung_23, umgebung_24, umgebung_25, umgebzus,
 				literatur,
+				erhaltung,
 				fauna, e_datum, l_datum,
 				foto,
 				created_at, created_from, updated_at, updated_from,
@@ -1370,10 +1475,11 @@
 				gemeinde_schluessel,
 				aktuell,
 				aktuell_seit,
+				hat_pdf_bogen,
 				geom
 			)
 			SELECT
-				id,
+				gb4a.id AS id,
 				" . $akg->get('kampagne_id') . " AS kampagne_id,
 				" . $akg->get_id() . " AS kartiergebiet_id,
 				kartierebene_id, bogenart_id,
@@ -1384,6 +1490,7 @@
 				beschreibung,
 				substrat_1, substrat_2, substrat_3, substrat_4, substrat_5, substrat_6, substrat_7, substrat_8, substrat_9, substrat_10, trophie_1, trophie_2, trophie_3, trophie_4, trophie_5, wasser_1, wasser_2, wasser_3, wasser_4, wasser_5, wasser_6, wasser_7, wasser_8, wasser_9, relief_1, relief_2, relief_3, relief_4, relief_5, relief_6, relief_7, relief_8, relief_9, relief_10, relief_11, relief_12, exposition_1, exposition_2, exposition_3, exposition_4, exposition_5, exposition_6, exposition_7, exposition_8, nutzintens_1, nutzintens_2, nutzintens_3, nutzintens_4, nutzungsart_1, nutzungsart_2, nutzungsart_3, nutzungsart_4, nutzungsart_5, nutzungsart_6, nutzungsart_7, nutzungsart_8, nutzungsart_9, nutzungsart_10, nutzungsart_11, nutzungsart_12, nutzungsart_13, nutzungsart_14, nutzartzus, umgebung_1, umgebung_2, umgebung_3, umgebung_4, umgebung_5, umgebung_6, umgebung_7, umgebung_8, umgebung_9, umgebung_10, umgebung_11, umgebung_12, umgebung_13, umgebung_14, umgebung_15, umgebung_16, umgebung_17, umgebung_18, umgebung_19, umgebung_20, umgebung_21, umgebung_22, umgebung_23, umgebung_24, umgebung_25, umgebzus,
 				literatur,
+				COALESCE(lo.bea_erhalt, lo.sys_erhalt)::mvbio.erhaltungszustand AS erhaltung,
 				fauna, e_datum, l_datum,
 				foto,
 				created_at, created_from, updated_at, updated_from,
@@ -1398,11 +1505,13 @@
 				gemeinde_schluessel,
 				" . $select_aktuell . " AS aktuell,
 				" . $select_aktuell_seit . " AS aktuell_seit,
+				true AS hat_pdf_bogen,
 				geom
 			FROM
-				mvbio.grundboegen4archiv
+				mvbio.grundboegen4archiv gb4a LEFT JOIN
+				archiv.lrt_objekte lo ON gb4a.lrt_objekt_id = lo.id
 			WHERE
-				kartiergebiet_id = " . $akg->get_id() . ";
+				gb4a.kartiergebiet_id = " . $akg->get_id() . ";
 
 			-- biotoptypen_nebencodes
 			INSERT INTO archiv.biotoptypen_nebencodes (
@@ -1546,6 +1655,8 @@
 				zusammengefasste_ids IS NOT NULL AND
 				kartiergebiet_id = " . $akg->get_id() . ";
 
+			" . $update_bvz_nr . "
+
 			UPDATE
 				mvbio.kartierobjekte ko
 			SET
@@ -1569,6 +1680,17 @@
 		}
 
 		$archived_boegen = $obj->find_where("kartiergebiet_id = " . $akg->get_id() . " AND bogenart_id = 2");
+
+		$result = create_print_jobs($gui, $ak, $archived_boegen);
+		if (!$result['success']) {
+			return array(
+				'success' => false,
+				'msg' => 'Fehler beim Erzeugen der Druckjobs für die PDF-Bögen: ' . $result['msg'],
+				'num_archived_boegen' => 0
+			);
+		}
+
+		$msg .= $result['msg'];
 
 		// Fotos der Grundbögen in Archiv-Verzeichnis verschieben.
 		$obj = new PgObject($gui, 'archiv', 'fotos');
@@ -1599,7 +1721,7 @@
 		}
 		else {
 			if (count($fotos) > 0) {
-				$msg = archiv_fotos($fotos, 'Grundbögen');
+				$msg .= archiv_fotos($fotos, 'Grundbögen');
 			}
 		}
 
@@ -1610,26 +1732,62 @@
 		);
 	}
 
-	function archiv_kurzboegen($gui, $akg, $pruefer, $set_active) {
+	function archiv_kurzboegen($gui, $ak, $akg, $pruefer, $set_active, $flaechendeckend = true) {
 		$sql = '';
 		$current_timestamp = date('Y-m-d H:i:s');
 		if ($set_active) {
 			$select_aktuell = "true";
 			$select_aktuell_seit = "'" . $current_timestamp . "'";
+			$update_bvz_nr = get_update_bvz_nr_sql($akg->get_id(), 'kurzboegen');
 			// Setze existierende Erfassungsbögen im Archivkartiergebiet auf unaktuell und unaktuell_seit auf current_timestamp
-			$sql .= "
-				UPDATE
-					archiv.kurzboegen
-				SET
-					aktuell = false,
-					unaktuell_seit = '" . $current_timestamp . "'
-				WHERE
-					ST_Within(ST_PointOnSurface(geom), (SELECT geom FROM archiv.kartiergebiete WHERE id = " . $akg->get_id() . "));
-			";
+			if ($flaechendeckend) {
+				$sql .= "
+					UPDATE
+						archiv.kurzboegen
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					WHERE
+						ST_Within(ST_PointOnSurface(geom), (SELECT geom FROM archiv.kartiergebiete WHERE id = " . $akg->get_id() . "));
+				";
+			}
+			else {
+				$sql .= "
+					UPDATE
+						archiv.erfassungsboegen eb
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					FROM
+						mvbio.kurzboegen4archiv gb4a
+					WHERE
+						gb4a.kartiergebiet_id = " . $akg->get_id() . " AND
+						eb.id = gb4a.vorgaenger_id;
+
+					UPDATE
+						archiv.erfassungsboegen eb
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					FROM
+						(
+							SELECT
+								unnest(zusammengefasste_ids) AS vorgaenger_bogen_id
+							FROM
+								mvbio.kurzboegen4archiv
+							WHERE
+								zusammengefasste_ids IS NOT NULL AND
+								kartiergebiet_id = " . $akg->get_id() . "
+						) gb4a
+					WHERE
+						eb.id = gb4a.vorgaenger_bogen_id;
+				";
+			}
 		}
 		else {
 			$select_aktuell = "false";
 			$select_aktuell_seit = "NULL";
+			$update_bvz_nr = "";
 		}
 
 		$sql .= "
@@ -1654,6 +1812,7 @@
 				gemeinde_schluessel,
 				aktuell,
 				aktuell_seit,
+				hat_pdf_bogen,
 				geom
 			)
 			SELECT
@@ -1676,6 +1835,7 @@
 				gemeinde_schluessel,
 				" . $select_aktuell . " AS aktuell,
 				" . $select_aktuell_seit . " AS aktuell_seit,
+				true AS hat_pdf_bogen,
 				geom
 			FROM
 				mvbio.kurzboegen4archiv
@@ -1787,6 +1947,8 @@
 				zusammengefasste_ids IS NOT NULL AND
 				kartiergebiet_id = " . $akg->get_id() . ";
 
+			" . $update_bvz_nr . "
+
 			UPDATE
 				mvbio.kartierobjekte ko
 			SET
@@ -1809,6 +1971,17 @@
 		}
 
 		$archived_boegen = $obj->find_where("kartiergebiet_id = " . $akg->get_id() . " AND bogenart_id = 1");
+
+		$result = create_print_jobs($gui, $ak, $archived_boegen);
+		if (!$result['success']) {
+			return array(
+				'success' => false,
+				'msg' => 'Fehler beim Erzeugen der Druckjobs für die PDF-Bögen: ' . $result['msg'],
+				'num_archived_boegen' => 0
+			);
+		}
+
+		$msg .= $result['msg'];
 
 		// Fotos der Kurzboegen in Archiv-Verzeichnis verschieben
 		$obj = new PgObject($gui, 'archiv', 'fotos');
@@ -1839,7 +2012,7 @@
 		}
 		else {
 			if (count($fotos) > 0) {
-				$msg = archiv_fotos($fotos, 'Kurzbögen');
+				$msg .= archiv_fotos($fotos, 'Kurzbögen');
 			}
 		}
 
@@ -1850,7 +2023,11 @@
 		);
 	}
 
-	function archiv_verlustboegen($gui, $akg, $pruefer, $set_active) {
+	/**
+	 * Archiviert Verlustbögen, Parameter $flaechendeckend hier nur weil die Funktion $archiv_function mit
+	 * gleicher Anzahl von Parametern aufgerufen wird und nicht für archiv_verlustboegen unterschieden wird.
+	 */
+	function archiv_verlustboegen($gui, $ak, $akg, $pruefer, $set_active, $flaechendeckend = true) {
 		$current_timestamp = date('Y-m-d H:i:s');
 		$sql .= "
 			-- Setze Bezugsbögen im Archivkartiergebiet auf unaktuell und unaktuell_seit auf current_timestamp
@@ -2046,6 +2223,17 @@
 
 		$archived_boegen = $obj->find_where("kartiergebiet_id = " . $akg->get_id() . " AND bogenart_id = 3");
 
+		$result = create_print_jobs($gui, $ak, $archived_boegen);
+		if (!$result['success']) {
+			return array(
+				'success' => false,
+				'msg' => 'Fehler beim Erzeugen der Druckjobs für die PDF-Bögen: ' . $result['msg'],
+				'num_archived_boegen' => 0
+			);
+		}
+
+		$msg .= $result['msg'];
+
 		// Fotos der Verlustbögen in Archiv-Verzeichnis verschieben
 		$obj = new PgObject($gui, 'archiv', 'fotos_verlustboegen');
 		$fotos = $obj->find_by_sql(array(
@@ -2075,7 +2263,7 @@
 		}
 		else {
 			if (count($fotos) > 0) {
-				$msg = archiv_fotos($fotos, 'Verlustbögen');
+				$msg .= archiv_fotos($fotos, 'Verlustbögen');
 			}
 		}
 
@@ -2116,7 +2304,7 @@
 					'2#118' => 'Daniel Otto' // Contact
 				));
 				// change datei path in archiv.fotos to archiv_datei
-				$result = $foto->update_attr(array("datei = '" . $foto->get('archiv_datei') . ($foto->get('original_name') != '' ? '&' . $foto->get('original_name') : '') . "'"));
+				$result = $foto->update_attr(array("datei = '" . $foto->get('archiv_datei') . "'"));
 				// $msg .= '<br>Msg: ' . $result['msg'];
 			}
 		}
@@ -2334,6 +2522,37 @@
 		);
 	}
 
+	function create_print_jobs($gui, $ak, $boegen) {
+		include_once(CLASSPATH . 'PrintJob.php');
+		foreach($boegen as $bogen) {
+			$obj = new PgObject($gui, 'mvbio', 'bogenarten');
+			$bogenart = $obj->find_by('id', $bogen->get('bogenart_id'));
+			$pj = new PrintJob($gui);
+			$result = $pj->create(array(
+				'layer_id' => $bogenart->get('archiv_layer_id'),
+				'table_alias' => (strpos($bogenart->get('bezeichnung'), 'LRT') === false ? "b" : "lrt"),
+				'table_name' => $bogenart->get('archivtabelle'),
+				'status' => 'beauftragt',
+				'created_from' => $gui->user->Vorname . ' ' . $gui->user->Name,
+				'user_id' =>	$gui->Stelle->default_user_id,
+				'stelle_id' => $gui->Stelle->id,
+				'feature_id' => $bogen->get('id'),
+				'pdf_path' => '/var/www/data/mvbio/boegen/' . $ak->get('abk') . '/' . $bogenart->get('abk') . '/' . $bogen->get('label') . '_' . $bogenart->get('abk') . '.pdf',
+				'ddl_id' => $bogenart->get('ddl_id')
+			));
+			if (!$result['success']) {
+				return array(
+					'success' => false,
+					'msg' => 'Fehler beim Anlegen des Printjobs für Bogen Id: ' . $bogen->get('id') . ' Meldung: ' . $result['msg'] . ' SQL: ' . $result['sql']
+				);
+			}
+		}
+		return array(
+			'success' => true,
+			'msg' => 'Printjobs für ' . count($boegen) . ' Bögen erfolgreich angelegt.<br>'
+		);
+	}
+
 	function get_assigned_boegen($gui, $ba, $akg_id) {
 		$obj = new PgObject($gui, 'mvbio', $ba->get('archivtabelle') . '4archiv');
 		return $obj->find_where("kartiergebiet_id = " . $akg_id);
@@ -2351,6 +2570,15 @@
 			throw new Exception('Kartierebene von Kampagne id: ' . $akg->get('kampagne_id') . ' nicht gefunden!');
 		}
 		return $kartierebene;
+	}
+
+	function get_archivkampagne($gui, $archivkampagne_id) {
+		$obj = new PgObject($gui, 'archiv', 'kampagnen');
+		$archivkampagne = $obj->find_by('id', $archivkampagne_id);
+		if ($archivkampagne->data === false) {
+			throw new Exception('Kartierkampagne id: ' . $archivkampagne_id . ' nicht gefunden!');
+		}
+		return $archivkampagne;
 	}
 
 	function get_unarchived_boegen($gui, $kartiergebiet, $archivkampagne) {
@@ -2377,6 +2605,7 @@
 			'select' => "
 				ke2kk.kartierebene_id,
 				ba.id,
+				ba.abk,
 				ba.bezeichnung,
 				ba.archivtabelle,
 				ba.layer_name_part AS name_plural,
@@ -2390,7 +2619,6 @@
 			'where' => "ke2kk.kampagne_id = " . $akg->get('kampagne_id'),
 			'order' => 'ba.id'
 		));
-
 		// // Frage Bogenart der Verlustobjekte ab.
 		// $result = $obj->find_by_sql(array(
 		// 	'select' => "
@@ -2458,6 +2686,30 @@
 		return $kk;
 	}
 
+	function is_flaechendeckend($gui, $akg) {
+		$msg = '';
+		$obj = new PgObject($gui, 'mvbio', 'kartiergebiete2archivkartiergebiete');
+		$kartiergebiete = $obj->find_by_sql(array(
+			'select' => "kg.id, kg.flaechendeckend",
+			'from' => "mvbio.kartiergebiete2archivkartiergebiete kg2akg JOIN mvbio.kartiergebiete kg ON kg2akg.kartiergebiet_id = kg.id",
+			'where' => "kg2akg.archivkartiergebiet_id  = ". $akg->get_id()
+		));
+		$msg .= "SQL zur Abfrage flächendeckend: " . $obj->sql;
+
+		$flaechendeckend = array_reduce(
+			$kartiergebiete,
+			function($carry, $kg) {
+				return $carry && $kg->get('flaechendeckend') === 't';
+			},
+			true
+		);
+
+		return array(
+			'flaechendeckend' => $flaechendeckend,
+			'msg' => $msg
+		);
+	}
+
 	/**
 	 * Lädt die Kartiergebiete der Kampagne und die zugehörigen Archiv-Kartiergebiete.
 	 * @param $gui
@@ -2491,7 +2743,7 @@
 				'where' => "kartiergebiet_id = " . $kg->get_id(),
 				'group_by' => 'kartiergebiet_id'
 			))[0];
-			$kg->archivierbar = ($kg->sum_kartierobjekte->get('nicht_archivierbar') + $kg->sum_verlustobjekte->get('nicht_archivierbar')) === 0;
+			$kg->archivierbar = $kg->get('flaechendeckend') OR (($kg->sum_kartierobjekte->get('nicht_archivierbar') + $kg->sum_verlustobjekte->get('nicht_archivierbar')) === 0);
 			if ($kg->archivierbar) {
 				foreach ($kk->archivkampagnen AS $akk) {
 					$assigned_archivkartiergebiete = $obj->find_by_sql(array(
@@ -2655,13 +2907,24 @@
 		);
 	}
 
+	/**
+	 * Funktion zum Rückgängigmachen der Archivierung von Bögen
+	 */
 	function undo_archiv_boegen($gui, $ak, $akg, $ba) {
 		$obj = new PgObject($gui, 'mvbio', 'lrt_gruppen');
 		$lrt_gruppen = $obj->find_where('id < 6');
+		$msg = '';
+
+		// Frage die Bögen im Archivkartiergebiet ab, dessen Archivierung rückgängig gemacht werden soll
+		$obj = new PgObject($gui, 'archiv', $ba->get('archivtabelle'));
+		$undo_boegen = $obj->find_where("kartiergebiet_id = " . $akg->get_id());
+		$ak = get_archivkampagne($gui, $akg->get('kampagne_id'));
+
 		$sql = "
 			-- Setze die Bögen die vorher aktuell waren (letztes unaktuell_seit)
 			-- zurück auf aktuell, wenn sie nicht schon aktuell waren und
 			-- die Bögen die aus dem Archiv entfernt werden sollen aktuell waren
+			-- ToDo: Wenn Kariergebiet nicht flaechendeckend nur die Vorgänger wieder auf aktuell setzen.
 			UPDATE
 				archiv." . $ba->get('archivtabelle') . " b
 			SET
@@ -2681,6 +2944,7 @@
 			WHERE
 				NOT b.aktuell AND
 				b.unaktuell_seit = last_aktuell.max_datum AND
+				ST_Within(b.geom, (SELECT kg.geom FROM archiv.kartiergebiete kg WHERE kg.id = " . $akg->get_id() . ")) AND
 				EXISTS (
 					SELECT
 						* 
@@ -2749,6 +3013,16 @@
 				b.kartiergebiet_id = " . $akg->get_id() . " AND
 				h.nachfolger_bogen_id = b.id;
 
+			-- Lösche die Printjobs
+			DELETE FROM
+				public.print_jobs pj
+			USING
+				archiv." . $ba->get('archivtabelle') . " b
+			WHERE
+				b.kartiergebiet_id = " . $akg->get_id() . " AND
+				pj.table_name = '" . $ba->get('archivtabelle') . "' AND
+				pj.feature_id = b.id::text;
+
 			-- Lösche die Bögen
 			DELETE FROM
 				archiv." . $ba->get('archivtabelle') . "
@@ -2775,6 +3049,7 @@
 				ko.id = ab.id AND
 				ab.kartiergebiet_id = " . $akg->get_id() . "
 		";
+		$sql;
 		$obj = new PgObject($gui, 'mvbio', $ba->get('archivtabelle') . '4archiv');
 		$query = $obj->execSQL($sql);
 		if ($query === false) {
@@ -2785,15 +3060,35 @@
 			);
 		}
 
-		$archived_boegen = $obj->find_where("kartiergebiet_id = " . $akg->get_id());
+		foreach($undo_boegen AS $undo_bogen) {
+			// Lösche Vorschaubilder und PDF-Datei des Bogen aus dem Archivverzeichnis
+			// /var/www/data/mvbio/boegen/' || kk.abk || '/' || ba.abk || '/' || b.label || '_' || ba.abk || '.pdf'
+			$jpg_path = '/var/www/data/mvbio/boegen/' . $ak->get('abk') . '/' . $ba->get('abk') . '/' . $undo_bogen->get('label') . '_' . $ba->get('abk') . '_thumb.jpg';
+			if (file_exists($jpg_path)) {
+				$msg .= 'Lösche Vorschaubild: ' . $jpg_path . '<br>';
+				unlink($jpg_path);
+			}
+			$pdf_path = '/var/www/data/mvbio/boegen/' . $ak->get('abk') . '/' . $ba->get('abk') . '/' . $undo_bogen->get('label') . '_' . $ba->get('abk') . '.pdf';
+			if (file_exists($pdf_path)) {
+				$msg .= 'Lösche PDF-Bogen: ' . $pdf_path . '<br>';
+				unlink($pdf_path);
+			}
+		}
+
 		return array(
 			'success' => true,
-			'msg' => 'Archivierung der ' . $ba->get('layer_name_part') . ' in Archivkartiergebiet Id: ' . $akg->get_id() . ' erfolgreich rückgängig gemacht!<p>' . $msg,
-			'num_assigned_boegen' => count($archived_boegen)
+			'msg' => 'Archivierung der ' . $ba->get('name_plural') . ' in Archivkartiergebiet Id: ' . $akg->get_id() . ' erfolgreich rückgängig gemacht!<br>' . $msg,
+			'num_assigned_boegen' => count($undo_boegen)
 		);
 	}
 
 	function undo_archiv_verlustboegen($gui, $ak, $akg, $ba) {
+		// Frage die Verlustbögen im Archivkartiergebiet ab, dessen Archivierung rückgängig gemacht werden soll
+		$obj = new PgObject($gui, 'archiv', 'verlustboegen');
+		$undo_boegen = $obj->find_where("kartiergebiet_id = " . $akg->get_id());
+		$ak = get_archivkampagne($gui, $akg->get('kampagne_id'));
+		$msg = '';
+
 		$sql = "
 			-- Lösche die Nebentabellen der Verlustbögen
 			DELETE FROM
@@ -2840,6 +3135,16 @@
 				vb.kartiergebiet_id = " . $akg->get_id() . " AND
 				eb.id = vb.bezugsbogen_id;
 
+			-- Lösche die Printjobs
+			DELETE FROM
+				public.print_jobs pj
+			USING
+				archiv.verlustboegen vb
+			WHERE
+				vb.kartiergebiet_id = " . $akg->get_id() . " AND
+				pj.table_name = 'verlustboegen' AND
+				pj.feature_id = vb.id::text;
+
 			-- Lösche die Verlustbögen im Archiv
 			DELETE FROM
 				archiv.verlustboegen
@@ -2868,11 +3173,125 @@
 				'msg' => $err_msg . ' in SQL ' . $sql
 			);
 		}
-		$archived_boegen = $obj->find_where("kartiergebiet_id = " . $akg->get_id());
+
+		foreach($undo_boegen AS $undo_bogen) {
+			// Lösche Vorschaubild und PDF-Datei des Bogen aus dem Archivverzeichnis
+			// /var/www/data/mvbio/boegen/' || kk.abk || '/'  || b.giscode || '_VB' || '.pdf'
+			$jpg_path = '/var/www/data/mvbio/boegen/' . $ak->get('abk') . '/VB/' . $undo_bogen->get('label') . '_VB_thumb.jpg';
+			if (file_exists($jpg_path)) {
+				$msg .= 'Lösche Verlustbogenvorschaubild: ' . $jpg_path . '<br>';
+				unlink($jpg_path);
+			}
+
+			$pdf_path = '/var/www/data/mvbio/boegen/' . $ak->get('abk') . '/VB/' . $undo_bogen->get('label') . '_VB' . '.pdf';
+			$msg .= 'Lösche Verlustbogen-PDF: ' . $pdf_path . '<br>';
+			unlink($pdf_path);
+		}
+
 		return array(
 			'success' => true,
-			'msg' => 'Archivierung der ' . $ba->get('layer_name_part') . ' in Archivkartiergebiet Id: ' . $akg->get_id() . ' erfolgreich rückgängig gemacht!<p>' . $msg,
-			'num_assigned_boegen' => count($archived_boegen)
+			'msg' => 'Archivierung der ' . $ba->get('name_plural') . ' in Archivkartiergebiet Id: ' . $akg->get_id() . ' erfolgreich rückgängig gemacht!<br>' . $msg,
+			'num_assigned_boegen' => count($undo_boegen)
 		);
+	}
+	
+	function get_update_bvz_nr_sql($archivkartiergebiet_id, $archivtabelle) {
+		$sql = "
+			WITH
+			-- 1) Ermitteln, welche vorgaenger_id mehrfach vorkommt
+			v AS (
+				SELECT 
+					vorgaenger_id,
+					COUNT(*) AS cnt
+				FROM
+					mvbio." . $archivtabelle . "4archiv
+				WHERE
+					vorgaenger_id IS NOT NULL AND
+					kartiergebiet_id = " . $archivkartiergebiet_id . "
+				GROUP BY
+					vorgaenger_id
+			),
+
+			-- 2) Vorgänger-bvz_nr laden, Multi-/Single-Vorgänger markieren
+			vorg AS (
+				SELECT 
+					i.id,
+					i.gemeinde_schluessel / 1000 AS landkreis_schluessel,
+					i.vorgaenger_id,
+					split_part(t.bvz_nr, '-', 2)::integer AS vorg_bvz_nr,
+					COALESCE(v.cnt, 0) AS cnt
+				FROM mvbio." . $archivtabelle . "4archiv i
+					LEFT JOIN archiv.erfassungsboegen t ON t.id = i.vorgaenger_id
+					LEFT JOIN v ON v.vorgaenger_id = i.vorgaenger_id
+				WHERE
+					i.kartiergebiet_id = " . $archivkartiergebiet_id . "
+			),
+
+			-- 3) Pro Landkkreis die bisher höchste laufende Nummer
+			next_bvz_nr AS (
+				SELECT 
+					b.gemeinde_schluessel / 1000 AS landkreis_schluessel,
+					COALESCE(MAX(split_part(b.bvz_nr, '-', 2)::integer), 0) AS max_bvz_nr
+				FROM
+					archiv.erfassungsboegen b JOIN
+					mvbio." . $archivtabelle . "4archiv a ON b.gemeinde_schluessel / 1000 = a.gemeinde_schluessel / 1000
+				GROUP BY
+					b.gemeinde_schluessel / 1000
+			),
+
+			-- 4) Entscheiden, ob neue bvz_nr benötigt wird
+			resolved AS (
+				SELECT
+					vorg.id,
+					vorg.landkreis_schluessel,
+					vorg.vorg_bvz_nr,
+					CASE
+						WHEN vorg.vorgaenger_id IS NULL THEN 1       -- Fall A
+						WHEN vorg.cnt > 1 THEN 1                     -- Fall C
+						ELSE 0                                       -- Fall B
+					END AS needs_new
+				FROM
+					vorg
+			),
+
+			-- 5a) Nur die Zeilen nummerieren, die needs_new = 1 sind
+			only_new AS (
+				SELECT
+					r.id,
+					ROW_NUMBER() OVER (
+						PARTITION BY r.landkreis_schluessel
+						ORDER BY r.id
+					) AS rn
+				FROM resolved r
+				WHERE r.needs_new = 1
+			),
+
+			-- 5b) final_bvz_nr zusammenbauen
+			numbered_new AS (
+				SELECT
+					r.id,
+					r.landkreis_schluessel,
+					CASE 
+						WHEN r.needs_new = 1 THEN 
+							nl.max_bvz_nr + n.rn
+						ELSE
+							r.vorg_bvz_nr
+					END AS final_bvz_nr
+				FROM resolved r
+					LEFT JOIN only_new n ON n.id = r.id
+					JOIN next_bvz_nr nl ON nl.landkreis_schluessel = r.landkreis_schluessel
+			)
+
+			-- 6) Update archiv." . $archivtabelle . "
+			UPDATE archiv." . $archivtabelle . " b
+			SET
+				bvz_nr = lk.abk || '-' || LPAD(nn.final_bvz_nr::text, 6, '0')
+			FROM
+				numbered_new nn JOIN
+				gebietseinheiten.landkreise lk ON nn.landkreis_schluessel = lk.schluessel
+			WHERE
+				b.id = nn.id;
+		";
+		return $sql;
 	}
 ?>

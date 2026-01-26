@@ -27,7 +27,7 @@
       <tr>
         <td><a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=302&value_kartiergebiet_id=<? echo $kg->get_id(); ?>&operator_kartiergebiet_id==&csrf_token=<? echo $_SESSION['csrf_token']; ?>" title="Kartiergebiet anzeigen"><?php echo $kg->get('id'); ?></a></td>
         <td><?php echo $kg->get('losnummer'); ?></td>
-        <td><?php echo $kg->get('bezeichnung'); ?></td><?php
+        <td><?php echo $kg->get('bezeichnung'); ?><? echo ($kg->get('flaechendeckend') == 't' ? '' : '<br>Einzelarchivierung'); ?></td><?php
         if ($kg->archivierbar) {
           foreach ($kk->archivkampagnen as $archivkampagne) { ?>
             <td><?
@@ -88,7 +88,7 @@ function archivkartiergebietauswahl($kg, $archivkampagne) {
           'output' => $archivkartiergebiet->get('bezeichnung') . ' (' . $archivkartiergebiet->get_id() . ')'
         );
       },
-      array_filter($archivkampagne->archivkartiergebiete, function($archivkartiergebiet) { return !$archivkartiergebiet->is_archiviert; })
+      array_filter($archivkampagne->archivkartiergebiete, function($archivkartiergebiet) use($kg) { return !$archivkartiergebiet->is_archiviert AND ($kg->get('flaechendeckend') == $archivkartiergebiet->get('flaechendeckend')); })
     ), // options
     $assigned_archivkartiergebiet ? $assigned_archivkartiergebiet->get_id() : null, // value
     1, // size

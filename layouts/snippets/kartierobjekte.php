@@ -1,5 +1,4 @@
 <?php include(SNIPPETS . 'generic_layer_editor_2.php'); ?>
-<? if ($this->user->id != 2) { ?>
 <style>
 	.bewertungsFrame {
 		background-color:white;
@@ -90,6 +89,4 @@
 
 	window.addEventListener('load', loaded);
 	window.addEventListener('unload', unloaded);
-</script><?
-}
-?>
+</script>

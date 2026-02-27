@@ -29,7 +29,7 @@
     $language = 'german';
 
     $debug = new Debugger(DEBUGFILE);	# öffnen der Debug-log-datei
-    $log_convert = new LogFile('cron/convert_jobs.log', 'text', 'a');
+    $log_convert = new LogFile(LOGPATH . 'cron/convert_jobs.log', 'text', 'a');
 
     if (LOG_LEVEL > 0) {
       $log_mysql = new LogFile(LOGFILE_MYSQL,'text','Log-Datei MySQL', '#------v: ' . date("Y:m:d H:i:s", time()));
@@ -101,7 +101,6 @@
         else {
           $convert_job->update_attr(array("msg = '" . $result['msg'] . "'", "status = 'fehlerhaft'"));
         }
-        echo "\n" . $result['msg'];
       }
       else {
         $log_convert->write("Keine beauftragte Konvertierung gefunden. Nichts zu tun.\n");

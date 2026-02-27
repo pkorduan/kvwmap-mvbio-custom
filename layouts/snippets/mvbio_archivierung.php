@@ -61,12 +61,12 @@
 			}
 
 			// Query bogenarten die archiviert werden müssen und gehe diese durch.
-			$bogenarten = get_bogenarten($this, $akg);
 			$num_archived_boegen = 0;
 			$success = true;
 			$msg = '';
-			$ke = get_kartierebene($this, $akg->get('kampagne_id'));
 			$ak = get_archivkampagne($this, $akg->get('kampagne_id'));
+			$ke = get_kartierebene($this, $ak);
+			$bogenarten = get_bogenarten($this, $ak);
 			$result = is_flaechendeckend($this, $akg);
 			$flaechendeckend = $result['flaechendeckend'];
 			$msg .= 'Archivierung flächendeckend: ' . ($flaechendeckend ? 'ja' : 'nein') . '<br>';
@@ -74,7 +74,7 @@
 				$ab = new PgObject($this, 'mvbio', $ba->get('archivtabelle') . '4archiv');
 				if ($ba->get_id() == 3) {
 					// Verlustbögen
-					$akg->set('kartierebene_id', $ke->get('id'));
+					$akg->set('kartierebene_id', $ke->get_id());
 				}
 				$boegen = $ab->find_where("kartiergebiet_id = " . $this->formvars['archivkartiergebiet_id']);
 
@@ -305,6 +305,7 @@
 			}
 
 			$kk = get_kartierkampagne($this, $this->formvars['kampagne_id']);
+
 			if (!$kk->get_id()) {
 				throw new Exception('Kampagne mit ID ' . $this->formvars['kampagne_id'] . ' nicht gefunden!');
 			}
@@ -338,26 +339,32 @@
 			}
 
 			$kampagne_id = $this->formvars['kampagne_id'];
-			$obj = new PgObject($this, 'mvbio', 'kartiergebiete2archivkartiergebiete');
-			$obj->identifiers = array(
+			$kg2akg = new PgObject($this, 'mvbio', 'kartiergebiete2archivkartiergebiete');
+			$kg2akg->identifiers = array(
 				array('column' => 'kartiergebiet_id', 'type' => 'integer'),
 				array('column' => 'archivkartiergebiet_id', 'type' => 'integer')
 			);
+
+			// Frage die Archivkampagne ab.
+			$archivkampagne = new PgObject($this, 'archiv', 'kampagnen');
+			$archivkampagne = $archivkampagne->find_by('id', $kampagne_id);
 
 			// Frage das Archivkartiergebiet ab.
 			$archivkartiergebiet = new PgObject($this, 'archiv', 'kartiergebiete');
 			$archivkartiergebiet = $archivkartiergebiet->find_by('id', $this->formvars['archivkartiergebiet_id']);
 
 			// Frage die zum Archivkartiergebiet zugeordneten Kartiergebiete ab.
-			$kartiergebiete = $obj->find_where("archivkartiergebiet_id = " . $this->formvars['archivkartiergebiet_id']);
-			if (count($kartiergebiete) == 0) {
+			$kg2akg = $kg2akg->find_where("archivkartiergebiet_id = " . $this->formvars['archivkartiergebiet_id']);
+			if (count($kg2akg) == 0) {
 				echo 'Keine zugeordneten Kartiergebiete zum Archivkartiergebiet Id: ' . $this->formvars['archivkartiergebiet_id'] . ' gefunden!';
 				exit;
 			}
 
 			$obj = new PgObject($this, 'mvbio', 'kartiergebiete');
-			$bogenarten = get_bogenarten($this, $archivkartiergebiet);
-			$kartierebene = get_kartierebene($this, $archivkartiergebiet->get('kampagne_id'));
+			$kartiergebiet = $obj->find_by('id', $kg2akg[0]->get('kartiergebiet_id'));
+			$kartierkampagne_id = $kartiergebiet->get('kampagne_id');
+			$bogenarten = get_bogenarten($this, $archivkampagne);
+			$kartierebene = get_kartierebene($this, $archivkampagne);
 
 			foreach ($bogenarten as $ba) {
 				// mvbio.kurzboegen4archiv
@@ -371,6 +378,7 @@
 						kg.id,
 						kg.losnummer,
 						kg.bezeichnung,
+						kg.kampagne_id,
 						count(*) AS anzahl_boegen
 					",
 					'from' => "
@@ -487,27 +495,25 @@
 				throw new Exception('Archivkartiergebiet mit id: ' . $this->formvars['archivkartiergebiet_id'] . ' nicht gefunden!');
 			}
 
+			$result = is_flaechendeckend($this, $akg);
+			$flaechendeckend = $result['flaechendeckend'];
+
 			$ak = new PgObject($this, 'archiv', 'kampagnen');
 			$ak = $ak->find_by('id', $akg->get('kampagne_id'));
 
 			// Query bogenarten die archiviert werden müssen und gehe diese durch.
-			$bogenarten = get_bogenarten($this, $akg);
+			$bogenarten = get_bogenarten($this, $ak);
 			$num_assigned_boegen = 0;
 			$success = true;
 			$msg = '';
 			foreach ($bogenarten AS $ba) {
 				if ($ba->get_id() == 3) {
 					// Verlustbögen
-					$obj = new PgObject($this, 'archiv', 'kartierebenen2kampagne');
-					$ke = $obj->find_by('kampagne_id', $akg->get('kampagne_id'));
-					if ($ke->data === false) {
-						throw new Exception('Kartierebene von Kampagne id: ' . $akg->get('kampagne_id') . ' nicht gefunden!');
-					}
-					$akg->set('kartierebene_id', $ke->get('kartierebene_id'));
+					$akg->set('kartierebene_id', $ak->get('kartierebene_id'));
 					$result = undo_archiv_verlustboegen($this, $ak, $akg, $ba);
 				}
 				else {
-					$result = undo_archiv_boegen($this, $ak, $akg, $ba);
+					$result = undo_archiv_boegen($this, $ak, $akg, $ba, $flaechendeckend);
 				};
 
 				if ($result['success']) {
@@ -997,60 +1003,8 @@
 		$sql = '';
 		$msg = '';
 		$current_timestamp = date('Y-m-d H:i:s');
-		if ($set_active) {
-			$select_aktuell = "true";
-			$select_aktuell_seit = "'" . $current_timestamp . "'";
-			// Setze existierende Erfassungsbögen im Archivkartiergebiet auf unaktuell und unaktuell_seit auf current_timestamp
-			// ToDo Bei flaechendeckend = false nur die Vorgänger und die zu archivierenden auf unaktuell setzen.
-			if ($flaechendeckend) {
-				$sql .= "
-					UPDATE
-						archiv.gruenlandboegen
-					SET
-						aktuell = false,
-						unaktuell_seit = '" . $current_timestamp . "'
-					WHERE
-						ST_Within(ST_PointOnSurface(geom), (SELECT geom FROM archiv.kartiergebiete WHERE id = " . $akg->get_id() . "));
-				";
-			}
-			else {
-				$sql .= "
-					UPDATE
-						archiv.gruenlandboegen gb
-					SET
-						aktuell = false,
-						unaktuell_seit = '" . $current_timestamp . "'
-					FROM
-						mvbio.gruenlandboegen4archiv gb4a
-					WHERE
-						gb4a.kartiergebiet_id = " . $akg->get_id() . " AND
-						gb.id = gb4a.vorgaenger_id;
-
-					UPDATE
-						archiv.gruenlandboegen gb
-					SET
-						aktuell = false,
-						unaktuell_seit = '" . $current_timestamp . "'
-					FROM
-						(
-							SELECT
-								unnest(zusammengefasste_ids) AS vorgaenger_bogen_id
-							FROM
-								mvbio.gruenlandboegen4archiv
-							WHERE
-								zusammengefasste_ids IS NOT NULL AND
-								kartiergebiet_id = " . $akg->get_id() . "
-						) gb4a
-					WHERE
-						gb.id = gb4a.vorgaenger_bogen_id;
-				";
-			}
-		}
-		else {
-			$select_aktuell = "false";
-			$select_aktuell_seit = "NULL";
-		}
-
+		// Bei den Grünlandbögen wird die Aktualität nicht berücksichtigt.
+		// Darum ist immer bei allen aktuell = false, aktuell_seit = NULL und unaktuell_seit = NULL
 		$sql = "
 			-- gruenlandboegen
 			INSERT INTO archiv.gruenlandboegen (
@@ -1310,12 +1264,16 @@
 			if ($flaechendeckend) {
 				$sql .= "
 					UPDATE
-						archiv.grundboegen
+						archiv.grundboegen gb
 					SET
 						aktuell = false,
 						unaktuell_seit = '" . $current_timestamp . "'
 					WHERE
-						ST_Within(ST_PointOnSurface(geom), (SELECT geom FROM archiv.kartiergebiete WHERE id = " . $akg->get_id() . "));
+						(
+							gb.kartierebene_id = " . $ak->get('kartierebene_id') . " OR
+							(" . $ak->get('kartierebene_id') . " = 4 AND gb.kartierebene_id IN (1, 2))
+						) AND
+						ST_Within(ST_PointOnSurface(gb.geom), (SELECT geom FROM archiv.kartiergebiete WHERE id = " . $akg->get_id() . "));
 				";
 			}
 			else {
@@ -1540,7 +1498,7 @@
 				mvbio.grundboegen4archiv boegen ON nt.kartierung_id = boegen.id
 			WHERE
 				boegen.kartiergebiet_id = " . $akg->get_id() . ";
-
+				
 			-- bogen_historie
 			INSERT INTO archiv.bogen_historie (vorgaenger_bogen_id, nachfolger_bogen_id, bemerkung, hauptvorgaenger)
 			SELECT
@@ -1579,6 +1537,34 @@
 				boegen.kartiergebiet_id = " . $akg->get_id() . " AND
 				boegen.id = ko.id
 		";
+
+		// Anlegen der Fotos mit neuem ud aus mvbio.fotos in archiv.fotos und neuen Dateinamen
+		// "-- fotos
+		// INSERT INTO archiv.fotos (
+		// 	id,
+		// 	datei,
+		// 	bogen_id,
+		// 	richtung,
+		// 	himmelsrichtung,
+		// 	beschreibung, geom, created_at,
+		// 	e_datum
+		// )
+		// SELECT
+		//   nt.id,
+		// 	Concat_ws('/', '/var/www/data/mvbio/archivfotos', kk.abk, kg.bezeichnung, boegen.label || '-' || LPAD((ROW_NUMBER() OVER (PARTITION BY boegen.id ORDER BY nt.id))::text, 3, '0') || '.jpg') AS datei,
+		// 	boegen.id AS bogen_id,
+		// 	nt.richtung,
+		// 	nt.himmelsrichtung,
+		// 	nt.beschreibung, nt.geom, nt.created_at,
+		// 	nt.exif_erstellungszeit::date AS e_datum
+		// FROM
+		// 	mvbio.fotos nt JOIN
+		// 	mvbio.grundboegen4archiv boegen ON nt.kartierung_id = boegen.id JOIN
+		// 	archiv.kartiergebiete kg ON boegen.kartiergebiet_id = kg.id JOIN
+		// 	archiv.kampagnen kk ON kg.kampagne_id = kk.id
+		// WHERE
+		// 	boegen.kartiergebiet_id = " . $akg->get_id() . ";"
+
 
 		$obj = new PgObject($gui, 'archiv', 'erfassungsboegen');
 		$gui->mvbio_log_file->write('SQL zur Archivierung der ' . $ba->get('bezeichnung') . ': ' . $sql);
@@ -1624,45 +1610,49 @@
 			// Setze existierende Erfassungsbögen im Archivkartiergebiet auf unaktuell und unaktuell_seit auf current_timestamp
 			if ($flaechendeckend) {
 				$sql .= "
-			UPDATE
-				archiv.kurzboegen
-			SET
-				aktuell = false,
-				unaktuell_seit = '" . $current_timestamp . "'
-			WHERE
-				ST_Within(ST_PointOnSurface(geom), (SELECT geom FROM archiv.kartiergebiete WHERE id = " . $akg->get_id() . "));
-		";
+					UPDATE
+						archiv.kurzboegen kb
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					WHERE
+						(
+							kb.kartierebene_id = " . $ak->get('kartierebene_id') . " OR
+							(" . $ak->get('kartierebene_id') . " = 4 AND kb.kartierebene_id IN (1, 2))
+						) AND
+						ST_Within(ST_PointOnSurface(kb.geom), (SELECT geom FROM archiv.kartiergebiete WHERE id = " . $akg->get_id() . "));
+				";
 			}
 			else {
 				$sql .= "
-			UPDATE
-				archiv.erfassungsboegen eb
-			SET
-				aktuell = false,
-				unaktuell_seit = '" . $current_timestamp . "'
-			FROM
-				mvbio.kurzboegen4archiv gb4a
-			WHERE
-				gb4a.kartiergebiet_id = " . $akg->get_id() . " AND
-				eb.id = gb4a.vorgaenger_id;
-
-			UPDATE
-				archiv.erfassungsboegen eb
-			SET
-				aktuell = false,
-				unaktuell_seit = '" . $current_timestamp . "'
-			FROM
-				(
-					SELECT
-						unnest(zusammengefasste_ids) AS vorgaenger_bogen_id
+					UPDATE
+						archiv.erfassungsboegen eb
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
 					FROM
-						mvbio.kurzboegen4archiv
+						mvbio.kurzboegen4archiv gb4a
 					WHERE
-						zusammengefasste_ids IS NOT NULL AND
-						kartiergebiet_id = " . $akg->get_id() . "
-				) gb4a
-			WHERE
-				eb.id = gb4a.vorgaenger_bogen_id;
+						gb4a.kartiergebiet_id = " . $akg->get_id() . " AND
+						eb.id = gb4a.vorgaenger_id;
+
+					UPDATE
+						archiv.erfassungsboegen eb
+					SET
+						aktuell = false,
+						unaktuell_seit = '" . $current_timestamp . "'
+					FROM
+						(
+							SELECT
+								unnest(zusammengefasste_ids) AS vorgaenger_bogen_id
+							FROM
+								mvbio.kurzboegen4archiv
+							WHERE
+								zusammengefasste_ids IS NOT NULL AND
+								kartiergebiet_id = " . $akg->get_id() . "
+						) gb4a
+					WHERE
+						eb.id = gb4a.vorgaenger_bogen_id;
 				";
 			}
 		}
@@ -2124,7 +2114,7 @@
 					'fotos" . ($ba->get_id() === 3 ? '_verlustboegen' : '') . "' AS dst_table,
 					'datei' AS dst_column,
 					'jpeg:extent=" . $max_size . "' AS define_options,
-					'{\"2#003\":\"" . $ba->get('bezeichnung') . "\",\"2#005\":\"' || b.label || '\",\"2#120\":\"Datei Biotopkartierung\",\"2#110\":\"Kartierer der Kampagne\",\"2#116\":\"Created by MVBio\",\"2#118\":\"Daniel Otto\"}' AS exif_data,
+					'{\"2#005\":\"Biotop- und Lebensraumtypenerfassung Mecklenburg-Vorpommern\",\"2#080\":\"LUNG M-V\",\"2#116\":\"Landesamt für Umwelt, Naturschutz und Geologie M-V\",\"2#120\":\"' || b.label || '\"}' AS exif_data,
 					NOW() AS created_at,
 					'" . $gui->user->Vorname . " " . $gui->user->Name . "' AS created_from,
 					" . $gui->user->id . " AS user_id,
@@ -2152,6 +2142,29 @@
 		$num_fotos = $rs['num_fotos'];
 		if ($num_fotos > 0) {
 			$msg = 'Es wurden ' . $num_fotos . ' Konvertierungsjobs für Fotos der Bogenart ' . $ba->get('bezeichnung') . ' im Archivkartiergebiet ' . $akg->get_id() . ' angelegt.';
+
+			// Setze die zukünftigen Dateipfade der Fotos in der Archiv-Tabelle
+			$sql = "
+				UPDATE
+					archiv.fotos" . ($ba->get_id() === 3 ? '_verlustboegen' : '') . " f
+				SET
+					datei = cj.dst_file
+				FROM
+					public.convert_jobs cj
+				WHERE
+					f.datei = cj.src_file AND
+					cj.dst_schema = 'archiv' AND
+					cj.dst_table = 'fotos" . ($ba->get_id() === 3 ? '_verlustboegen' : '') . "' AND
+					cj.dst_column = 'datei'
+			";
+			$ret = $gui->pgdatabase->execSQL($sql, 4, 1, true);
+			if (!$ret['success']) {
+				return array(
+					'success' => false,
+					'msg' => 'Fehler beim Setzen der neuen Pfade auf die Fotos: ' . $ret['msg'],
+					'num_archived_boegen' => 0
+				);
+			}
 		}
 		else {
 			$msg = 'Für Bogenart ' . $ba->get('bezeichnung') . ' gibt es keine Fotos im Archivkartiergebiet ' . $akg->get_id() . '.';
@@ -2411,18 +2424,13 @@
 		return $obj->find_where("kartiergebiet_id = " . $akg_id);
 	}
 
-	function get_kartierebene($gui, $archivkampagne_id) {
-		$obj = new PgObject($gui, 'archiv', 'kartierebenen2kampagne');
-		$kartierebene = $obj->find_by_sql(
-			array(
-				'from' => 'archiv.kartierebenen2kampagne e2k JOIN archiv.kartierebenen e ON e2k.kartierebene_id = e.id',
-				'where' => 'e2k.kampagne_id = ' . $archivkampagne_id
-			)
-		)[0];
-		if ($kartierebene->data === false) {
-			throw new Exception('Kartierebene von Kampagne id: ' . $akg->get('kampagne_id') . ' nicht gefunden!');
+	function get_kartierebene($gui, $ak) {
+		$obj = new PgObject($gui, 'archiv', 'kartierebenen');
+		$ke = $obj->find_by('id', $ak->get('kartierebene_id'));
+		if ($ke->data === false) {
+			throw new Exception('Kartierebene (id: ' . $ak->get('kartierebene_id') . ') von Kampagne (id: ' . $ak->get_id() . ') nicht gefunden!');
 		}
-		return $kartierebene;
+		return $ke;
 	}
 
 	function get_archivkampagne($gui, $archivkampagne_id) {
@@ -2438,8 +2446,8 @@
 		$obj = new PgObject($gui, 'mvbio', 'kartierobjekte');
 		return $obj->find_by_sql(array(
 			'select' => 'count(*) AS num_boegen',
-			'from' => 'mvbio.kartierobjekte ko JOIN mvbio.bogenarten ba ON ko.bogenart_id = ba.id JOIN mvbio.bogenarten2kartierebenen ba2ke ON ba.id = ba2ke.bogenart_id JOIN archiv.kartierebenen2kampagne ke2ak ON ba2ke.kartierebene_id = ke2ak.kartierebene_id',
-			'where' => 'ko.kartierebene_id = ke2ak.kartierebene_id AND ko.kartiergebiet_id = ' . $kartiergebiet->get_id() . ' AND ke2ak.kampagne_id = ' . $archivkampagne->get_id()
+			'from' => 'mvbio.kartierobjekte ko JOIN mvbio.bogenarten2kartierebenen ba2ke ON ko.bogenart_id = ba2ke.bogenart_id AND ko.kartierebene_id = ba2ke.kartierebene_id',
+			'where' => 'ko.kartierebene_id = ' . $archivkampagne->get('kartierebene_id') . ' AND ko.kartiergebiet_id = ' . $kartiergebiet->get_id()
 		));
 	}
 
@@ -2451,12 +2459,12 @@
 	/**
 	 * Fragt die im Archivkartiergebiet $akg vorkommenden Bogenarten der Kartier- und Verlustobjekte ab.
 	 */
-	function get_bogenarten($gui, $akg) {
+	function get_bogenarten($gui, $ak) {
 		// Frage die Bogenarten der Kartierobjekte ab.
 		$obj = new PgObject($gui, 'mvbio', 'bogenarten');
 		$bogenarten = $obj->find_by_sql(array(
 			'select' => "
-				ke2kk.kartierebene_id,
+				ba2ke.kartierebene_id,
 				ba.id,
 				ba.abk,
 				ba.bezeichnung,
@@ -2466,28 +2474,11 @@
 			",
 			'from' => "
 				mvbio.bogenarten2kartierebenen ba2ke JOIN
-				archiv.kartierebenen2kampagne ke2kk ON ba2ke.kartierebene_id = ke2kk.kartierebene_id JOIN
 				mvbio.bogenarten ba ON ba2ke.bogenart_id = ba.id
 			",
-			'where' => "ke2kk.kampagne_id = " . $akg->get('kampagne_id'),
+			'where' => "ba2ke.kartierebene_id = " . $ak->get('kartierebene_id'),
 			'order' => 'ba.id'
 		));
-		// // Frage Bogenart der Verlustobjekte ab.
-		// $result = $obj->find_by_sql(array(
-		// 	'select' => "
-		// 		(SELECT kartierebene_id FROM archiv.kartierebenen2kampagne WHERE kampagne_id = " . $akg->get('kampagne_id') . ") AS kartierebene_id,
-		// 		ba.id,
-		// 		ba.bezeichnung,
-		// 		ba.archivtabelle,
-		// 		ba.layer_name_part AS name_plural,
-		// 		ba.bogen4archiv_layer_id
-		// 	",
-		// 	'from' => "
-		// 		mvbio.bogenarten ba
-		// 	",
-		// 	'where' => "ba.id = 3"
-		// ));
-		// array_push($bogenarten, $result[0]);
 		return $bogenarten;
 	}
 
@@ -2520,11 +2511,11 @@
 	 * @return Kampagne
 	 */
 	function get_kartierkampagne($gui, $kampagne_id) {
-		$obj = new PgObject($gui, 'mvbio', 'kampagnen');
-		$kk = $obj->find_by('id', $kampagne_id);
+		$kk = new PgObject($gui, 'mvbio', 'kampagnen');
+		$kk = $kk->find_by('id', $kampagne_id);
 		// Kartierebenen der Kampagne
-		$obj = new PgObject($gui, 'mvbio', 'kartierebenen');
-		$kk->kartierebenen = $obj->find_by_sql(array(
+		$ke = new PgObject($gui, 'mvbio', 'kartierebenen');
+		$kk->kartierebenen = $ke->find_by_sql(array(
 			'select' => 'ke.id, ke.abk, ke.bezeichnung, ke.bogenarten',
 			'from' => 'mvbio.kartierebenen ke JOIN mvbio.kartierebenen2kampagne k2k ON ke.id = k2k.kartierebene_id',
 			'where' => 'k2k.kampagne_id = ' . $kk->get_id()
@@ -2534,7 +2525,6 @@
 		$kk->archivkampagnen = get_archivkampagnen($gui, $kk->get_id());
 
 		// Kartiergebiete der Kampagne mit dessen zugehörigen Archiv-Kartiergebieten (assigned_archivkartiergebiet)
-		$obj = new PgObject($gui, 'mvbio', 'kartiergebiete');
 		$kk->kartiergebiete = get_kartiergebiete($gui, $kk);
 		return $kk;
 	}
@@ -2762,7 +2752,7 @@
 	/**
 	 * Funktion zum Rückgängigmachen der Archivierung von Bögen
 	 */
-	function undo_archiv_boegen($gui, $ak, $akg, $ba) {
+	function undo_archiv_boegen($gui, $ak, $akg, $ba, $flaechendeckend) {
 		$obj = new PgObject($gui, 'mvbio', 'lrt_gruppen');
 		$lrt_gruppen = $obj->find_where('id < 6');
 		$msg = '';
@@ -2773,42 +2763,81 @@
 
 		$ak = get_archivkampagne($gui, $akg->get('kampagne_id'));
 
-		$sql = "
-			-- Setze die Bögen die vorher aktuell waren (letztes unaktuell_seit)
-			-- zurück auf aktuell, wenn sie nicht schon aktuell waren und
-			-- die Bögen die aus dem Archiv entfernt werden sollen aktuell waren
-			-- ToDo: Wenn Kariergebiet nicht flaechendeckend nur die Vorgänger wieder auf aktuell setzen.
-			UPDATE
-				archiv." . $ba->get('archivtabelle') . " b
-			SET
-				aktuell = true,
-				unaktuell_seit = NULL
-			FROM
-				(
-					SELECT
-						max(unaktuell_seit) AS max_datum
-					FROM
-						archiv." . $ba->get('archivtabelle') . " b JOIN
-						archiv.kartiergebiete kg ON ST_Within(b.geom, kg.geom)
-					WHERE
-						b.kartiergebiet_id != " . $akg->get_id() . " AND
-						kg.id = " . $akg->get_id() . "
-				) last_aktuell
-			WHERE
-				NOT b.aktuell AND
-				b.unaktuell_seit = last_aktuell.max_datum AND
-				ST_Within(b.geom, (SELECT kg.geom FROM archiv.kartiergebiete kg WHERE kg.id = " . $akg->get_id() . ")) AND
-				EXISTS (
-					SELECT
-						* 
-					FROM
-						archiv." . $ba->get('archivtabelle') . "
-					WHERE
-						kartiergebiet_id = " . $akg->get_id() . " AND
-						aktuell
-					LIMIT 1
-				);
+		if ($flaechendeckend) {
+			$sql = "
+				-- Setze die Bögen die vorher aktuell waren (letztes unaktuell_seit)
+				-- zurück auf aktuell, wenn sie nicht schon aktuell waren und
+				-- wenn es im Archivkartiergebiet zu löschende aktuelle Bögen gibt.
+				UPDATE
+					archiv." . $ba->get('archivtabelle') . " b
+				SET
+					aktuell = true,
+					unaktuell_seit = NULL
+				FROM
+					(
+						SELECT
+							max(unaktuell_seit) AS max_datum
+						FROM
+							archiv." . $ba->get('archivtabelle') . " b JOIN
+							archiv.kartiergebiete kg ON ST_Within(ST_PointOnSurface(b.geom), kg.geom)
+						WHERE
+							b.kartiergebiet_id != " . $akg->get_id() . " AND
+							kg.id = " . $akg->get_id() . "
+					) last_aktuell
+				WHERE
+					NOT b.aktuell AND
+					b.unaktuell_seit = last_aktuell.max_datum AND
+					(
+						b.kartierebene_id = " . $ak->get('kartierebene_id') . " OR
+						(" . $ak->get('kartierebene_id') . " = 4 AND b.kartierebene_id IN (1, 2))
+					) AND
+					ST_Within(ST_PointOnSurface(b.geom), (SELECT kg.geom FROM archiv.kartiergebiete kg WHERE kg.id = " . $akg->get_id() . ")) AND
+					EXISTS (
+						SELECT
+							* 
+						FROM
+							archiv." . $ba->get('archivtabelle') . "
+						WHERE
+							kartiergebiet_id = " . $akg->get_id() . " AND
+							aktuell
+						LIMIT 1
+					);
+			";
+		}
+		else {
+			$sql = "
+				UPDATE
+					archiv.erfassungsboegen b
+				SET
+					aktuell = true,
+					unaktuell_seit = NULL
+				FROM
+					mvbio." . $ba->get('archivtabelle') . "4archiv gb4a
+				WHERE
+					gb4a.kartiergebiet_id = " . $akg->get_id() . " AND
+					b.id = gb4a.vorgaenger_id;
 
+				UPDATE
+					archiv.erfassungsboegen b
+				SET
+					aktuell = true,
+					unaktuell_seit = NULL
+				FROM
+					(
+						SELECT
+							unnest(zusammengefasste_ids) AS vorgaenger_bogen_id
+						FROM
+							mvbio." . $ba->get('archivtabelle') . "4archiv
+						WHERE
+							zusammengefasste_ids IS NOT NULL AND
+							kartiergebiet_id = " . $akg->get_id() . "
+					) gb4a
+				WHERE
+					b.id = gb4a.vorgaenger_bogen_id;
+			";
+		}
+
+		$sql .= "
 			DELETE FROM
 				archiv.beeintraechtigungen_gefaehrdungen nt
 			USING

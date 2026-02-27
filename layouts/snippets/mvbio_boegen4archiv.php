@@ -109,5 +109,5 @@
 		<input type="button" value="Rückgängig machen" onclick="undo_archiv_boegen(this);" style="margin-top: 7px"/>
 	</div>
 	<br>
-	<a href="index.php?go=show_snippet&snippet=mvbio_archivierung&action=show_kartiergebiete&kampagne_id=<? echo $kampagne_id; ?>&csrf_token=<? echo $_SESSION['csrf_token']; ?>" title="Anzeige der Zuordnung der Kartiergebiete zu den Archivkartiergebieten" class="link">zur Zuordnung der Kartiergebiete zu den Archivkartiergebieten</a>
+	<a href="index.php?go=show_snippet&snippet=mvbio_archivierung&action=show_kartiergebiete&kampagne_id=<? echo $kartierkampagne_id; ?>&csrf_token=<? echo $_SESSION['csrf_token']; ?>" title="Anzeige der Zuordnung der Kartiergebiete zu den Archivkartiergebieten" class="link">zur Zuordnung der Kartiergebiete zu den Archivkartiergebieten</a>
 </div>

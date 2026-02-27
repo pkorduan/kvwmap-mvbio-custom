@@ -68,6 +68,10 @@
     } ?>
   </tbody>
 </table><?
+function array_sort($array, $callback) {
+  usort($array, $callback);
+  return $array;
+}
 
 function archivkartiergebietauswahl($kg, $archivkampagne) {
   $html = '<div style="width: 273px">';
@@ -88,7 +92,12 @@ function archivkartiergebietauswahl($kg, $archivkampagne) {
           'output' => $archivkartiergebiet->get('bezeichnung') . ' (' . $archivkartiergebiet->get_id() . ')'
         );
       },
-      array_filter($archivkampagne->archivkartiergebiete, function($archivkartiergebiet) use($kg) { return !$archivkartiergebiet->is_archiviert AND ($kg->get('flaechendeckend') == $archivkartiergebiet->get('flaechendeckend')); })
+      array_sort(
+        array_filter($archivkampagne->archivkartiergebiete, function($archivkartiergebiet) use($kg) { return !$archivkartiergebiet->is_archiviert AND ($kg->get('flaechendeckend') == $archivkartiergebiet->get('flaechendeckend')); }),
+        function($a, $b) {
+          return strcmp($a->get('bezeichnung'), $b->get('bezeichnung'));
+        }
+      )
     ), // options
     $assigned_archivkartiergebiet ? $assigned_archivkartiergebiet->get_id() : null, // value
     1, // size

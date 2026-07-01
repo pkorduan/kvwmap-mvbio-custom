@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.css" type="text/css">
 <link rel="stylesheet" href="plugins/xplankonverter/styles/design.css" type="text/css">
 <link rel="stylesheet" href="plugins/xplankonverter/styles/styles.css" type="text/css">
+<link rel="stylesheet" href="<? echo BOOTSTRAPTABLE_PATH; ?>/extensions/filter-control/bootstrap-table-filter-control.min.css">
 
 <script src="<?php echo JQUERY_PATH; ?>jquery-1.12.0.min.js"></script>
 <script src="<?php echo JQUERY_PATH; ?>jquery.base64.js"></script>
@@ -10,6 +11,7 @@
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>bootstrap-table.min.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>extension/bootstrap-table-export.min.js"></script>
 <script src="<?php echo BOOTSTRAPTABLE_PATH; ?>locale/bootstrap-table-de-DE.min.js"></script>
+<script type="text/javascript" src="<? echo BOOTSTRAPTABLE_PATH; ?>/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 
 <script language="javascript" type="text/javascript">
 	$('#gui-table').css('width', '100%');
@@ -126,23 +128,40 @@
 				data-switchable="true"
 			>Kampagne</th>
 			<th
+				data-field="losnummer"
+				data-sortable="true"
+				data-visible="true"
+				data-switchable="true"
+				data-filter-control="input"
+			>Los</th>
+			<th
 				data-field="kartiergebiet_id"
 				data-sortable="true"
 				data-visible="true"
 				data-switchable="true"
+				data-filter-control="input"
 			>Kartiergebiet ID</th>
 			<th
 				data-field="bezeichnung"
 				data-sortable="true"
 				data-visible="true"
 				data-switchable="true"
+				data-filter-control="input"
 			>Kartiergebiet</th>
 			<th
-				data-field="losnummer"
+				data-field="auftragnehmer"
 				data-sortable="true"
 				data-visible="true"
 				data-switchable="true"
-			>Losnummer</th>
+				data-filter-control="select"
+			>Auftragnehmer</th>
+			<th
+				data-field="auftraggeber"
+				data-sortable="true"
+				data-visible="true"
+				data-switchable="true"
+				data-filter-control="select"
+			>Auftraggeber</th>
 			<th
 				data-field="kartiergebiet_id"
 				data-visible="true"

@@ -16,7 +16,7 @@
 		$num_assigned_boegen += count($bogenart->assigned_boegen);
 		$num_archived_boegen += count($bogenart->archived_boegen); ?>
 		<br><span style="font-size: 18px; font-weight: bold"><? echo $bogenart->get('name_plural'); ?> (bogenart_id: <? echo $bogenart->get('id'); ?>)</span>
-		<div id="assigned-div_<? echo $bogenart->get('id'); ?>" class="assigned-div" style="margin-top: 0px; display: <? echo (count($bogenart->archived_boegen) > 0 ? "none" : "block"); ?>">
+		<div id="assigned-div_<? echo $bogenart->get('id'); ?>" class="assigned-div" style="margin-top: 0px; display: <? echo (count($bogenart->archived_boegen) == 0 OR $kartiergebiet->get('flaechendeckend') == 'f' ? "block" : "none"); ?>">
 			Anzahl zugeordnete Bögen gesamt: <span id="num_assigned_boegen_<? echo $bogenart->get('id'); ?>"><? echo count($bogenart->assigned_boegen); ?></span><?
 			if (count($bogenart->assigned_boegen) > 0) { ?>
 				=> <a href="index.php?go=Layer-Suche_Suchen&selected_layer_id=<? echo $bogenart->get('bogen4archiv_layer_id'); ?>&operator_kartiergebiet_id==&value_kartiergebiet_id=<? echo $archivkartiergebiet->get_id(); ?>" title="Anzeige der zu archivierenden Kartierobjekte in der Suchergebnisanzeige in einem neuen Tab" target="_blank" class="link"><? echo $bogenart->get('bezeichnung'); ?>daten anzeigen</a><?
@@ -62,9 +62,14 @@
 			Bereits archivierte Bögen: <span id="num_archived_boegen_<? echo $bogenart->get('id'); ?>"><? echo count($bogenart->assigned_boegen); ?></span>
 		</div><?
 	} ?>
-	<br>
-	<br>
-	<div class="assigned-div" style="display: <? echo ($num_archived_boegen == 0 ? "block" : "none"); ?>">
+	<br><?
+	if ($kartiergebiet->get('flaechendeckend') == 'f') { ?>
+		Einzelobjekt-Archivierung<?
+	} else { ?>
+		Flächendeckende Archivierung<?
+	} ?>
+
+	<div class="assigned-div" style="display: <? echo (($num_archived_boegen == 0 OR $kartiergebiet->get('flaechendeckend') == 'f') ? "block" : "none"); ?>">
 		Gesamtzahl der zur Archivierung zugeordneten Bögen: <span id="num_assigned_boegen"><? echo $num_assigned_boegen; ?></span><?php
 		if (count(array_filter($bogenarten, function($bogenart) { return $bogenart->get('id') == 5; })) > 0) {
 			// Wenn Grünlandbögen dabei sind, set_active checkbox verstecken und nicht einstellbar machen ?>

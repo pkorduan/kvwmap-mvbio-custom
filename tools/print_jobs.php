@@ -28,8 +28,7 @@
     define('DBWRITE', DEFAULTDBWRITE);
     $language = 'german';
 
-    $debug = new Debugger('cron/print_jobs.log', 'text/plain', 'a');
-    $debug->user_funktion = 'admin';
+    $debug = new Debugger(DEBUGFILE);
 
     if (LOG_LEVEL > 0) {
       $log_mysql = new LogFile(LOGFILE_MYSQL,'text','Log-Datei MySQL', '#------v: ' . date("Y:m:d H:i:s", time()));
@@ -80,20 +79,22 @@
     $GUI->Stelle = new stelle($GUI->formvars['stelle_id'], $GUI->database);
     $GUI->user = new user($GUI->formvars['login_name'], 0, $GUI->database);
     $GUI->user->setRolle($GUI->formvars['stelle_id']);
+    $print_jobs = array();
     if ($GUI->formvars['print_job_id'] != '') {
-      $pj = PrintJob::find_by_id($GUI, $GUI->formvars['print_job_id']);
+      $print_jobs[] = PrintJob::find_by_id($GUI, $GUI->formvars['print_job_id']);
     }
     else {
-      $pj = PrintJob::find_next($GUI);
+      $print_jobs = PrintJob::find_next($GUI, 50);
     }
-    if ($pj) {
-      $GUI->debug->write('Printjob ' . $pj->get_id() . ' gefunden.');
+    echo date('Y-d-m H:i:s') . ': ' . count($print_jobs) . " zur Ausführung abgefragt.\n";
+    foreach($print_jobs AS $pj) {
       // Abfrage der Stelle und des Users für den der Druck erfolgen soll
       $GUI->Stelle = new stelle($pj->get('stelle_id'), $GUI->database);
       $user = Nutzer::find_by_id($GUI, $pj->get('user_id'));
       $GUI->user = new user($user->get('login_name'), 0, $GUI->database);
       $GUI->user->setRolle($pj->get('stelle_id'));
       $GUI->user->debug->user_funktion = 'admin';
+      $pj->gui = $GUI;
       $result = $pj->print();
       if ($result['success']) {
         $pj->update_attr(array("printed_at = 'now()'", "status = 'gedruckt'"));
@@ -101,10 +102,7 @@
       else {
         $pj->update_attr(array("msg = '" . $result['msg'] . "'", "status = 'fehlerhaft'"));
       }
-      echo "\n" . $result['msg'];
-    }
-    else {
-      // $GUI->debug->show("No print job found or more than 10 running.\n", true);
+      echo date('Y-d-m H:i:s') . ': ' . $result['msg'] . "\n";
     }
     $GUI->debug->close();
   }

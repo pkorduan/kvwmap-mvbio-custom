@@ -19,7 +19,6 @@
     include(CLASSPATH . 'rolle.php');
     include(CLASSPATH . 'stelle.php');
     include(CLASSPATH . 'users.php');
-    include(CLASSPATH . 'mysql.php');
     include(CLASSPATH . 'postgresql.php');
     include(CLASSPATH . 'PgObject.php');
     include(CLASSPATH . 'Nutzer.php');
@@ -32,20 +31,12 @@
     $debug->user_funktion = 'admin';
 
     if (LOG_LEVEL > 0) {
-      $log_mysql = new LogFile(LOGFILE_MYSQL,'text','Log-Datei MySQL', '#------v: ' . date("Y:m:d H:i:s", time()));
       $log_postgres = new LogFile(LOGFILE_POSTGRES, 'text', 'Log-Datei Postgres', '------v: ' . date("Y:m:d H:i:s", time()));
     }
 
     $GUI = new GUI('', '', ''); // übernimmt $debug aus globaler Variable
 
     // if (!$GUI->is_tool_allowed('only_cli')) exit;
-    $userDb = new database(); // übernimmt auch $debug aus globale Variable
-    $userDb->host = MYSQL_HOST;
-    $userDb->user = MYSQL_USER;
-    $userDb->passwd = MYSQL_PASSWORD;
-    $userDb->dbName = MYSQL_DBNAME;
-    $GUI->database = $userDb;
-    $GUI->database->open();
     $GUI->pgdatabase = new pgdatabase();
     $GUI->pgdatabase->open(2);
 
@@ -77,8 +68,8 @@
     }
 
     $err_msgs = array();
-    $GUI->Stelle = new stelle($GUI->formvars['stelle_id'], $GUI->database);
-    $GUI->user = new user($GUI->formvars['login_name'], 0, $GUI->database);
+    $GUI->Stelle = new stelle($GUI->formvars['stelle_id'], $GUI->pgdatabase);
+    $GUI->user = new user($GUI->formvars['login_name'], 0, $GUI->pgdatabase);
     $GUI->user->setRolle($GUI->formvars['stelle_id']);
     $print_jobs = array();
     if ($GUI->formvars['print_job_id'] != '') {
@@ -90,9 +81,9 @@
     echo date('Y-d-m H:i:s') . ' ' . (count($print_jobs) === 0 ? 'keine Jobs vorhanden' :  count($print_jobs) . ' zur Ausführung gefunden.') . "\n";
     foreach($print_jobs AS $pj) {
       // Abfrage der Stelle und des Users für den der Druck erfolgen soll
-      $GUI->Stelle = new stelle($pj->get('stelle_id'), $GUI->database);
+      $GUI->Stelle = new stelle($pj->get('stelle_id'), $GUI->pgdatabase);
       $user = Nutzer::find_by_id($GUI, $pj->get('user_id'));
-      $GUI->user = new user($user->get('login_name'), 0, $GUI->database);
+      $GUI->user = new user($user->get('login_name'), 0, $GUI->pgdatabase);
       $GUI->user->setRolle($pj->get('stelle_id'));
       $GUI->user->debug->user_funktion = 'admin';
       $pj->gui = $GUI;

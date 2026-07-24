@@ -1,0 +1,17 @@
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2019-12-16_11-10-15_add_trigger_to_count_fotos.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2019-12-16_11-20-20_add_verlustobjekte.sql
+/var/www/apps/kvwmap/custom/layouts/db/mysql/data/2019-12-19_09-12-16_change_layer_related_to_verlust.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2020-01-05_07-48-49_add_fkey-constraints.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2020-01-06_08-33-51_fix_num_foto_trigger_function.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2020-01-07_11-17-35_update_trigger_function_validate_kartierobjekte.sql
+/var/www/apps/kvwmap/custom/layouts/db/mysql/data/2020-02-06_09-51-50_rm_lfd_nr_in_archiv_boegen.sql
+/var/www/apps/kvwmap/custom/layouts/db/mysql/data/2020-02-18_09-30-16_rename_layer_nutzer_add_kartierer.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2020-01-18_17-31-29_enhence_table_defs.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2020-02-23_14-38-14_add_fkey-constraints-archiv.sql
+/var/www/apps/kvwmap/custom/layouts/db/mysql/data/2020-02-26_12-12-16_update_layer_settings.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2020-03-12_12-12-01_update_kartierobjekt_id_in_archiv.sql
+/var/www/apps/kvwmap/custom/layouts/db/mysql/data/2020-03-12_12-13-13_update_kartierobjekt_id_in_archiv.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2020-03-16_17-00-21_change_pflanzenart_id.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2020-03-22_12-01-23_change_relations_to_kartierobjekte_in_archiv.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2020-05-07_12-40-12_add_hcp_in_verlustobjekten.sql
+/var/www/apps/kvwmap/custom/layouts/db/postgresql/schema/2020-06-25_15-04-03_add_fotos_for_verlustboegen.sql

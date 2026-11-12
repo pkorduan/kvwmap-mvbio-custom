@@ -153,9 +153,6 @@
 
 	# Stellen den Filter so ein, dass Kartierer keine Kartierungen von anderen sehen, die noch in der Erfassung sind
 	if ($bearbeitungsstufe_filter == '' AND $user_id_filter == '') {
-		if ($this->user->id == 1) {
-			echo '<br>filter leer:';
-		}
 		$filter = '&searchmask_count=1&value_user_id=' . $this->user->id . '&operator_user_id==&boolean_operator_1=OR&1_value_bearbeitungsstufe=1&1_operator_bearbeitungsstufe=%3E';
 	}
 	else {

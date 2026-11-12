@@ -112,7 +112,7 @@
 		header('Content-Type: text/html; charset=utf-8');
 		include(CLASSPATH . 'Layer.php');
 		$layer = Layer::find_by_name($this, 'Verlustobjekte');
-		$this->formvars['selected_layer_id'] = $layer->get('Layer_ID');
+		$this->formvars['selected_layer_id'] = $layer->get('layer_id');
 		$this->formvars['value_verlustobjekt_id'] = $new_verlustobjekt_id;
 		$this->formvars['operator_verlustobjekt_id'] = '=';
 		$this->GenerischeSuche_Suchen();

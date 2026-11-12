@@ -20,13 +20,11 @@
     include(CLASSPATH . 'stelle.php');
     include(CLASSPATH . 'users.php');
     include(CLASSPATH . 'postgresql.php');
-    include(CLASSPATH . 'PgObject.php');
+    include_once(CLASSPATH . 'PgObject.php');
     include(CLASSPATH . 'Nutzer.php');
     include(CLASSPATH . 'PrintJob.php');
-
     define('DBWRITE', DEFAULTDBWRITE);
     $language = 'german';
-
     $debug = new Debugger(DEBUGFILE);
     $debug->user_funktion = 'admin';
 
@@ -35,11 +33,9 @@
     }
 
     $GUI = new GUI('', '', ''); // übernimmt $debug aus globaler Variable
-
     // if (!$GUI->is_tool_allowed('only_cli')) exit;
     $GUI->pgdatabase = new pgdatabase();
-    $GUI->pgdatabase->open(2);
-
+    $GUI->pgdatabase->open();
     if (isset($argv)) {
       array_shift($argv);
       $_REQUEST = array();
@@ -76,7 +72,7 @@
       $print_jobs[] = PrintJob::find_by_id($GUI, $GUI->formvars['print_job_id']);
     }
     else {
-      $print_jobs = PrintJob::find_next($GUI, 50);
+      $print_jobs = PrintJob::find_next($GUI, 10);
     }
     echo date('Y-d-m H:i:s') . ' ' . (count($print_jobs) === 0 ? 'keine Jobs vorhanden' :  count($print_jobs) . ' zur Ausführung gefunden.') . "\n";
     foreach($print_jobs AS $pj) {
@@ -89,7 +85,7 @@
       $pj->gui = $GUI;
       $result = $pj->print();
       if ($result['success']) {
-        $pj->update_attr(array("printed_at = 'now()'", "status = 'gedruckt'"));
+        $pj->update_attr(array("printed_at = 'now()'", "status = 'gedruckt'", "msg = msg || ' filesize: " . human_filesize($result['pdf_path']) . "'"));
       }
       else {
         $pj->update_attr(array("msg = '" . $result['msg'] . "'", "status = 'fehlerhaft'"));
